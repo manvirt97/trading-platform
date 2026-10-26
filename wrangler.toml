@@ -9,3 +9,11 @@ compatibility_date = "2026-10-01"
 binding = "DB"
 database_name = "rangeform-users"
 database_id = "6aa50056-4a2d-4ba1-8517-da4de248322f"
+
+# Firebase Web SDK identifiers. These are public browser configuration values, not private keys.
+# Google sign-in also requires enabling the provider and authorizing rangeform.pages.dev.
+[vars]
+FIREBASE_PROJECT_ID = "rangeform-7e8d2"
+FIREBASE_API_KEY = "AIzaSyDuW6AYo89yiDQXFQWG_Ea0b3U1iaShbdk"
+FIREBASE_AUTH_DOMAIN = "rangeform-7e8d2.firebaseapp.com"
+FIREBASE_APP_ID = "1:1048284129093:web:d93cc7eda8dc14ea96402c"
