@@ -48,6 +48,56 @@ function direction(x){
  }
 }
 
+
+let scenarioMode='both';
+// Scenarios are geometry calculated from completed historical bars, NOT AI forecasts.
+// The AI text assistant separately evaluates server-verified bars when configured.
+window.drawSignalScenarios=(data,chart)=>{
+ if(!data||!chart?.svg||!chart.priceToY)return;
+ const r=data.indicators||{},last=Number(data.last),high=Number(r.resistance20),low=Number(r.support20),atr=Number(r.atr14);
+ if(![last,high,low,atr].every(Number.isFinite)||last<=0||low<=0||high<low||atr<=0)return;
+ const ns='http://www.w3.org/2000/svg',root=chart.svg;
+ const style=getComputedStyle(document.body);
+ const green=style.getPropertyValue('--green').trim()||'#4d8f79',red=style.getPropertyValue('--red').trim()||'#a96668',muted=style.getPropertyValue('--muted').trim()||'#667';
+ const cx=chart.lastX,end=Math.min(790,chart.plotRight+128);
+ const y=value=>Math.max(chart.plotTop+11,Math.min(chart.plotBottom-10,chart.priceToY(value)));
+ const svg=(tag,attrs,parent=root)=>{
+  const el=document.createElementNS(ns,tag);
+  for(const [key,value] of Object.entries(attrs))el.setAttribute(key,String(value));
+  parent.append(el);return el;
+ };
+ const resistance=y(high),support=y(low);
+ for(const [n,level,color] of [['Resistance',high,green],['Support',low,red]]){
+  const lineY=y(level);
+  if(lineY>chart.plotTop+11&&lineY<chart.plotBottom-10){
+   svg('line',{x1:25,y1:lineY,x2:chart.plotRight,y2:lineY,stroke:color,'stroke-width':1,'stroke-dasharray':'3 7',opacity:.52});
+  }
+ }
+ svg('path',{d:'M'+(chart.plotRight+13)+' '+chart.plotTop+' V'+chart.plotBottom,stroke:muted,'stroke-width':1,'stroke-dasharray':'3 5',opacity:.5});
+ svg('text',{x:chart.plotRight+17,y:chart.plotTop+13,fill:muted,'font-size':10},root).textContent='NEXT BARS?';
+ for(const [kind,target,color,label] of [
+  ['bull',Math.max(last,high)+atr*.8,green,'BULL CASE'],
+  ['bear',Math.max(.01,Math.min(last,low)-atr*.8),red,'BEAR CASE']
+ ]){
+  const g=svg('g',{'data-scenario':kind,opacity:scenarioMode==='both'||scenarioMode===kind?1:.12});
+  const endY=y(target),midX=(cx+end)/2,midY=y((last+target)/2);
+  svg('path',{d:'M'+cx+' '+y(last)+' Q'+midX+' '+midY+' '+end+' '+endY,stroke:color,'stroke-width':2.4,'stroke-dasharray':'7 5','stroke-linecap':'round',fill:'none'},g);
+  svg('circle',{cx:end,cy:endY,r:3.5,fill:color},g);
+  const txt=svg('text',{x:end-2,y:Math.max(chart.plotTop+15,Math.min(chart.plotBottom-8,endY+(kind==='bull'?-10:18))),'text-anchor':'end','font-size':10,'font-weight':700,fill:color},g);
+  txt.textContent=label;
+  const tip=svg('title',{},g);tip.textContent=label+': illustrates the condition if price breaks the prior 20-bar range with appropriate volume. Projected path is NOT a forecast, trading order, or probable return.';
+ }
+};
+function chooseScenario(mode){
+ scenarioMode=['bull','bear','both'].includes(mode)?mode:'both';
+ document.querySelectorAll('[data-scenario-view]').forEach(b=>{
+  const chosen=b.dataset.scenarioView===scenarioMode;b.classList.toggle('selected',chosen);b.setAttribute('aria-pressed',String(chosen));
+ });
+ document.querySelectorAll('#signalChart [data-scenario]').forEach(g=>{
+  g.setAttribute('opacity',scenarioMode==='both'||g.getAttribute('data-scenario')===scenarioMode?'1':'.12');
+ });
+}
+
 function mount(){
  const controls=document.querySelector('#page-signals .controls-panel');
  if(controls&&!$('decisionDeck')){
@@ -89,7 +139,7 @@ window.renderTradeGuide=x=>{
  mount();active=x;const sig=direction(x),ind=x.indicators||{},stamp=x.last_bar_utc||'';
  $('deskSource').textContent=x.source==='twelvedata'?'TWELVE DATA · '+x.interval+' BARS':x.source==='user-csv'?'IMPORTED HISTORICAL DATA':'UNVERIFIED HISTORY';
  $('deskVerdict').dataset.bias=sig.kind;
- $('deskBias').textContent=sig.bias;$('deskLine').textContent=sig.detail;
+ $('deskBias').textContent=sig.bias;$('deskLine').textContent=sig.kind==='wait'&&x.score>=65?'Bullish technical bias, but NOT a verified buy entry. '+sig.reason:sig.kind==='wait'&&x.score<=35?'Bearish technical bias, but NOT a verified sell entry. '+sig.reason:sig.detail;
  $('deskReadiness').textContent=sig.kind==='wait'?(x.score>=65?'BULLISH BIAS · ENTRY NOT CONFIRMED':x.score<=35?'BEARISH BIAS · EXIT NOT CONFIRMED':'NO VERIFIED SETUP'):'CONDITIONAL SETUP · VERIFY BROKER';
  $('deskScore').textContent=x.score+'/100';$('deskPrice').textContent=usd(x.last);
  $('deskTime').textContent=x.interval+' · '+(stamp?new Date(stamp).toLocaleString('en-CA',{timeZone:'America/New_York',month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'})+' ET':'Time unknown');
@@ -145,9 +195,9 @@ async function checkProvider(show){mount();let msg=$('connectionMessage');if(msg
  try{let r=await fetch('/api/status',{cache:'no-store'}),d=await r.json();connected=Boolean(d.twelvedata_configured);enabled=Boolean(d.twelvedata_enabled);if(msg)msg.textContent=enabled?'Provider enabled in Cloudflare. Run the on-demand feed test to verify the API responds.':connected?'API key found, but market data is disabled. Protect the website and set LIVE_DATA_ENABLED=on.':'No provider key detected. Follow the steps above.';
    if(show&&enabled){try{const probe=await fetch('/api/provider-health',{cache:'no-store'}),p=await probe.json();if(msg)msg.textContent=probe.ok&&p.connected?'API RESPONDING · Last dated daily session '+p.latest_daily_session+' · '+p.round_trip_ms+'ms API response. This does not verify real-time exchange data.':'FEED CHECK FAILED · '+(p.message||'Unable to verify historical bars.')}catch{if(msg)msg.textContent='FEED CHECK FAILED · Could not contact provider verification endpoint.'}}
   const live=$('sourceSelect');if(live){if(live.value==='none'&&enabled)live.title='Private provider available only with authorized access';}
-  if(enabled && !liveMode){liveMode=true;/* Public landing never silently exhausts a personal data subscription. */}
+  if(enabled && !liveMode){liveMode=true;const select=$('sourceSelect');if(select?.value==='none')select.value='twelvedata';/* Do not silently fetch data or exhaust provider credits. */}
   if(show){let check=$('checkConnection');if(check){check.classList.add('pressed');setTimeout(()=>check.classList.remove('pressed'),300)}}
  }catch(e){if(msg)msg.textContent='Cannot reach app status API. '+e.message;}
 }
-document.addEventListener('DOMContentLoaded',()=>{mount();checkProvider(false);document.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;b.classList.add('tap-feedback');setTimeout(()=>b.classList.remove('tap-feedback'),300);});});
+document.addEventListener('DOMContentLoaded',()=>{mount();checkProvider(false);document.querySelectorAll('[data-scenario-view]').forEach(btn=>btn.addEventListener('click',()=>chooseScenario(btn.dataset.scenarioView)));$('chartAskAI')?.addEventListener('click',()=>{if(!active){window.toast?.('Analyze a symbol with real market history before asking AI about its chart.','error');return}window.rangeformExperience?.askChart?.(active)});document.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;b.classList.add('tap-feedback');setTimeout(()=>b.classList.remove('tap-feedback'),300);});});
 })();
