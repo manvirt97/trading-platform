@@ -3,7 +3,7 @@
 const $=id=>document.getElementById(id);
 const escape=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const dec=(date)=>{let d=Date.parse(date),age=Date.now()-d;if(!Number.isFinite(age)||age<0)return 'Time unverified';if(age<3600000)return Math.max(1,Math.floor(age/60000))+'m ago';if(age<86400000)return Math.floor(age/3600000)+'h ago';return Math.floor(age/86400000)+'d ago'};
-let newsCache=null,newsLast=0,currentUser=null,auth=null,authReady=false,aiReady=false,fetchSeq=0,commandItems=[],commandIndex=0;
+let newsCache=new Map(),newsLast=0,newsCategory='all',currentUser=null,auth=null,authReady=false,aiReady=false,fetchSeq=0,commandItems=[],commandIndex=0;
 const getJson=async(path,options={})=>{const resp=await fetch(path,{cache:'no-store',...options}),data=await resp.json().catch(()=>({}));if(!resp.ok)throw Error(data.error||'This service is temporarily unavailable');return data};
 const sleepDebounce=(func,delay=160)=>{let id;return(...args)=>{clearTimeout(id);id=setTimeout(()=>func(...args),delay)}};
 async function matches(term){try{return (await getJson('/api/symbol-search?q='+encodeURIComponent(term))).items||[]}catch{return []}}
@@ -26,34 +26,76 @@ async function drawCommand(q){
  if(!commandItems.length){let note=document.createElement('p');note.className='loading-news';note.textContent='No matching company in the curated directory. Search the news topic instead.';root.append(note)}
  commandItems[0]?.classList.add('active');
 }
-function newsMarkup(d){
+const CATEGORY_CONTENT={
+ all:{name:'All markets',subtitle:'Market-moving corporate, policy, and economic coverage.',title:'Read the story. Then read the reaction.',body:'A big headline is not a trade signal. Confirm the timing, affected securities, and whether the chart already reflects the news.',checks:['Is this new information or already priced in?','Do price and trading volume confirm the move?','What can invalidate the thesis?']},
+ earnings:{name:'Earnings',subtitle:'Company earnings, revenue, guidance, and quarterly results.',title:'Earnings move expectations.',body:'A stock can fall after strong results if expectations were even higher. Compare guidance, margins, revisions and earnings-call context.',checks:['Results versus analyst expectations','Guidance and margin outlook','After-hours gaps, spread and liquidity']},
+ rates:{name:'Fed & rates',subtitle:'Central banks, inflation releases, yields and rate policy.',title:'Rate decisions reprice the market.',body:'The surprise versus expectations matters more than the headline rate. Watch Treasury yields, growth stocks, currencies and bond-sensitive sectors.',checks:['Decision versus consensus','Treasury yields and market reaction','Press-conference and guidance surprises']},
+ energy:{name:'Energy',subtitle:'Oil, natural gas, OPEC, pipelines and energy equities.',title:'Energy trades on more than oil.',body:'Crude prices, differentials, refinery margins, supply outages, FX, and corporate cash returns can drive different energy stocks in opposite directions.',checks:['WTI / WCS and gas price moves','Company-specific production and margin exposure','Inventory data, OPEC and geopolitical risk']},
+ canada:{name:'Canada',subtitle:'TSX, Bank of Canada, Canadian equities and economic news.',title:'Connect Canadian news to the TSX.',body:'Canadian sectors respond differently to energy prices, the Canadian dollar, interest rates and cross-border demand.',checks:['TSX sector and CAD reaction','Bank of Canada and employment data','Company earnings and commodity exposure']},
+ technology:{name:'Technology',subtitle:'Semiconductors, AI, software and large-cap technology.',title:'Separate hype from earnings power.',body:'AI demand and product announcements matter, but valuation, growth assumptions, chip supply and positioning determine the market reaction.',checks:['Revenue growth and forward guidance','Chip demand, supply and capital spending','Valuation, positioning and price confirmation']}
+};
+function updateNewsScope(){
+ const def=CATEGORY_CONTENT[newsCategory]||CATEGORY_CONTENT.all;
+ const term=$('newsSymbol').value.trim();
+ $('newsScopeTitle').textContent=def.name+(term?' · '+term:'');
+ $('newsScopeSubtitle').textContent=def.subtitle;
+ $('newsListHeading').textContent=term?'Stories matching '+term:'Latest '+def.name.toLowerCase()+' stories';
+ $('newsInsightTitle').textContent=def.title;
+ $('newsInsightText').textContent=def.body;
+ const checklist=$('newsInsightChecks');checklist.replaceChildren();
+ def.checks.forEach(item=>{const row=document.createElement('div');row.className='news-check';const glyph=document.createElement('span');glyph.textContent='✓';const content=document.createElement('span');content.textContent=item;row.append(glyph,content);checklist.append(row)});
+ document.querySelectorAll('[data-category]').forEach(button=>{const active=button.dataset.category===newsCategory;button.classList.toggle('selected',active);button.setAttribute('aria-pressed',String(active))});
+}
+function newsMarkup(data){
  const dest=$('newsRows');dest.replaceChildren();
- if(!d.items.length){dest.innerHTML='<div class="empty-state"><strong>No verified articles returned for this search.</strong><p>Try a company name or a broader topic. A missing result is not proof there is no news.</p></div>';return}
- d.items.slice(0,24).forEach((item,i)=>{let link;try{link=new URL(item.url);if(link.protocol!=='https:')return}catch{return}
-  const a=document.createElement('a');a.className='news-item news-story';a.href=link.href;a.target='_blank';a.rel='noopener noreferrer';
-  const num=document.createElement('span');num.className='story-number';num.textContent=String(i+1).padStart(2,'0');
-  const main=document.createElement('div'),meta=document.createElement('div'),h=document.createElement('strong'),source=document.createElement('span');
-  meta.className='story-top';meta.textContent=(item.topic||'MARKETS')+' · '+dec(item.date);
-  h.textContent=item.title;source.className='story-source';source.textContent=(item.source||'Public publisher')+' · '+new Date(item.date).toLocaleString(undefined,{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'});
-  main.append(meta,h,source);let arrow=document.createElement('span');arrow.className='news-arrow';arrow.textContent='↗';a.append(num,main,arrow);dest.append(a)
+ if(!data.items.length){
+  const box=document.createElement('div');box.className='empty-state news-empty';
+  const heading=document.createElement('strong');heading.textContent='No matching stories in '+(data.category_label||'this category');
+  const note=document.createElement('p');note.textContent=data.note||'No matching recent headlines were verified. This does not mean there is no market news.';
+  const alt=document.createElement('a');alt.href='https://news.google.com/';alt.target='_blank';alt.rel='noopener noreferrer';alt.textContent='Browse the public news source ↗';
+  box.append(heading,note,alt);dest.append(box);return;
+ }
+ data.items.slice(0,24).forEach((item,i)=>{
+  let url;try{url=new URL(item.url);if(url.protocol!=='https:')return}catch{return}
+  const a=document.createElement('a');a.className='news-item news-story'+(i===0?' featured-news':'');a.href=url.href;a.target='_blank';a.rel='noopener noreferrer';
+  const num=document.createElement('span');num.className='story-number';num.textContent=i===0?'TOP':String(i+1).padStart(2,'0');
+  const main=document.createElement('div'),meta=document.createElement('div'),title=document.createElement('strong'),source=document.createElement('span');
+  meta.className='story-top';meta.textContent=(data.category_label||'MARKETS')+' · '+dec(item.date);
+  title.textContent=item.title;source.className='story-source';source.textContent=(item.source||'Public publisher')+' · '+new Date(item.date).toLocaleString(undefined,{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'});
+  main.append(meta,title,source);const arrow=document.createElement('span');arrow.className='news-arrow';arrow.textContent='↗';
+  a.append(num,main,arrow);dest.append(a)
  })
 }
-async function loadNews(){
- const term=$('newsSymbol').value.trim(),req=++newsLast;
- $('fetchNews').disabled=true;$('newsCount').textContent='UPDATING';
- $('newsRows').innerHTML='<div class="loading-news"><span class="loading-orbit"></span>Searching recent headlines…</div>';
+async function loadNews({refresh=false}={}){
+ const term=$('newsSymbol').value.trim(),category=newsCategory,req=++newsLast;
+ const key=category+'|'+term.toLowerCase();
+ updateNewsScope();
+ const cached=newsCache.get(key);
+ if(!refresh&&cached&&Date.now()-cached.savedAt<90000){renderNews(cached.data);return}
+ $('fetchNews').disabled=true;$('newsCount').textContent='SEARCHING';
+ $('newsRows').innerHTML='<div class="loading-news"><span class="loading-orbit"></span>Finding '+CATEGORY_CONTENT[category].name.toLowerCase()+' headlines from public publishers…</div>';
  try{
-  const data=await getJson('/api/news?'+new URLSearchParams({q:term,region:'CA'}));
+  const data=await getJson('/api/news?'+new URLSearchParams({q:term,category,region:'CA'}));
   if(req!==newsLast)return;
-  $('newsProvider').textContent=data.provider||'Public news';$('newsCount').textContent=data.items.length+' ARTICLES'+(data.availability==='partial'?' · PARTIAL':'');
-  $('newsFoot').textContent=data.note||'Original publication and freshness should be verified.';
-  newsMarkup(data);
-  newsCache=data;
+  newsCache.set(key,{data,savedAt:Date.now()});
+  renderNews(data);
  }catch(e){
   if(req!==newsLast)return;
-  $('newsProvider').textContent='SOURCE UNAVAILABLE';$('newsCount').textContent='RETRY';
-  const root=$('newsRows');root.replaceChildren();let box=document.createElement('div');box.className='empty-state';let title=document.createElement('strong');title.textContent='Public headlines are temporarily unavailable';let note=document.createElement('p');note.textContent=e.message+' — this does not mean the market is quiet.';let link=document.createElement('a');link.href='https://news.google.com/';link.target='_blank';link.rel='noopener noreferrer';link.textContent='Browse Google News directly ↗';box.append(title,note,link);root.append(box);$('newsFoot').textContent='No invented stories or fake “live” alert.'
+  $('newsProvider').textContent='NEWS SOURCES UNAVAILABLE';$('newsCount').textContent='SOURCE ERROR';
+  $('newsFreshness').textContent='Feed unavailable';
+  const root=$('newsRows');root.replaceChildren();const box=document.createElement('div');box.className='empty-state';
+  const title=document.createElement('strong');title.textContent='Could not retrieve verified '+CATEGORY_CONTENT[category].name.toLowerCase()+' headlines';
+  const note=document.createElement('p');note.textContent=e.message+' — no stories were invented or replaced by unrelated categories.';
+  const link=document.createElement('a');link.href='https://news.google.com/';link.target='_blank';link.rel='noopener noreferrer';link.textContent='Browse Google News directly ↗';
+  box.append(title,note,link);root.append(box);$('newsFoot').textContent='Public feeds can become temporarily unavailable.'
  }finally{if(req===newsLast)$('fetchNews').disabled=false}
+}
+function renderNews(data){
+ $('newsProvider').textContent=(data.category_label||'Market')+' / VERIFIED PUBLISHERS';
+ $('newsCount').textContent=data.items.length+' '+(data.items.length===1?'STORY':'STORIES')+(data.availability==='partial'?' · PARTIAL':'');
+ $('newsFreshness').textContent='Checked '+new Date(data.as_of).toLocaleTimeString(undefined,{hour:'numeric',minute:'2-digit'});
+ $('newsFoot').textContent=data.note||'Check original publication timestamps and market impact.';
+ newsMarkup(data)
 }
 async function loadPulse(){
  const root=$('overviewNewsPulse');if(!root)return;
@@ -100,9 +142,9 @@ function bind(){
  $('mobileMore').onclick=()=>window.rangeformSidebar?.open();
  document.querySelectorAll('[data-dock]').forEach(b=>b.onclick=()=>go(b.dataset.dock));
  window.addEventListener('rangeform:navigate',e=>{document.querySelectorAll('[data-dock]').forEach(b=>b.classList.toggle('on',b.dataset.dock===e.detail.page))});
- $('fetchNews').onclick=loadNews;
+ $('fetchNews').onclick=()=>loadNews({refresh:true});
  $('newsSymbol').onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();loadNews()}};
- document.querySelectorAll('[data-topic]').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('[data-topic]').forEach(x=>x.classList.remove('selected'));b.classList.add('selected');$('newsSymbol').value=b.dataset.topic;loadNews()}));
+ document.querySelectorAll('[data-category]').forEach(b=>b.addEventListener('click',()=>{newsCategory=b.dataset.category;$('newsSymbol').value='';loadNews()}));
  $('liveChartGo').onclick=chartGo;
  $('liveChartSearch').onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();chartGo()}};
  const sharedDatalist=document.createElement('datalist');sharedDatalist.id='rangeformSymbols';document.body.append(sharedDatalist);
@@ -118,6 +160,6 @@ function bind(){
  const themeObserver=new MutationObserver(()=>{$('rfTradingChart')?.setAttribute('theme',document.body.dataset.theme==='light'?'light':'dark')});themeObserver.observe(document.body,{attributes:true,attributeFilter:['data-theme']});
  updateSession();setInterval(updateSession,60000);loadPulse();setupAI();
 }
-window.rangeformExperience={loadNews,loadPulse};
+window.rangeformExperience={loadNews,loadPulse,selectNewsCategory:category=>{if(CATEGORY_CONTENT[category]){newsCategory=category;$('newsSymbol').value='';loadNews()}}};
 document.addEventListener('DOMContentLoaded',bind);
 })();
