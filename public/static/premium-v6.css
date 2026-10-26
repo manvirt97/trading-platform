@@ -145,3 +145,70 @@
  #page-signals .page-heading{margin-bottom:15px}
 }
 @media(prefers-reduced-motion:reduce){.news-story{transition:none}}
+
+
+/* Reading-first layout v7 — larger text, quiet surfaces and reduced header height. */
+body{font-size:16px;line-height:1.55;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+body[data-theme="light"]{--bg:#f5f7fa;--surface:#fff;--panel:#fbfcfd;--panel2:#eef2f6;--border:#d8e0e8;--muted:#526478;--text:#162738;--lime:#2d4f6e;--shadow:0 5px 20px rgba(18,42,67,.045)}
+body[data-theme="dark"]{--bg:#101923;--surface:#182431;--panel:#1b2a39;--panel2:#253445;--border:#3a4b5e;--muted:#b2c2d0;--text:#edf4f9;--lime:#b9cce0}
+body[data-theme="warm"]{--muted:#cdbfab;--border:#534b41}
+.nav-item{font-size:14.5px;font-weight:620;min-height:48px;line-height:1.3}
+.sidebar .side-label{font-size:11px;letter-spacing:.11em}
+.eyebrow,.kicker,.section-label{font-size:11px;letter-spacing:.09em}
+.page-heading h1,.intro h1{font-size:clamp(32px,3.05vw,49px);font-weight:740;letter-spacing:-.055em}
+.page-heading p,.intro p{font-size:15.5px;max-width:780px;line-height:1.55}
+.page-heading{margin-bottom:18px;padding:0}
+.main-content{padding-top:28px;max-width:1630px}
+.panel{box-shadow:0 4px 18px rgba(24,43,65,.04)}
+.panel h2{font-size:20px;font-weight:720;letter-spacing:-.025em}
+.btn,.desk-actions button,.news-topics button{font-size:13.5px;font-weight:650}
+.controls-panel label,.news-search-panel label{font-size:12px;font-weight:700}
+input,select,textarea{font-size:15px;line-height:1.4}
+.source-hint,.desk-choice-note,.desk-plan>p,.desk-plan p,.fine-copy{font-size:13px;line-height:1.65}
+.desk-eyebrow,.desk-plan small,.desk-metric small,.desk-guide b,.news-scope-eyebrow{font-size:11px;letter-spacing:.055em}
+.desk-verdict{min-height:0;padding:19px 21px}
+.desk-verdict strong{font-size:clamp(25px,2.5vw,34px)}
+.desk-verdict>span:not(.desk-eyebrow):not(.desk-readiness){font-size:14px;line-height:1.55}
+.desk-metric{min-height:0}
+.desk-metric>span{font-size:12px;line-height:1.5}
+.desk-metric strong{font-size:27px}
+.desk-guide p{font-size:13.5px;line-height:1.6}
+.desk-check{font-size:13px;line-height:1.45}
+.desk-readiness{font-size:11px}
+.desk-plan-levels small{font-size:11px}
+.desk-watch-levels span{font-size:13px}
+.desk-watch-levels b{font-size:16px}
+#page-news .page-heading{margin-bottom:11px}
+#page-news .page-heading h1{margin-bottom:7px}
+#page-news .page-heading p{max-width:760px}
+#page-news .pulse-intro{margin:8px 0 13px;padding:11px 15px;min-height:0}
+#page-news .pulse-intro strong{font-size:13.5px}
+#page-news .pulse-intro p{font-size:13px}
+#page-news .news-controls{min-height:0;padding:13px 16px}
+#page-news .news-topics{padding:12px 0;gap:9px}
+#page-news .news-topics button{min-height:40px}
+#page-news .news-scope{padding:12px 17px;margin-bottom:12px}
+#page-news .news-scope strong{font-size:21px;margin:0}
+#page-news .news-scope p{font-size:13px}
+#page-news .news-columns .news-body{padding:18px 20px}
+#page-news .news-columns .news-body .panel-head{margin-bottom:10px}
+#page-news .news-list .news-story{padding:14px 10px}
+#page-news .news-story strong{font-size:16.5px;line-height:1.42;font-weight:690}
+#page-news .news-story.featured-news strong{font-size:19px}
+#page-news .story-source,#page-news .story-top,#page-news .news-source-footer{font-size:12.5px;line-height:1.5}
+#page-news .news-intelligence{padding:18px 20px}
+#page-news .news-intelligence h2{font-size:22px;margin:9px 0 8px}
+#page-news .news-intelligence>p,#page-news .news-check{font-size:13.5px;line-height:1.6}
+#page-news .news-intel-divider{margin:13px 0}
+#page-news .news-intel-buttons{margin-top:12px}
+#page-news .news-intel-buttons .btn{font-size:13px}
+@media(max-width:900px){.main-content{padding-top:19px}#page-news .news-scope{flex-wrap:wrap}}
+@media(max-width:600px){
+ .main-content{padding-top:15px}
+ .page-heading h1,.intro h1{font-size:clamp(31px,8.5vw,42px)}
+ .page-heading p,.intro p{font-size:14.5px}
+ .desk-verdict strong{font-size:26px}
+ #page-news .pulse-intro{display:none}
+ #page-news .news-scope{padding:12px}
+ #page-news .news-story strong{font-size:16px}
+}
