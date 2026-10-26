@@ -411,3 +411,12 @@ body[data-theme=light] .news-columns .tv-news-frame{background:#fff}
 .sidebar .brand-type strong{font-size:21px;letter-spacing:-.045em;font-weight:770;text-transform:none;font-family:Inter,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif}
 .sidebar .brand-type small{letter-spacing:.14em}
 @media(max-width:680px){.sidebar .brand-type strong{font-size:19px}}
+
+/* Verified widget coverage rather than simulated quote cards. */
+#quantOverview[hidden]{display:none!important}
+#snapshotGrid:has(.tv-snapshot-market){display:block;min-height:0}
+.tv-snapshot-market{width:100%;min-width:0;padding:15px;border:1px solid var(--border);border-radius:17px;background:var(--surface);overflow:hidden}
+.tv-snapshot-market tv-market-overview{display:block;width:100%;height:430px;min-height:350px}
+.tv-snapshot-market p{font-size:11px;line-height:1.55;margin:11px 4px 1px;color:var(--muted)}
+@media(max-width:680px){.tv-snapshot-market{padding:10px;border-radius:14px}.tv-snapshot-market tv-market-overview{height:360px}.tv-snapshot-market p{font-size:10px}}
+@view-transition{navigation:none}
