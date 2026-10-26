@@ -68,12 +68,12 @@ function newsMarkup(data){
 }
 async function loadNews({refresh=false}={}){
  const term=$('newsSymbol').value.trim(),category=newsCategory,req=++newsLast;
- const key=category+'|'+term.toLowerCase();
+ const key=category+'|'+term.toLowerCase()+'|CA';
  updateNewsScope();
  const cached=newsCache.get(key);
  if(!refresh&&cached&&Date.now()-cached.savedAt<90000){renderNews(cached.data);return}
  $('fetchNews').disabled=true;$('newsCount').textContent='SEARCHING';
- $('newsRows').innerHTML='<div class="loading-news"><span class="loading-orbit"></span>Finding '+CATEGORY_CONTENT[category].name.toLowerCase()+' headlines from public publishers…</div>';
+ $('newsProvider').textContent=CATEGORY_CONTENT[category].name.toUpperCase()+' · TOPIC FILTER';$('newsRows').innerHTML='<div class="loading-news"><span class="loading-orbit"></span>Finding '+CATEGORY_CONTENT[category].name.toLowerCase()+' headlines from public publishers…</div>';
  try{
   const data=await getJson('/api/news?'+new URLSearchParams({q:term,category,region:'CA'}));
   if(req!==newsLast)return;
@@ -144,7 +144,7 @@ function bind(){
  window.addEventListener('rangeform:navigate',e=>{document.querySelectorAll('[data-dock]').forEach(b=>b.classList.toggle('on',b.dataset.dock===e.detail.page))});
  $('fetchNews').onclick=()=>loadNews({refresh:true});
  $('newsSymbol').onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();loadNews()}};
- document.querySelectorAll('[data-category]').forEach(b=>b.addEventListener('click',()=>{newsCategory=b.dataset.category;$('newsSymbol').value='';loadNews()}));
+ document.querySelectorAll('[data-category]').forEach(b=>b.addEventListener('click',()=>{if(newsCategory===b.dataset.category)return;newsCategory=b.dataset.category;$('newsSymbol').value='';updateNewsScope();loadNews()}));
  $('liveChartGo').onclick=chartGo;
  $('liveChartSearch').onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();chartGo()}};
  const sharedDatalist=document.createElement('datalist');sharedDatalist.id='rangeformSymbols';document.body.append(sharedDatalist);
