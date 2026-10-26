@@ -110,7 +110,7 @@ function mount(){
  <div class="desk-watch-levels" id="deskWatchLevels" hidden><span>WATCH ABOVE <b id="deskBullLevel">—</b> for a possible bullish breakout</span><span>WATCH BELOW <b id="deskBearLevel">—</b> for a possible bearish breakdown</span></div>
  <p id="deskPlanNote">No current entry or target is shown without a validated provider bar and confirmed rules. Even a detected setup needs a live broker quote and risk review.</p></div>
  <div class="desk-guide"><div><b>WHY?</b><p id="deskWhy">Waiting for valid quantitative evidence.</p></div><div><b>WHAT TO WATCH</b><p id="deskWatch">Confirm price, market hours, volume and upcoming events.</p></div><div><b>CONFIRMATION CHECKLIST</b><div class="desk-checklist" id="deskChecklist">Source • Freshness • Range • Volume • Broker confirmation</div></div></div>
- <div class="desk-actions"><button type="button" class="desk-choice" id="deskBuy" aria-pressed="false">↗ When to consider buying</button><button type="button" class="desk-choice" id="deskSell" aria-pressed="false">↘ When to consider selling</button><button type="button" class="desk-choice chosen" id="deskWait" aria-pressed="true">◷ Wait for confirmation</button><button type="button" class="desk-risk" id="deskRisk">Plan position risk ↗</button></div>
+ <div class="desk-actions"><button type="button" class="desk-choice" id="deskBuy" aria-pressed="false">↗ BUY CONDITIONS</button><button type="button" class="desk-choice" id="deskSell" aria-pressed="false">↘ SELL CONDITIONS</button><button type="button" class="desk-choice chosen" id="deskWait" aria-pressed="true">◷ WAIT / NO TRADE</button><button type="button" class="desk-risk" id="deskRisk">Size this trade ↗</button><button type="button" class="desk-connect" id="deskConnect">Connect market data ↗</button></div>
  <div id="deskChoiceNote" class="desk-choice-note">Conditional setups, not guaranteed trades. A verified quote, costs, market hours and news must be checked before any decision.</div></section>`;
   controls.after(panel);
   for(let [id,type] of [['deskBuy','buy'],['deskSell','sell'],['deskWait','wait']])$(id).onclick=()=>{
@@ -120,6 +120,7 @@ function mount(){
   };
   $('deskWait').classList.add('chosen');
   $('deskRisk').onclick=()=>{document.querySelector('[data-page="risk"]')?.click();$('riskFromSignal')?.click()};
+  $('deskConnect').onclick=()=>document.querySelector('[data-page="settings"]')?.click();
  }
  const intro=document.querySelector('#page-overview .notice');
  if(intro&&!$('liveOverviewStrip')){
@@ -134,10 +135,15 @@ function mount(){
  }
  let toolbar=$('page-signals')?.querySelector('.controls-panel');
  if(toolbar&&!$('sourceHint')){let el=document.createElement('div');el.id='sourceHint';el.className='source-hint';el.textContent='Data source and timestamp must be verified before using an intraday setup.';toolbar.after(el)}
+ // User's first screen is the decision, then the actual chart; research details follow below.
+ const chart=document.querySelector('#page-signals .signal-grid'),deck=$('decisionDeck');
+ if(chart&&deck&&chart.previousElementSibling!==deck)deck.after(chart);
+
 }
 window.renderTradeGuide=x=>{
  mount();active=x;const sig=direction(x),ind=x.indicators||{},stamp=x.last_bar_utc||'';
  $('deskSource').textContent=x.source==='twelvedata'?'TWELVE DATA · '+x.interval+' BARS':x.source==='user-csv'?'IMPORTED HISTORICAL DATA':'UNVERIFIED HISTORY';
+ $('deskConnect').hidden=x.source==='twelvedata';
  $('deskVerdict').dataset.bias=sig.kind;
  $('deskBias').textContent=sig.kind==='wait'&&x.score>=65?'BUY WATCH · WAIT FOR ENTRY':sig.kind==='wait'&&x.score<=35?'SELL WATCH · WAIT FOR EXIT SIGNAL':sig.bias;$('deskLine').textContent=sig.kind==='wait'&&x.score>=65?'Bullish technical bias, but NOT a verified buy entry. '+sig.reason:sig.kind==='wait'&&x.score<=35?'Bearish technical bias, but NOT a verified sell entry. '+sig.reason:sig.detail;
  $('deskReadiness').textContent=sig.kind==='wait'?(x.score>=65?'BULLISH BIAS · ENTRY NOT CONFIRMED':x.score<=35?'BEARISH BIAS · EXIT NOT CONFIRMED':'NO VERIFIED SETUP'):'CONDITIONAL SETUP · VERIFY BROKER';
@@ -169,6 +175,7 @@ window.resetTradeGuide=reason=>{
  $('deskLine').textContent=reason||'Select a source and analyze a symbol to load current evidence.';
  $('deskReadiness').textContent='FRESH ANALYSIS REQUIRED';
  $('deskSource').textContent='AWAITING VERIFIED DATA';
+ $('deskConnect').hidden=false;
  $('deskScore').textContent='—';
  $('deskPrice').textContent='—';
  $('deskTime').textContent='No verified bar';

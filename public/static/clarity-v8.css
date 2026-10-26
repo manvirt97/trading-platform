@@ -1,0 +1,163 @@
+/* RANGEFORM EXPERIENCE 8 — Readable, decision-first layout.
+   This stylesheet intentionally loads LAST, after shared theme definitions.
+   No decorative neon, no fake performance indicators. */
+:root{font-synthesis:none}
+body{font-family:"Segoe UI Variable Text","Segoe UI",Inter,system-ui,-apple-system,Arial,sans-serif!important;font-size:16px!important;line-height:1.58!important;letter-spacing:-.005em!important;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+html[data-rf-theme=light] body{--bg:#f5f7f9;--surface:#fff;--panel:#fff;--panel2:#edf3f7;--border:#d4dee6;--muted:#4d6070;--text:#142637;--lime:#315875}
+html[data-rf-theme=dark] body{--bg:#111922;--surface:#192532;--panel:#1c2b39;--panel2:#273747;--border:#45566a;--muted:#becbd6;--text:#f0f4f8;--lime:#b8cada}
+html[data-rf-theme=warm] body{--muted:#d6cbbd;--border:#5c5247}
+.main-content{max-width:1620px;padding:20px clamp(20px,3vw,46px) 45px}
+.page-heading{padding:0;margin:0 0 17px}
+.page-heading h1{font-size:clamp(29px,3vw,42px)!important;line-height:1.1!important;letter-spacing:-.045em!important;font-weight:760!important;margin:3px 0 9px!important}
+.page-heading p{font-size:16px!important;line-height:1.55!important;max-width:760px;color:var(--muted)}
+.page-heading .eyebrow{font-size:11px!important;letter-spacing:.075em;margin-bottom:8px}
+.panel{border-radius:16px;box-shadow:0 4px 15px rgba(22,43,65,.04);border:1px solid var(--border)}
+.panel h2{font-size:21px!important;line-height:1.25}
+h3{line-height:1.3}
+.eyebrow,.kicker{font-size:11px!important;letter-spacing:.075em!important;font-weight:740}
+.nav-item{min-height:48px;font-size:15px!important;font-weight:600!important;letter-spacing:0!important;line-height:1.2}
+.nav-item.active{box-shadow:inset 3px 0 var(--lime)}
+.side-label{font-size:11px!important;letter-spacing:.08em!important}
+.sidebar{width:234px;flex-basis:234px}
+.brand{height:82px;padding:15px 18px}
+.brand strong{font-size:20px;letter-spacing:-.025em}
+.topbar{height:65px;padding:0 26px}
+.topbar .crumb{font-size:12px;letter-spacing:.04em}
+.global-nav a{font-size:13px!important;font-weight:650!important}
+.edition-indicator{font-size:11px;color:var(--muted);border:1px solid var(--border);background:var(--surface);border-radius:8px;padding:7px 10px;font-weight:730;white-space:nowrap}
+.edition-indicator strong{color:var(--text);letter-spacing:.03em}
+button,.btn{transition:background-color .15s,border-color .15s,box-shadow .15s}
+.btn{font-size:14px!important;letter-spacing:0!important;min-height:43px;font-weight:670}
+input,select,textarea{font-family:inherit!important;font-size:15px!important;line-height:1.45!important}
+.controls-panel label,.news-controls label{font-size:12.5px!important;font-weight:700}
+.data-stamp,.source-explain,.fine-copy,.source-hint,.desk-choice-note{font-size:13px!important;line-height:1.6!important;color:var(--muted)}
+/* NEWS — compact flagship header instead of a giant headline and repeated boxes. */
+#page-news .page-heading{background:linear-gradient(115deg,#16293c 0%,#2d475e 100%);border:1px solid #31475c;color:#f9fbff;border-radius:18px;padding:22px 27px;margin:0 0 15px;min-height:140px;display:flex;align-items:center;justify-content:space-between;gap:20px;box-shadow:0 8px 20px rgba(14,31,47,.12)}
+#page-news .page-heading h1{color:#fff!important;font-size:clamp(30px,3vw,42px)!important}
+#page-news .page-heading h1 em{color:#c4d2df}
+#page-news .page-heading p{color:#d5e1ea!important;font-size:15px!important;max-width:570px}
+#page-news .page-heading .eyebrow{color:#c1d0dd}
+#page-news .page-heading .soft-tag{color:#e4edf3;border-color:#5b7287;background:rgba(255,255,255,.08);font-size:11px}
+#page-news .pulse-intro{display:none!important}
+#page-news .news-controls{margin:0 0 8px;padding:14px 17px!important;border-radius:14px;box-shadow:none;gap:12px}
+#page-news .news-controls label{flex:1;min-width:min(270px,100%)}
+#page-news .news-search-panel input{min-height:46px!important;min-width:min(270px,100%);width:100%;font-size:15px!important}
+#page-news .news-search-panel #fetchNews{font-size:14px!important;height:46px;padding:0 20px}
+#page-news .source-explain{flex:1 0 100%;padding:0;font-size:12.5px!important}
+#page-news .news-topics{padding:8px 0 11px!important;display:flex;gap:8px!important;flex-wrap:wrap}
+#page-news .news-topics button{font-size:14px!important;padding:9px 15px!important;min-height:41px!important;border-radius:11px!important;letter-spacing:0}
+#page-news .news-topics button.selected{background:var(--panel2)}
+#page-news .news-scope{margin:0 0 11px!important;padding:10px 15px!important;border-radius:12px!important;min-height:0!important;display:flex;align-items:center;gap:16px;background:var(--surface)!important}
+#page-news .news-scope-eyebrow{display:none}
+#page-news .news-scope strong{display:inline!important;font-size:16px!important;letter-spacing:-.01em;margin:0 10px 0 0!important}
+#page-news .news-scope p{display:inline;font-size:13px!important;color:var(--muted)}
+#page-news .news-freshness{font-size:12px!important;padding:6px 9px!important}
+#page-news .news-columns{grid-template-columns:minmax(0,1.68fr) minmax(270px,.68fr);gap:13px}
+#page-news .news-body,#page-news .news-intelligence{padding:18px 21px!important}
+#page-news .news-body .panel-head{margin-bottom:10px!important}
+#page-news #newsListHeading{font-size:22px!important}
+#page-news .news-item{padding:16px 12px!important;grid-template-columns:42px minmax(0,1fr) 20px!important}
+#page-news .news-story strong{font-size:17px!important;line-height:1.5!important;letter-spacing:-.01em!important;font-weight:660!important}
+#page-news .news-story.featured-news{margin-bottom:8px!important;padding:17px 14px!important;background:var(--panel2)!important}
+#page-news .news-story.featured-news strong{font-size:19px!important}
+#page-news .news-story .story-source,#page-news .news-story .story-top{font-size:13px!important;color:var(--muted);line-height:1.5}
+#page-news .news-intelligence{position:static!important}
+#page-news .news-intelligence h2{font-size:21px!important;letter-spacing:-.018em!important;margin:11px 0!important}
+#page-news .news-intelligence>p,#page-news .news-check{font-size:14px!important;line-height:1.65!important}
+#page-news .news-check{gap:10px}
+#page-news .news-intel-divider{margin:15px 0}
+/* SIGNAL LAB — decision / chart appear before deep research */
+#page-signals .page-heading{margin-bottom:14px}
+#page-signals .controls-panel{padding:16px!important;gap:12px;align-items:end;background:var(--surface);border-radius:15px}
+#page-signals .controls-panel label{min-width:0}
+#page-signals .decision-deck{padding:15px 16px!important;background:var(--surface)!important;border-radius:17px!important;border:1px solid var(--border);box-shadow:0 5px 18px rgba(17,38,59,.055);margin:14px 0 14px}
+#page-signals .desk-title{display:flex;justify-content:space-between;align-items:center;margin-bottom:9px}
+#page-signals .desk-title .eyebrow{margin:0}
+#page-signals .desk-row{display:grid;grid-template-columns:minmax(0,2.2fr) repeat(2,minmax(145px,.7fr));gap:11px}
+#page-signals .desk-verdict{min-height:0!important;padding:17px 21px!important;border-radius:14px}
+#page-signals .desk-verdict strong{font-size:clamp(23px,2.2vw,33px)!important;letter-spacing:-.035em!important;line-height:1.22!important;margin:8px 0 9px}
+#page-signals .desk-verdict>span:not(.desk-eyebrow):not(.desk-readiness){font-size:14px!important;line-height:1.55!important}
+#page-signals .desk-readiness{font-size:11px!important;letter-spacing:0!important}
+#page-signals .desk-metric{padding:17px!important;min-height:0!important;border-radius:14px}
+#page-signals .desk-metric small{font-size:11px!important}
+#page-signals .desk-metric strong{font-size:27px!important}
+#page-signals .desk-metric span{font-size:12.5px!important;line-height:1.5!important}
+#page-signals .desk-plan{padding:12px 16px!important;margin-top:11px!important;border-radius:12px}
+#page-signals .desk-plan-top{font-size:11px!important;letter-spacing:.045em}
+#page-signals .desk-plan-levels{padding-top:10px!important;gap:10px!important;margin-top:0!important}
+#page-signals .desk-plan-levels small{font-size:11px!important;margin:0 0 6px}
+#page-signals .desk-plan-levels>div{padding:10px 13px!important}
+#page-signals .desk-plan-levels strong{font-size:20px!important}
+#page-signals .desk-plan p{font-size:13px!important;line-height:1.55!important;margin:9px 0 0}
+#page-signals .desk-watch-levels{margin-top:11px;gap:10px}
+#page-signals .desk-watch-levels span{font-size:13px!important}
+#page-signals .desk-guide{padding:11px 0 0;margin-top:7px}
+#page-signals .desk-guide b{font-size:11px!important;letter-spacing:.05em}
+#page-signals .desk-guide p,#page-signals .desk-check{font-size:13px!important;line-height:1.5!important}
+#page-signals .desk-actions{padding-top:11px!important;gap:9px}
+#page-signals .desk-actions button{font-size:13px!important;min-height:43px!important;padding:8px 12px!important;border-radius:10px!important}
+#page-signals .desk-choice-note{padding-top:8px}
+#page-signals .signal-grid{margin:14px 0 18px;gap:14px}
+#page-signals .deep-chart,#page-signals .now-panel{padding:19px!important}
+#page-signals .chart-wrap.tall{min-height:320px}
+#page-signals .signal-grid .panel-head h2{font-size:20px!important}
+#page-signals .scenario-toggle{gap:7px}
+#page-signals .scenario-toggle button{font-size:13px!important}
+#page-signals .thesis-workbench{margin-top:18px}
+#page-signals .thesis-head h2{font-size:22px!important}
+#page-signals .thesis-head p,#page-signals .evidence-item p,#page-signals .thesis-verdict p{font-size:14px!important;line-height:1.55!important}
+/* User controlled comfortable text sizing */
+html[data-reader=large] body{font-size:18px!important}
+html[data-reader=large] .news-story strong{font-size:19px!important}
+html[data-reader=large] .news-story.featured-news strong{font-size:21px!important}
+html[data-reader=large] .page-heading p,
+html[data-reader=large] .desk-guide p,
+html[data-reader=large] .desk-verdict>span:not(.desk-eyebrow):not(.desk-readiness),
+html[data-reader=large] #page-news .news-intelligence>p{font-size:16px!important}
+.reader-controls{display:inline-flex;align-items:center;gap:3px;padding:3px;background:var(--panel2);border:1px solid var(--border);border-radius:9px}
+.reader-controls button{border:none;background:transparent;color:var(--text);font-size:14px;font-weight:750;border-radius:6px;height:29px;min-width:31px;cursor:pointer}
+.reader-controls button[aria-pressed=true]{background:var(--surface);box-shadow:0 1px 5px rgba(0,0,0,.08)}
+.reader-controls button:hover{background:var(--surface)}
+@media(max-width:1250px){.edition-indicator{display:none}#page-signals .desk-row{grid-template-columns:1fr 1fr}#page-signals .desk-verdict{grid-column:1/-1}}
+@media(max-width:980px){#page-news .news-columns{grid-template-columns:1fr}#page-news .page-heading{padding:19px 20px}#page-signals .desk-guide{grid-template-columns:1fr 1fr}#page-news .news-intelligence{display:none}}
+@media(max-width:700px){
+ .main-content{padding:17px 14px calc(98px + env(safe-area-inset-bottom))}
+ .topbar{padding:0 12px}
+ .reader-controls{display:none}
+ #page-news .page-heading{padding:18px;border-radius:14px;min-height:0}
+ #page-news .page-heading h1{font-size:29px!important}
+ #page-news .page-heading p{font-size:14px!important}
+ #page-news .page-heading .soft-tag{display:none}
+ #page-news .news-controls{padding:12px!important}
+ #page-news .news-search-panel input{width:100%}
+ #page-news .news-topics{display:flex;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:thin;white-space:nowrap}
+ #page-news .news-topics button{flex:0 0 auto}
+ #page-news .news-scope{display:flex;align-items:flex-start;flex-wrap:wrap}
+ #page-news .news-columns .news-body{padding:14px 13px!important}
+ #page-news .news-story strong{font-size:16px!important}
+ #page-signals .desk-row{grid-template-columns:1fr 1fr}
+ #page-signals .desk-verdict{grid-column:1/-1}
+ #page-signals .desk-guide{grid-template-columns:1fr}
+ #page-signals .desk-plan-levels{grid-template-columns:1fr 1fr}
+ #page-signals .desk-plan-levels>div:last-child{grid-column:1/-1}
+ #page-signals .desk-actions button{flex:1 1 45%}
+ #page-signals .desk-actions .desk-risk{flex:1 1 100%}
+}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{scroll-behavior:auto!important;animation-duration:.01ms!important;transition-duration:.01ms!important}}
+
+/* Put the quick choice immediately after the visible model verdict. */
+#page-signals .decision-deck{display:flex;flex-direction:column}
+#page-signals .desk-title{order:0}
+#page-signals .desk-row{order:1}
+#page-signals .desk-actions{order:2}
+#page-signals .desk-choice-note{order:3}
+#page-signals .desk-plan{order:4}
+#page-signals .desk-guide{order:5}
+#page-signals .desk-actions .desk-connect{background:var(--panel2);border:1px solid var(--border);color:var(--text);font-weight:720}
+#page-signals #deskConnect[hidden]{display:none!important}
+#page-signals .desk-actions button[aria-pressed=true]{border-width:2px;box-shadow:inset 0 -2px var(--lime)}
+
+html[data-reader=large] #page-news .news-story strong{font-size:20px!important;line-height:1.55!important}
+html[data-reader=large] #page-news .news-story.featured-news strong{font-size:22px!important}
+html[data-reader=large] #page-news .news-intelligence>p,html[data-reader=large] #page-news .news-check,html[data-reader=large] #page-signals .desk-guide p,html[data-reader=large] #page-signals .desk-choice-note{font-size:16.5px!important;line-height:1.65!important}
+html[data-reader=large] #page-news .page-heading p,html[data-reader=large] #page-signals .page-heading p{font-size:17px!important}

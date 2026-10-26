@@ -102,3 +102,22 @@ test('public default is real provider widget coverage, never generated prices',(
  assert.doesNotMatch(load('public/static/market-shared.css'),/@view-transition\{navigation:auto\}/);
  assert.doesNotMatch(html,/TradingView market desk<\/a>WORKSPACE/);
 });
+
+
+test('clear view experience visibly replaces the old layout and exposes reader controls',()=>{
+ const html=load('public/research.html');
+ const css=load('public/static/clarity-v8.css');
+ const guide=load('public/static/guide.js');
+ const reader=load('public/static/reader-v8.js');
+ assert.match(html,/clarity-v8\.css\?v=1/);
+ assert.match(html,/V8<\/strong> · CLEAR VIEW/);
+ assert.match(html,/Market news <em>that matters/);
+ assert.match(html,/Trade <em>decision desk/);
+ assert.match(html,/id="readerRegular"/);
+ assert.match(html,/id="readerLarge"/);
+ assert.match(css,/#page-news \.page-heading\{/);
+ assert.match(css,/#page-news \.news-story strong/);
+ assert.match(css,/#page-signals \.decision-deck\{display:flex/);
+ assert.match(guide,/deck\.after\(chart\)/);
+ assert.match(reader,/dataset\.reader/);
+});
