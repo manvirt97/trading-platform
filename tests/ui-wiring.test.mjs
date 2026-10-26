@@ -74,3 +74,31 @@ test('mobile dock is solid, edge-attached and never exposes scrolling content',(
  assert.equal(manifest.icons[0].src,'/static/rangeform-official-icon.png');
  for(const path of ['public/market.html','public/account.html'])assert.match(load(path),/rangeform-official-icon\.png/);
 });
+
+
+test('every top-level view shares saved palette before first paint',()=>{
+ for(const path of ['public/research.html','public/market.html','public/account.html']){
+  const html=load(path);
+  assert.match(html,/theme-sync\.js\?v=1/);
+  assert.match(html,/theme-sync\.css\?v=2/);
+ }
+ const theme=load('public/static/theme-sync.js');
+ assert.match(theme,/rangeform_theme/);
+ assert.match(theme,/dataset\.rfTheme/);
+ assert.match(theme,/link\.rel='prefetch'/);
+ assert.match(load('public/static/market.js'),/RangeformTheme\?\.apply/);
+ assert.match(load('public/static/app.js'),/RangeformTheme\?\.apply/);
+});
+
+test('public default is real provider widget coverage, never generated prices',()=>{
+ const html=load('public/research.html'),app=load('public/static/app.js'),server=load('functions/_shared/http.js');
+ assert.match(html,/<tv-market-overview mode="market-movers"/);
+ assert.doesNotMatch(html,/<option value="demo">/);
+ assert.match(html,/<option value="none">Not connected<\/option>/);
+ assert.match(app,/source:'none'/);
+ assert.match(app,/if\(state\.source==='none'\)/);
+ assert.match(server,/ENABLE_TEST_FIXTURES==='on'/);
+ assert.match(server,/Synthetic example prices are disabled/);
+ assert.doesNotMatch(load('public/static/market-shared.css'),/@view-transition\{navigation:auto\}/);
+ assert.doesNotMatch(html,/TradingView market desk<\/a>WORKSPACE/);
+});
