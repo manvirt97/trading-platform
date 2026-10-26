@@ -1,6 +1,15 @@
 {
-  "name":"rangeform-cloudflare","version":"3.1.0","private":true,"type":"module",
-  "description":"Cloudflare Pages trading research prototype, demo only by default",
-  "scripts":{"test":"node --test tests/*.test.mjs","dev":"npx wrangler pages dev public","syntax":"node --check public/static/app.js && node --check functions/_shared/core.js && node --check functions/_shared/http.js"},
-  "engines":{"node":">=20"}
+  "name": "rangeform-cloudflare",
+  "version": "6.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Cloudflare Pages trading research prototype, demo only by default",
+  "scripts": {
+    "test": "node --test tests/*.test.mjs",
+    "dev": "npx wrangler pages dev public",
+    "syntax": "node --check public/static/market.js && node --check public/static/radar.js && node --check public/static/account.js && node --check functions/_shared/auth.js && node --check functions/api/radar.js && node --check functions/api/profile.js && node --check functions/api/research-ai.js && node --check functions/api/profile-config.js && node --check public/static/app.js && node --check functions/_shared/core.js && node --check functions/_shared/http.js"
+  },
+  "engines": {
+    "node": ">=20"
+  }
 }
