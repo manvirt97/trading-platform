@@ -1,0 +1,153 @@
+/* Rangeform mobile shell v2.
+   One edge-attached, fully opaque dock. Content finishes ABOVE the dock.
+   Keep the same semantics and selectors as research.html. */
+.mobile-brand-mark{display:none}
+
+@media(max-width:680px){
+  :root{
+    --rf-dock-bar-height:64px;
+    --rf-dock-safe-bottom:env(safe-area-inset-bottom,0px);
+    --rf-dock-total-height:calc(var(--rf-dock-bar-height) + var(--rf-dock-safe-bottom));
+  }
+
+  html,body{
+    max-width:100%;
+    overflow-x:clip;
+  }
+
+  /* The dock belongs to the screen edge, not to a transparent floating card. */
+  .mobile-dock,
+  body.standalone .mobile-dock{
+    position:fixed;
+    top:auto;
+    left:0;
+    right:0;
+    bottom:0;
+    width:100%;
+    height:var(--rf-dock-total-height);
+    min-height:var(--rf-dock-total-height);
+    max-height:none;
+    box-sizing:border-box;
+    display:grid;
+    grid-template-columns:repeat(5,minmax(0,1fr));
+    align-items:center;
+    gap:2px;
+    padding:6px 7px calc(6px + var(--rf-dock-safe-bottom));
+    margin:0;
+    border:0;
+    border-top:1px solid var(--border);
+    border-radius:0;
+    background:var(--surface);
+    background-color:var(--surface);
+    box-shadow:0 -6px 20px rgba(0,0,0,.12);
+    backdrop-filter:none;
+    -webkit-backdrop-filter:none;
+    isolation:isolate;
+    overflow:hidden;
+    z-index:35;
+  }
+
+  /* Avoid any translucent pseudo-overlay exposing scrolling cards. */
+  .mobile-dock::before,.mobile-dock::after{content:none!important}
+
+  .mobile-dock button{
+    min-width:0;
+    min-height:0;
+    width:100%;
+    height:49px;
+    max-height:49px;
+    padding:3px 2px;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+    gap:3px;
+    border:1px solid transparent;
+    border-radius:12px;
+    background:transparent;
+    color:var(--muted);
+    text-align:center;
+    touch-action:manipulation;
+    -webkit-tap-highlight-color:transparent;
+  }
+
+  .mobile-dock button>span{
+    width:26px;
+    height:22px;
+    display:grid;
+    place-items:center;
+    color:inherit;
+    font-size:19px;
+    line-height:22px;
+    font-weight:550;
+  }
+
+  .mobile-dock button>small{
+    display:block;
+    margin:0;
+    color:inherit;
+    font-size:10px;
+    line-height:13px;
+    font-weight:650;
+    letter-spacing:0;
+    white-space:nowrap;
+  }
+
+  .mobile-dock button.on{
+    background:var(--panel2);
+    border-color:var(--border);
+    color:var(--text);
+  }
+  .mobile-dock button:active{transform:scale(.96)}
+  .mobile-dock button:focus-visible{outline:2px solid var(--lime);outline-offset:-2px}
+
+  /* Room for the full bar and the device's home-indicator safe area. */
+  .main-content,body.standalone .main-content{
+    padding-bottom:calc(var(--rf-dock-total-height) + 24px)!important;
+    scroll-margin-bottom:calc(var(--rf-dock-total-height) + 12px);
+  }
+  .app-footer{display:none!important}
+  .toast-host{bottom:calc(var(--rf-dock-total-height) + 12px)}
+
+  /* Premium, restrained iconography and fully visible brand mark. */
+  .ai-glyph{
+    color:inherit!important;
+    font-family:ui-sans-serif,system-ui,-apple-system,sans-serif!important;
+    font-variant-emoji:text;
+  }
+  .mobile-brand-mark{
+    display:block;
+    flex:0 0 27px;
+    width:27px;
+    height:27px;
+    min-width:27px;
+    min-height:27px;
+    border-radius:8px;
+    object-fit:contain;
+  }
+  .topbar .top-left{display:flex;align-items:center;gap:7px;min-width:0}
+  .topbar .top-left .crumb{min-width:0;max-width:77px;overflow:hidden;white-space:nowrap}
+  .topbar .top-left .crumb b{overflow:hidden;text-overflow:ellipsis}
+  .topbar .top-actions{gap:7px}
+
+  .sidebar .brand{height:76px;min-height:76px;padding:13px 14px;gap:9px;overflow:visible}
+  .sidebar .brand-mark{
+    width:43px;height:43px;min-width:43px;min-height:43px;
+    flex:0 0 43px;overflow:visible;
+  }
+  .sidebar .brand-mark img{width:43px;height:43px;display:block;object-fit:contain}
+  .sidebar .brand-type{min-width:0;flex:1}
+  .sidebar .brand-type strong{font-size:18px;letter-spacing:-.045em;line-height:1.15;overflow:visible;text-overflow:clip}
+  .sidebar .brand-type small{font-size:7px;letter-spacing:.11em}
+  .sidebar .close-mobile{flex:0 0 32px;width:32px;min-width:32px;height:32px;padding:0}
+
+  body.standalone{overscroll-behavior-y:contain}
+}
+
+@media(max-width:365px){
+  .mobile-dock{padding-left:4px;padding-right:4px}
+  .mobile-dock button>small{font-size:9px}
+  .mobile-brand-mark{width:23px;height:23px;min-width:23px;min-height:23px;flex-basis:23px}
+  .topbar .top-actions{gap:4px}
+  .topbar .demo-pill{max-width:80px}
+}

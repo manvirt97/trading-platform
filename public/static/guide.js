@@ -7,32 +7,60 @@ const usd=v=>Number.isFinite(Number(v))?'$'+Number(v).toLocaleString('en-CA',{ma
 let active=null,enabled=false,connected=false,shownFor='',liveMode=false;
 const night=()=>new Intl.DateTimeFormat('en-US',{timeZone:'America/New_York',hour:'2-digit',hour12:false}).format(new Date());
 const freshness=x=>{
- if(!x||x.source!=='twelvedata')return {fresh:false,reason:'Illustration only — not real market data'};
- if(!['1min','5min','15min'].includes(x.interval))return {fresh:false,reason:'Daily bars cannot trigger a day trade'};
- const stamp=Date.parse(x.last_bar_utc),dur={'1min':60000,'5min':300000,'15min':900000}[x.interval];
- if(!Number.isFinite(stamp)||stamp>Date.now()+30000)return {fresh:false,reason:'Invalid timestamp — verify provider data'};
- let age=Date.now()-stamp;
- if(age>dur*3+60000)return {fresh:false,reason:'Latest completed bar is '+Math.round(age/60000)+' min old — not timely'};
- return {fresh:true,reason:'Last completed bar: '+Math.max(0,Math.round(age/60000))+' min old; not a streaming quote'};
+ if(!x||x.source!=='twelvedata')return {fresh:false,reason:'No verified intraday provider data. Historical CSV can support research, not a live buy/sell alert.'};
+ if(!['1min','5min','15min'].includes(x.interval))return {fresh:false,reason:'Daily bars show context, not a current intraday entry.'};
+ const now=new Date(),clock=Object.fromEntries(new Intl.DateTimeFormat('en-US',{timeZone:'America/New_York',weekday:'short',hour:'2-digit',minute:'2-digit',hour12:false}).formatToParts(now).map(z=>[z.type,z.value]));
+ const minute=Number(clock.hour)*60+Number(clock.minute);
+ if(['Sat','Sun'].includes(clock.weekday)||minute<570||minute>=960)return {fresh:false,reason:'Outside the regular US stock session. No active intraday setup; verify exchange holidays separately.'};
+ const stamp=Date.parse(x.last_bar_utc),duration={'1min':60000,'5min':300000,'15min':900000}[x.interval];
+ if(!Number.isFinite(stamp)||stamp>Date.now()+30000)return {fresh:false,reason:'Market-data timestamp invalid or in the future.'};
+ const age=Date.now()-stamp;
+ if(age>duration*3+60000)return {fresh:false,reason:'Latest completed bar '+Math.ceil(age/60000)+' minutes old — too stale for an intraday signal.'};
+ return {fresh:true,reason:'Latest completed bar '+Math.max(0,Math.round(age/60000))+' minutes old. Check exchange entitlement and broker quote before trading.'}
 };
 function direction(x){
- const f=freshness(x),score=Number(x.score),r=x.indicators||{};
- const up=score>=65,down=score<=35,breakUp=Number(x.last)>Number(r.resistance20),breakDown=Number(x.last)<Number(r.support20),rel=Number(r.rel_volume||0);
- const bullish=up&&breakUp&&rel>=1.1&&x.data_quality==='complete-ohlcv';
- const bearish=down&&breakDown&&rel>=1.1&&x.data_quality==='complete-ohlcv';
- let bias=score>=65?'BULLISH WATCH':score<=35?'BEARISH WATCH':'NO CLEAR EDGE',kind=up?'buy':down?'sell':'wait';
- if(bullish){bias='BUY SETUP DETECTED';kind='buy';}
- if(bearish){bias='SELL PRESSURE DETECTED';kind='sell';}
- if(!f.fresh){bias=x.source==='archived-demo'?'DEMO · '+bias:'WAIT · '+(x.interval==='1day'?'DAILY DATA':'STALE OR IMPORTED');kind='wait';}
- const impact=(x.components||[]).slice().sort((a,b)=>Math.abs(b.impact)-Math.abs(a.impact)).slice(0,3).map(z=>z.name+': '+(z.impact>0?'+':'')+z.impact+' pts');
- const atr=Number(r.atr14||0),last=Number(x.last),hi=Number(r.resistance20),lo=Number(r.support20);
- const invalidBuy=atr>0?last-1.2*atr:lo,invalidSell=atr>0?last+1.2*atr:hi;
- return {kind,bias,fresh:f.fresh,reason:f.reason,bullish,bearish,impact,entry:kind==='buy'?hi:kind==='sell'?lo:null,stop:kind==='buy'?invalidBuy:kind==='sell'?invalidSell:null,watch:kind==='buy'?'Look for a fresh completed bar above the 20-bar high WITH volume. A sudden move alone is not confirmation.':kind==='sell'?'Look for a fresh completed bar below support with volume. A bearish reading is not a command to short.':'Wait for trend, volume and a confirmed range break to agree.',detail:f.fresh?'Provider data available — not proof that the setup will work':f.reason};
+ const status=freshness(x),r=x.indicators||{},price=Number(x.last),hi=Number(r.resistance20),lo=Number(r.support20),vol=Number(r.rel_volume),score=Number(x.score);
+ const complete=x.data_quality==='complete-ohlcv'&&[price,hi,lo,vol,score].every(Number.isFinite)&&lo>0&&hi>=lo;
+ const rising=score>=65&&price>hi&&vol>=1.15;
+ const falling=score<=35&&price<lo&&vol>=1.15;
+ const bullish=status.fresh&&complete&&rising,bearish=status.fresh&&complete&&falling;
+ const kind=bullish?'buy':bearish?'sell':'wait';
+ const atr=Number(r.atr14),riskSize=Number.isFinite(atr)&&atr>0?atr:null;
+ const longStop=complete?(riskSize?Math.max(0,price-1.2*riskSize):lo):null;
+ const shortInvalid=complete?(riskSize?price+1.2*riskSize:hi):null;
+ const stop=kind==='buy'?longStop:kind==='sell'?shortInvalid:null;
+ const risk=Number.isFinite(stop)?Math.abs(price-stop):null;
+ const target=risk>0?(kind==='buy'?price+2*risk:price-2*risk):null;
+ const waitWhy=!status.fresh?status.reason:!complete?'Price, OHLCV or support/resistance is missing; no actionable research signal.':score>35&&score<65?'Indicators disagree. No directional edge is confirmed.':vol<1.15?'The move lacks a volume confirmation (minimum 1.15×).':'Wait for a completed breakout or breakdown candle to confirm the move.';
+ const checks=[
+   {ok:status.fresh,label:'Completed bar recent enough for the session'},
+   {ok:complete,label:'Source contains complete OHLCV history'},
+   {ok:complete&&((rising||falling)),label:'Trend, range break and volume agree'},
+   {ok:false,label:'Independent broker quote, spread and event calendar must still be checked'}
+ ];
+ return {
+  kind,bias:kind==='buy'?'BUY SETUP · REVIEW':kind==='sell'?'SELL / REDUCE · REVIEW':'WAIT · NO VERIFIED ENTRY',
+  reason:kind==='wait'?waitWhy:status.reason,fresh:status.fresh,bullish,bearish,checks,
+  impact:(x.components||[]).slice().sort((a,b)=>Math.abs(b.impact)-Math.abs(a.impact)).slice(0,3).map(z=>z.name+': '+(z.impact>0?'+':'')+z.impact+' pts'),
+  entry:kind==='wait'?null:price,stop,target,
+  watch:kind==='buy'?'A bullish setup is detected on the last completed bar. Confirm bid/ask, spread, major news, and that the next bar holds above resistance.':kind==='sell'?'Bearish pressure is detected. If already invested, review exit conditions. This is not a recommendation to open a short position.':'No entry today based on available evidence. Compare trend, volume, price levels and data age before considering a position.',
+  detail:kind==='wait'?waitWhy:'Conditional technical research, NOT an order. Verify live broker quotes, spread, earnings and corporate events.'
+ }
 }
+
 function mount(){
  const controls=document.querySelector('#page-signals .controls-panel');
  if(controls&&!$('decisionDeck')){
-  const panel=document.createElement('section');panel.id='decisionDeck';panel.className='decision-deck';panel.innerHTML=`<div class="desk-title"><span class="eyebrow">THE DECISION DESK / TIME SENSITIVE</span><span id="deskSource" class="desk-data">NO DATA YET</span></div><div class="desk-row"><div class="desk-verdict" id="deskVerdict"><span class="desk-eyebrow">RESEARCH SIGNAL</span><strong id="deskBias">WAIT FOR ANALYSIS</strong><span id="deskLine">Never act on demo, stale or unverified quotes.</span></div><div class="desk-metric"><small>ALIGNMENT</small><strong id="deskScore">—</strong><span>Indicator agreement · not win probability</span></div><div class="desk-metric"><small>LAST PRICE</small><strong id="deskPrice">—</strong><span id="deskTime">Latest completed candle</span></div></div><div class="desk-guide"><div><b>WHY THE SIGNAL?</b><p id="deskWhy">Run an analysis to see the strongest factors.</p></div><div><b>WHAT TO WATCH NEXT</b><p id="deskWatch">The app will explain confirmation and invalidation conditions.</p></div><div><b>REFERENCE LEVELS</b><p id="deskLevels">No levels available yet.</p></div></div><div class="desk-actions"><button class="desk-choice" id="deskBuy" aria-pressed="false">▲ Bullish conditions</button><button class="desk-choice" id="deskSell" aria-pressed="false">▼ Bearish conditions</button><button class="desk-choice" id="deskWait" aria-pressed="true">◷ Wait / no trade</button><button class="desk-risk" id="deskRisk">Open risk planner →</button></div><div id="deskChoiceNote" class="desk-choice-note">These are research views, not brokerage order buttons. No trades are executed.</div></section>`;
+  const panel=document.createElement('section');panel.id='decisionDeck';panel.className='decision-deck';panel.innerHTML=`<div class="desk-title"><span class="eyebrow">THE OPPORTUNITY DESK / EVIDENCE FIRST</span><span id="deskSource" class="desk-data">AWAITING VERIFIED DATA</span></div>
+ <div class="desk-row"><div class="desk-verdict" id="deskVerdict" data-bias="wait"><span class="desk-eyebrow">WHAT SHOULD I DO?</span><strong id="deskBias">WAIT · NO VERIFIED ENTRY</strong><span id="deskLine">No connected, current market-data bars. Don't trade a generated signal.</span><span id="deskReadiness" class="desk-readiness">DATA CHECK REQUIRED</span></div>
+ <div class="desk-metric"><small>RULE ALIGNMENT</small><strong id="deskScore">—</strong><span>Technical factors agreeing, not the chance of profit.</span></div>
+ <div class="desk-metric"><small>LAST COMPLETED PRICE</small><strong id="deskPrice">—</strong><span id="deskTime">Verify the timestamp</span></div></div>
+ <div class="desk-plan"><div class="desk-plan-top"><span>CONDITIONAL TRADE PLAN</span><span id="deskGate">WAIT FOR REAL MARKET DATA</span></div>
+ <div class="desk-plan-levels"><div><small>REFERENCE ENTRY</small><strong id="deskEntry">—</strong></div><div><small>INVALIDATION / STOP</small><strong id="deskInvalid">—</strong></div><div><small>ILLUSTRATIVE 2R TARGET</small><strong id="deskTarget">—</strong></div></div>
+ <p id="deskPlanNote">No current entry or target is shown without a validated provider bar and confirmed rules. Even a detected setup needs a live broker quote and risk review.</p></div>
+ <div class="desk-guide"><div><b>WHY?</b><p id="deskWhy">Waiting for valid quantitative evidence.</p></div><div><b>WHAT TO WATCH</b><p id="deskWatch">Confirm price, market hours, volume and upcoming events.</p></div><div><b>CONFIRMATION CHECKLIST</b><div class="desk-checklist" id="deskChecklist">Source • Freshness • Range • Volume • Broker confirmation</div></div></div>
+ <div class="desk-actions"><button type="button" class="desk-choice" id="deskBuy" aria-pressed="false">↗ Explore bullish case</button><button type="button" class="desk-choice" id="deskSell" aria-pressed="false">↘ Explore bearish case</button><button type="button" class="desk-choice chosen" id="deskWait" aria-pressed="true">◷ Wait / avoid</button><button type="button" class="desk-risk" id="deskRisk">Plan position risk ↗</button></div>
+ <div id="deskChoiceNote" class="desk-choice-note">Scenarios are educational. There are no brokerage orders or guaranteed profitable trades.</div></section>`;
   controls.after(panel);
   for(let [id,type] of [['deskBuy','buy'],['deskSell','sell'],['deskWait','wait']])$(id).onclick=()=>{
    document.querySelectorAll('.desk-choice').forEach(btn=>{btn.classList.remove('chosen');btn.setAttribute('aria-pressed','false')});$(id).classList.add('chosen');$(id).setAttribute('aria-pressed','true');
@@ -44,42 +72,52 @@ function mount(){
  }
  const intro=document.querySelector('#page-overview .notice');
  if(intro&&!$('liveOverviewStrip')){
-  let el=document.createElement('div');el.id='liveOverviewStrip';el.className='live-strip';el.innerHTML=`<span id="liveStripDot" class="strip-dot"></span><div><strong id="liveStripTitle">Demo market — no live data connected</strong><small id="liveStripSub">Connect a licensed provider in Cloudflare to unlock current completed bars.</small></div><button class="strip-action" id="liveStripAction">Connection setup →</button>`;
+  let el=document.createElement('div');el.id='liveOverviewStrip';el.className='live-strip';el.innerHTML=`<span id="liveStripDot" class="strip-dot"></span><div><strong id="liveStripTitle">TradingView charts · exchange delays vary</strong><small id="liveStripSub">Connect a licensed provider in Cloudflare to unlock current completed bars.</small></div><button class="strip-action" id="liveStripAction">Connection setup →</button>`;
   intro.after(el);$('liveStripAction').onclick=()=>document.querySelector('[data-page="settings"]')?.click();
  }
  const status=document.querySelector('#page-settings .connection-list');
  if(status&&!$('setupLive')){
-  let el=document.createElement('div');el.className='live-setup';el.id='setupLive';el.innerHTML=`<div class="setting-caption">PERSONAL LIVE-DATA CONNECTION</div><h3>Turn on your own market feed</h3><p>① Protect this Pages website with Cloudflare Access (only you can sign in). ② Add <code>TWELVEDATA_API_KEY</code> as an encrypted Cloudflare secret. ③ Add <code>LIVE_DATA_ENABLED</code> with value <code>on</code>. ④ Redeploy and reload this page.</p><p>Without an API key, the app intentionally shows synthetic prices. Individual data plans cannot be used to redistribute quotes on a public site. This feature uses REST polling, not tick-by-tick streaming.</p><button id="checkConnection" class="btn btn-primary">Check provider connection ↻</button><span id="connectionMessage" class="conn-note">Waiting for connection check</span>`;
+  let el=document.createElement('div');el.className='live-setup';el.id='setupLive';el.innerHTML=`<div class="setting-caption">PERSONAL LIVE-DATA CONNECTION</div><h3>Turn on your own market feed</h3><p>① Protect this Pages website with Cloudflare Access (only you can sign in). ② Add <code>TWELVEDATA_API_KEY</code> as an encrypted Cloudflare secret. ③ Add <code>LIVE_DATA_ENABLED</code> with value <code>on</code>. ④ Redeploy and reload this page.</p><p>Without a licensed API, Rangeform shows independent TradingView market charts and news instead of generating prices. Individual plans may not be redistributed to public visitors. Provider REST bars are not tick-by-tick streaming.</p><button id="checkConnection" class="btn btn-primary">Check provider connection ↻</button><span id="connectionMessage" class="conn-note">Waiting for connection check</span>`;
   status.parentElement.append(el);
   $('checkConnection').onclick=()=>checkProvider(true);
  }
  let toolbar=$('page-signals')?.querySelector('.controls-panel');
  if(toolbar&&!$('sourceHint')){let el=document.createElement('div');el.id='sourceHint';el.className='source-hint';el.textContent='Data source and timestamp must be verified before using an intraday setup.';toolbar.after(el)}
 }
-window.renderTradeGuide=(x)=>{
- mount();active=x;let s=direction(x),r=x.indicators||{},stamp=x.last_bar_utc||'';
- $('deskSource').textContent=x.source==='twelvedata'?'TWELVE DATA · CHECK MARKET HOURS':x.source==='user-csv'?'IMPORTED CSV · UNVERIFIED':'SYNTHETIC DEMO';
- $('deskVerdict').dataset.bias=s.kind;$('deskBias').textContent=s.bias;$('deskLine').textContent=s.detail;
- $('deskScore').textContent=x.score+'/100';$('deskPrice').textContent=usd(x.last);$('deskTime').textContent=x.interval+' • '+(stamp?new Date(stamp).toLocaleString('en-CA',{timeZone:'America/New_York',month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'})+' ET':'—');
- $('deskWhy').textContent=s.impact.join(' • ')||'Not enough information.';
- $('deskWatch').textContent=s.watch;
- $('deskLevels').textContent='Prior high '+usd(r.resistance20)+' • Prior low '+usd(r.support20)+(s.stop?' • Illustrative invalidation '+usd(s.stop):'')+'. Verify current bid/ask and costs.';
- $('deskChoiceNote').textContent=s.fresh?'This is a time-sensitive research setup, not an order. Check market hours, liquidity, spread and breaking news.':'No actionable trade signal: '+s.reason;
- for(let [id,bias] of [['deskBuy','buy'],['deskSell','sell'],['deskWait','wait']]){$(id).classList.toggle('chosen',bias===s.kind);$(id).setAttribute('aria-pressed',String(bias===s.kind))}
- if(s.fresh && (s.bullish||s.bearish)&&shownFor!==x.symbol+'|'+x.interval+'|'+stamp+'|'+s.kind){shownFor=x.symbol+'|'+x.interval+'|'+stamp+'|'+s.kind;if(localStorage.getItem('rangeform_alerts')==='yes'){try{window.toast?.('New '+s.kind.toUpperCase()+' setup: '+x.symbol+' • verify timestamp and spread.')}catch{}}}
+window.renderTradeGuide=x=>{
+ mount();active=x;const sig=direction(x),ind=x.indicators||{},stamp=x.last_bar_utc||'';
+ $('deskSource').textContent=x.source==='twelvedata'?'LICENSED PROVIDER · '+x.interval:x.source==='user-csv'?'IMPORTED HISTORICAL DATA':'UNVERIFIED HISTORY';
+ $('deskVerdict').dataset.bias=sig.kind;
+ $('deskBias').textContent=sig.bias;$('deskLine').textContent=sig.detail;
+ $('deskReadiness').textContent=sig.kind==='wait'?'NO VERIFIED SETUP':'CONDITIONAL SETUP · VERIFY BROKER';
+ $('deskScore').textContent=x.score+'/100';$('deskPrice').textContent=usd(x.last);
+ $('deskTime').textContent=x.interval+' · '+(stamp?new Date(stamp).toLocaleString('en-CA',{timeZone:'America/New_York',month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'})+' ET':'Time unknown');
+ $('deskGate').textContent=sig.kind==='wait'?'NOT ACTIONABLE':sig.kind==='buy'?'BULLISH CONDITIONS MET':'BEARISH CONDITIONS MET';
+ $('deskEntry').textContent=sig.entry==null?'—':usd(sig.entry);
+ $('deskInvalid').textContent=sig.stop==null?'—':usd(sig.stop);
+ $('deskTarget').textContent=sig.target==null?'—':usd(sig.target);
+ $('deskPlanNote').textContent=sig.kind==='wait'?'No trade levels without validated current bars and confirmed rules. '+sig.reason:'Illustrative 2R is arithmetic, not a predicted profit. Confirm market price and upcoming catalysts before making any decision.';
+ $('deskWhy').textContent=sig.impact.join(' · ')||'Not enough reliable inputs.';
+ $('deskWatch').textContent=sig.watch;
+ const checklist=$('deskChecklist');checklist.replaceChildren();
+ for(const check of sig.checks){const row=document.createElement('div');row.className='desk-check '+(check.ok?'yes':'pending');const dot=document.createElement('span');dot.textContent=check.ok?'✓':'—';const label=document.createElement('span');label.textContent=check.label;row.append(dot,label);checklist.append(row)}
+ $('deskChoiceNote').textContent=sig.kind==='wait'?'WAIT — '+sig.reason:'This is a conditional technical setup. An independent live broker price, spread, exchange status and breaking news must still be checked.';
+ for(const [id,mode] of [['deskBuy','buy'],['deskSell','sell'],['deskWait','wait']]){$(id).classList.toggle('chosen',mode===sig.kind);$(id).setAttribute('aria-pressed',String(mode===sig.kind))}
+ if(sig.kind!=='wait'&&shownFor!==x.symbol+'|'+x.interval+'|'+stamp+'|'+sig.kind){shownFor=x.symbol+'|'+x.interval+'|'+stamp+'|'+sig.kind;if(localStorage.getItem('rangeform_alerts')==='yes')window.toast?.('Conditional '+sig.kind+' setup on '+x.symbol+'. Independently verify quote and news.')}
 };
+
 window.renderOverviewGuide=(x,radar)=>{
  mount();let fresh=freshness(x),n=(radar?.rows||[]).filter(y=>y.source==='twelvedata'&&!y.error).length;
  $('liveStripDot').classList.toggle('on',x.source==='twelvedata'&&fresh.fresh);
- $('liveStripTitle').textContent=x.source==='twelvedata'?'Twelve Data connected • '+x.symbol+' '+x.interval:'Synthetic demo • no live quotes';
- $('liveStripSub').textContent=x.source==='twelvedata'?(fresh.reason+' • '+n+' watchlist symbols loaded. Data may be delayed.'):'To view real bars, configure your private data provider in Cloudflare settings.';
+ $('liveStripTitle').textContent=x.source==='twelvedata'?'Twelve Data connected • '+x.symbol+' '+x.interval:'Exchange-delayed market widgets · quant API not connected';
+ $('liveStripSub').textContent=x.source==='twelvedata'?(fresh.reason+' • '+n+' watchlist symbols loaded. Data may be delayed.'):'TradingView widgets are available above. Quant model values require real, authorized historical data.';
  $('liveStripAction').textContent=x.source==='twelvedata'?'Review setup →':'Connect market data →';
 };
 window.renderOverviewError=message=>{mount();$('liveStripTitle').textContent='Market data unavailable';$('liveStripSub').textContent=message};
 async function checkProvider(show){mount();let msg=$('connectionMessage');if(msg)msg.textContent='Checking connection…';
- try{let r=await fetch('/api/status',{cache:'no-store'}),d=await r.json();connected=Boolean(d.twelvedata_configured);enabled=Boolean(d.twelvedata_enabled);if(msg)msg.textContent=enabled?'Provider configured and authorized. Check prices and time stamps.':connected?'API key found, but live data is locked. Protect the website and set LIVE_DATA_ENABLED=on.':'No provider key detected. Follow the steps above.';
-  const live=$('sourceSelect');if(live){live.value=enabled?'twelvedata':'demo';$('intervalSelect').value=enabled?'5min':'1day';}
-  if(enabled && !liveMode){liveMode=true;state.source='twelvedata';state.interval='5min';$('autoRefresh').value='300';window.scheduleRefresh?.();window.loadOverview?.();}
+ try{let r=await fetch('/api/status',{cache:'no-store'}),d=await r.json();connected=Boolean(d.twelvedata_configured);enabled=Boolean(d.twelvedata_enabled);if(msg)msg.textContent=enabled?'Personal provider detected. Public redistribution needs licensing review and timestamps must be checked.':connected?'API key found, but live data is locked. Protect the website and set LIVE_DATA_ENABLED=on.':'No provider key detected. Follow the steps above.';
+  const live=$('sourceSelect');if(live){if(live.value==='none'&&enabled)live.title='Private provider available only with authorized access';}
+  if(enabled && !liveMode){liveMode=true;/* Public landing never silently exhausts a personal data subscription. */}
   if(show){let check=$('checkConnection');if(check){check.classList.add('pressed');setTimeout(()=>check.classList.remove('pressed'),300)}}
  }catch(e){if(msg)msg.textContent='Cannot reach app status API. '+e.message;}
 }

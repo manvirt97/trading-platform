@@ -1,0 +1,40 @@
+/* Rangeform premium shell, shared by Market Desk and private Workspace.
+   Own visual system: deliberately calm, source-aware, readable and responsive. */
+:root{--rf-soft-shadow:0 13px 42px rgba(9,24,42,.085)}
+body{font-feature-settings:"tnum" 1;line-height:1.5}
+.bar{border-bottom:1px solid var(--edge);box-shadow:0 3px 26px rgba(8,22,39,.06)}
+.bar .brand{gap:11px}
+.bar .brand b{font-weight:780;letter-spacing:-.052em}
+.bar .nav a{font-size:12px;letter-spacing:0;font-weight:700}
+.bar .nav a.active{box-shadow:inset 0 -2px color-mix(in srgb,var(--accent) 48%,transparent)}
+.bar .icon-btn{border-radius:11px}
+.wrap{max-width:1380px;padding-top:29px}
+.hero{position:relative;isolation:isolate;overflow:hidden;align-items:center;gap:22px;padding:clamp(24px,3.5vw,46px);border:1px solid var(--edge);border-radius:24px;background:linear-gradient(115deg,var(--panel),var(--soft));box-shadow:var(--rf-soft-shadow);margin-bottom:23px}
+.hero::before{content:"";pointer-events:none;position:absolute;z-index:-1;top:-130px;right:-80px;width:290px;height:290px;border:38px solid rgba(135,167,193,.09);border-radius:50%}
+.hero h1{font-weight:760;font-size:clamp(36px,4.4vw,66px);letter-spacing:-.075em;line-height:1.04;margin:11px 0 16px}
+.hero h1 em{font-weight:640;color:var(--accent)}
+.hero p{font-size:14px;line-height:1.75}
+.hero .pill{border-radius:12px;min-height:46px;padding:11px 16px;align-self:end}
+.overline{letter-spacing:.13em;font-weight:790}
+.tile{border-radius:17px;box-shadow:var(--rf-soft-shadow);transition:border-color .18s,box-shadow .18s}
+.tile:hover{border-color:color-mix(in srgb,var(--edge) 60%,var(--accent) 40%)}
+.tile-head{padding:19px 20px 14px}
+.tile-head h3{font-size:17px;letter-spacing:-.04em;font-weight:760}
+.toolbar{border-radius:15px;padding:15px;gap:11px;box-shadow:0 3px 13px rgba(13,28,48,.035)}
+.field input,.field select{border-radius:10px;min-height:42px}
+.primary,.pill{border-radius:10px;font-weight:720;transition:transform .14s ease,box-shadow .17s ease,background-color .17s ease}
+.primary:hover,.pill:hover{box-shadow:0 4px 16px rgba(8,24,41,.12)}
+.primary:active,.pill:active{transform:scale(.98)}
+.quick button,.intervals button{border-radius:9px;font-weight:720}
+.warning{border-radius:12px;padding:14px 17px;line-height:1.65}
+.section-header h2,h2{letter-spacing:-.045em}
+.chart{border-radius:12px;overflow:hidden}
+.content{padding:20px 21px}
+.content h3{font-size:19px;font-weight:760;letter-spacing:-.045em}
+.content p{line-height:1.75}
+.login-row{border-radius:17px}
+.account-form input,.account-form select,.ai-form input,.ai-form textarea{border-radius:11px;min-height:44px}
+.account-form button,.ai-form button{min-height:44px;border-radius:10px}
+@media(max-width:900px){.wrap{padding-top:20px}.hero{flex-direction:column;align-items:stretch;padding:28px}.hero .pill{align-self:flex-start}.hero h1{font-size:clamp(35px,7vw,55px)}}
+@media(max-width:650px){.wrap{padding:16px 14px calc(25px + env(safe-area-inset-bottom,0px))}.hero{margin-bottom:19px;border-radius:18px;padding:23px 19px}.hero h1{font-size:clamp(34px,10vw,49px)}.hero p{font-size:13px}.hero .pill{width:100%;justify-content:center}.tile{border-radius:15px}.toolbar{padding:12px}.bar .nav a{font-size:11px!important}.tile-head{padding:15px}.content{padding:17px}.warning{padding:12px}.bar .brand b{font-size:17px}}
+@media(prefers-reduced-motion:reduce){.tile,.primary,.pill{transition:none}}

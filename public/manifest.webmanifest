@@ -1,0 +1,40 @@
+{
+  "name": "Rangeform — Market Intelligence",
+  "short_name": "Rangeform",
+  "description": "Interactive market charts, research, news and a personal workspace",
+  "id": "/",
+  "start_url": "/research",
+  "scope": "/",
+  "display": "standalone",
+  "display_override": [
+    "standalone"
+  ],
+  "background_color": "#0d1623",
+  "theme_color": "#0d1623",
+  "orientation": "any",
+  "icons": [
+    {
+      "src": "/static/rangeform-official-icon.png",
+      "sizes": "96x96",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Market Desk",
+      "short_name": "Markets",
+      "url": "/market.html"
+    },
+    {
+      "name": "Advanced Research",
+      "short_name": "Research",
+      "url": "/research"
+    },
+    {
+      "name": "My Workspace",
+      "short_name": "Workspace",
+      "url": "/account.html"
+    }
+  ]
+}

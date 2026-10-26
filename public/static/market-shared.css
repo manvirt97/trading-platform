@@ -1,0 +1,59 @@
+/* Shared Rangeform navigation across Market Desk and My Workspace */
+.bar{position:sticky;top:0;z-index:25;min-height:76px;background:var(--panel);box-shadow:0 4px 24px #13283908}
+.bar .nav{gap:5px}
+.bar .nav a{display:inline-flex!important;align-items:center;justify-content:center;white-space:nowrap;min-height:39px;padding:0 14px;border-radius:10px;border:1px solid transparent;transition:background .15s,color .15s}
+.bar .nav a:hover{background:var(--soft);color:var(--text)}
+.bar .nav a.active{background:var(--soft);border-color:var(--edge);color:var(--text)}
+.bar .brand{gap:11px}.bar .mark{border-radius:12px}
+@media(max-width:780px){
+ .bar{height:auto;min-height:110px;display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-rows:54px 45px;row-gap:0;padding:5px 13px;align-items:center}
+ .bar .brand{grid-column:1;grid-row:1}
+ .bar .head-actions{grid-column:2;grid-row:1}
+ .bar .nav{grid-column:1/-1;grid-row:2;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px;width:100%;margin:0}
+ .bar .nav a{white-space:nowrap;font-size:11px;padding:0 5px;min-height:38px;text-align:center}
+ .bar .brand b{font-size:12px}.bar .brand small{font-size:8px}
+ .bar .head-actions .label-chip{display:none}
+ .bar .mark{width:34px;height:34px}
+}
+@media(max-width:370px){.bar .nav a{font-size:10px}.bar .brand b{font-size:11px}}
+
+/* Match Rangeform's Research header centerline exactly */
+.bar .brand .mark{width:42px;height:42px;flex:0 0 42px;display:block;padding:0;border:0;background:transparent;box-shadow:none;overflow:hidden;border-radius:12px}
+.bar .brand .mark img{display:block;width:100%;height:100%;object-fit:cover}
+@media(min-width:1081px){
+ .bar{position:sticky}
+ .bar .nav{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px;width:465px;min-width:465px;margin:0;padding:4px;border:1px solid var(--edge);border-radius:13px;background:var(--panel)}
+ .bar .nav a{font-size:12px;text-align:center;min-width:0;overflow:hidden;text-overflow:ellipsis}
+ .bar .head-actions{margin-left:auto}
+}
+@media(min-width:1081px) and (max-width:1450px){
+ .bar .nav{width:420px;min-width:420px}
+ .bar .nav a{font-size:11px}
+}
+@media(min-width:781px) and (max-width:1080px){
+ .bar{display:grid;grid-template-columns:180px 1fr;grid-template-rows:45px 45px;height:97px;align-items:center;gap:2px;padding:4px 17px}
+ .bar .brand{grid-column:1;grid-row:1;min-width:0}
+ .bar .nav{grid-column:1/-1;grid-row:2;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px;width:100%;margin:0}
+ .bar .nav a{width:100%;text-align:center;padding:9px 5px}
+ .bar .head-actions{grid-column:2;grid-row:1;justify-self:end}
+}
+@media(max-width:780px){.bar .brand .mark{width:35px;height:35px;flex-basis:35px}.bar .nav a{display:inline-flex!important}}
+@view-transition{navigation:none}
+@media(prefers-reduced-motion:no-preference){
+ ::view-transition-old(root){animation:.12s ease-out both rfFadeOut}
+ ::view-transition-new(root){animation:.18s ease-out both rfFadeIn}
+ @keyframes rfFadeOut{to{opacity:.68}}
+ @keyframes rfFadeIn{from{opacity:.7}to{opacity:1}}
+}
+
+
+@media(max-width:780px){html,body{max-width:100%;overflow-x:clip}.bar{padding-top:calc(5px + env(safe-area-inset-top,0px));padding-left:calc(13px + env(safe-area-inset-left,0px));padding-right:calc(13px + env(safe-area-inset-right,0px))}}
+body.standalone{overscroll-behavior-y:contain}
+
+/* Match the selected layered logo wordmark across all three destinations */
+.bar .brand b{font-size:20px;letter-spacing:-.045em;font-weight:760;text-transform:none;font-family:Inter,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif}
+.bar .brand small{letter-spacing:.12em}
+@media(max-width:780px){.bar .brand b{font-size:17px;letter-spacing:-.03em}.bar .brand small{font-size:8px}}
+
+/* App navigation is immediate; avoid costly cross-document snapshot animations. */
+@view-transition{navigation:none}

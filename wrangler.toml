@@ -2,4 +2,23 @@ name = "rangeform"
 pages_build_output_dir = "public"
 compatibility_date = "2026-10-01"
 # Do not add API keys to this file! Use Cloudflare Pages Settings > Variables and Secrets.
-# No D1 database or shared server-side journal: each user's journal stays in their browser.
+# Rangeform account storage uses a separate D1 database when Firebase Auth is configured.
+# Before sign-in is enabled, guest research remains browser-local.
+
+[[d1_databases]]
+binding = "DB"
+database_name = "rangeform-users"
+database_id = "6aa50056-4a2d-4ba1-8517-da4de248322f"
+
+# Firebase Web SDK identifiers. These are public browser configuration values, not private keys.
+# Google sign-in also requires enabling the provider and authorizing rangeform.pages.dev.
+[vars]
+FIREBASE_PROJECT_ID = "rangeform-7e8d2"
+FIREBASE_API_KEY = "AIzaSyDuW6AYo89yiDQXFQWG_Ea0b3U1iaShbdk"
+FIREBASE_AUTH_DOMAIN = "rangeform-7e8d2.firebaseapp.com"
+FIREBASE_APP_ID = "1:1048284129093:web:d93cc7eda8dc14ea96402c"
+# Set on only for rate-limited, signed-in Cloudflare Workers AI. There is no exposed private AI key.
+AI_ENABLED = "on"
+
+[ai]
+binding = "AI"
