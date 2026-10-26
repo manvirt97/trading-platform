@@ -12,7 +12,7 @@ const freshness=x=>{
  const stamp=Date.parse(x.last_bar_utc),dur={'1min':60000,'5min':300000,'15min':900000}[x.interval];
  if(!Number.isFinite(stamp)||stamp>Date.now()+30000)return {fresh:false,reason:'Invalid timestamp — verify provider data'};
  let age=Date.now()-stamp;
- if(age>dur*3+60000)return {fresh:false,reason:'Latest completed bar is '+Math.round(age/60000)+' min old — not timely'};
+ if(age>dur*3+60000){const parts=Object.fromEntries(new Intl.DateTimeFormat('en-US',{timeZone:'America/New_York',weekday:'short',hour:'2-digit',minute:'2-digit',hour12:false}).formatToParts(new Date()).map(p=>[p.type,p.value]));const minute=Number(parts.hour)*60+Number(parts.minute);const outside=['Sat','Sun'].includes(parts.weekday)||minute<570||minute>=960;const ageLabel=age>=86400000?(age/86400000).toFixed(1)+' days':Math.round(age/60000)+' min';return {fresh:false,reason:outside?'Outside normal U.S. equity session (9:30–16:00 ET). Last completed bar '+ageLabel+' old — not a current quote.':'Last completed bar '+ageLabel+' old — stale for intraday trading.'}};
  return {fresh:true,reason:'Last completed bar: '+Math.max(0,Math.round(age/60000))+' min old; not a streaming quote'};
 };
 function direction(x){
