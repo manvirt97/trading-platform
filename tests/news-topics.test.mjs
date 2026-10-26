@@ -14,6 +14,7 @@ test('news categories have independent relevance rules, never duplicate the same
  assert.ok(relevantToTopic('TSX Canadian markets rebound','canada'));
  assert.ok(relevantToTopic('Nvidia AI semiconductor outlook','technology'));
  assert.ok(relevantToQuery('Apple rallies on earnings','Apple'));
+ assert.ok(relevantToQuery('Tesla shares react to results','Tesla, Inc.'));
  assert.ok(!relevantToQuery('Apple rallies on earnings','Microsoft'));
 });
 
