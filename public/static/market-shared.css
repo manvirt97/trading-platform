@@ -16,3 +16,32 @@
  .bar .mark{width:34px;height:34px}
 }
 @media(max-width:370px){.bar .nav a{font-size:10px}.bar .brand b{font-size:11px}}
+
+/* Match Rangeform's Research header centerline exactly */
+.bar .brand .mark{width:42px;height:42px;flex:0 0 42px;display:block;padding:0;border:0;background:transparent;box-shadow:none;overflow:hidden;border-radius:12px}
+.bar .brand .mark img{display:block;width:100%;height:100%;object-fit:cover}
+@media(min-width:1081px){
+ .bar{position:sticky}
+ .bar .nav{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px;width:465px;min-width:465px;margin:0;padding:4px;border:1px solid var(--edge);border-radius:13px;background:var(--panel)}
+ .bar .nav a{font-size:12px;text-align:center;min-width:0;overflow:hidden;text-overflow:ellipsis}
+ .bar .head-actions{margin-left:auto}
+}
+@media(min-width:1081px) and (max-width:1450px){
+ .bar .nav{width:420px;min-width:420px}
+ .bar .nav a{font-size:11px}
+}
+@media(min-width:781px) and (max-width:1080px){
+ .bar{display:grid;grid-template-columns:180px 1fr;grid-template-rows:45px 45px;height:97px;align-items:center;gap:2px;padding:4px 17px}
+ .bar .brand{grid-column:1;grid-row:1;min-width:0}
+ .bar .nav{grid-column:1/-1;grid-row:2;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px;width:100%;margin:0}
+ .bar .nav a{width:100%;text-align:center;padding:9px 5px}
+ .bar .head-actions{grid-column:2;grid-row:1;justify-self:end}
+}
+@media(max-width:780px){.bar .brand .mark{width:35px;height:35px;flex-basis:35px}.bar .nav a{display:inline-flex!important}}
+@view-transition{navigation:auto}
+@media(prefers-reduced-motion:no-preference){
+ ::view-transition-old(root){animation:.12s ease-out both rfFadeOut}
+ ::view-transition-new(root){animation:.18s ease-out both rfFadeIn}
+ @keyframes rfFadeOut{to{opacity:.68}}
+ @keyframes rfFadeIn{from{opacity:.7}to{opacity:1}}
+}
