@@ -385,7 +385,7 @@ body[data-theme=light] .news-columns .tv-news-frame{background:#fff}
  .mobile-dock button{min-height:55px;transition:background .18s,transform .14s}
  .mobile-dock button:active{transform:scale(.94)}
 }
-@view-transition{navigation:auto}
+@view-transition{navigation:none}
 @media(prefers-reduced-motion:no-preference){
  ::view-transition-old(root){animation:.12s ease-out both fadeAway}
  ::view-transition-new(root){animation:.18s ease-out both fadeAppear}
