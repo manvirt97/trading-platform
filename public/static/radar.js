@@ -24,5 +24,5 @@ async function load(force=false){refresh.disabled=true;refresh.textContent='Chec
  if(!d.headlines?.length)addText(news,'li','No recent headlines were returned. Check the linked sources directly.');
  }catch(e){status.textContent='Live public news coverage unavailable; no rankings displayed.';showEmpty('Cannot verify current headlines right now. Do not treat demo data as a recommendation.');}
  finally{refresh.disabled=false;refresh.textContent='Scan again ↻'}}
-sel.addEventListener('change',()=>{localStorage.setItem('market_radar_region',sel.value);load()});refresh.addEventListener('click',()=>load(true));load();
+sel.addEventListener('change',()=>{localStorage.setItem('market_radar_region',sel.value);load()});refresh.addEventListener('click',()=>load(true));load();setInterval(()=>{if(!document.hidden)load()},15*60*1000);
 })();
