@@ -21,7 +21,7 @@ export function suggestSymbols(text,limit=7){
 }
 export function resolveSymbol(text){
  const q=cleaned(text);if(!q)return null;
- const exact=catalog.find(x=>x.symbol.toLowerCase()===q||x.name.toLowerCase()===q);
+ const exact=catalog.find(x=>x.symbol.toLowerCase()===q||x.name.toLowerCase()===q||(q.length>=5&&x.name.toLowerCase().startsWith(q)));
  if(exact)return {symbol:exact.symbol,name:exact.name,exchange:exact.exchange};
  const top=suggestSymbols(text,2);
  // Don't silently reinterpret ambiguous free-form questions as stock symbols.
