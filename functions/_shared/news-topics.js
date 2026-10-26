@@ -36,3 +36,9 @@ export function primaryTopic(title){
  }
  return best;
 }
+
+/** Avoid unrelated crime and political general-news stories in a market terminal. */
+export function marketRelevant(title){
+ const value=String(title||'');
+ return /\b(stock(?:s)?|shares?|equity|equities|market(?:s)?|wall street|nasdaq|dow jones|s&p|tsx|trading|invest(?:or|ment|ing)?|earnings?|quarterly|revenue|profit|margin|forecast|guidance|dividend|bond|yield|treasury|fed|federal reserve|inflation|interest rates?|economy|economic|gdp|jobs?|employment|tariffs?|trade deal|oil|crude|opec|natural gas|lng|energy|refin(?:ery|ing)|bank(?:s|ing)?|currency|dollar|cad|usd|merger|acquisition|ipo|crypto|bitcoin|semiconductor|nvidia|tesla|apple|microsoft|financial|retail sales|consumer spending|supply chain|commodit(?:y|ies)|gold|copper)\b/i.test(value);
+}
