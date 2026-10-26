@@ -17,3 +17,27 @@ button.loading::after{content:' ···';display:inline-block;animation:softpulse
 .live-setup{border-top:1px solid var(--border);margin-top:22px;padding-top:19px}.live-setup h3{font-size:17px}.live-setup p{font-size:12px;line-height:1.8;color:var(--muted)}.live-setup code{color:var(--text);background:var(--surface);padding:2px 4px;border:1px solid var(--border);border-radius:4px}.live-setup .conn-note{display:block;margin-top:12px;color:var(--muted);font-size:11px}.live-setup #checkConnection{margin-top:8px}
 @media(max-width:1050px){.desk-row{grid-template-columns:1fr 1fr}.desk-verdict{grid-column:span 2}.desk-guide{grid-template-columns:1fr 1fr}.desk-guide>div:nth-child(2){border-right:0}}
 @media(max-width:650px){.decision-deck{padding:15px}.desk-title{flex-direction:column;align-items:flex-start}.desk-row{grid-template-columns:1fr 1fr}.desk-verdict{padding:15px}.desk-metric{padding:14px}.desk-metric strong{font-size:20px}.desk-guide{grid-template-columns:1fr;gap:5px}.desk-guide>div{padding:10px 0;border-right:0;border-bottom:1px solid var(--border)}.desk-guide>div:last-child{border:0}.desk-actions button{flex:1 1 43%}.desk-actions .desk-risk{flex:1 1 100%;margin-left:0}.live-strip{align-items:flex-start;flex-wrap:wrap}.strip-action{margin-left:24px}}
+/* Rangeform Signal Desk premium refresh — clearer decisions, restrained fintech depth */
+.decision-deck{border-radius:22px;padding:25px;background:linear-gradient(135deg,var(--panel),var(--surface));box-shadow:0 14px 45px rgba(4,15,30,.13);overflow:hidden}
+.desk-title{padding-bottom:5px}
+.desk-verdict{border-radius:17px;padding:23px;min-height:190px;border:1px solid var(--border);border-left:4px solid var(--blue);box-shadow:0 9px 30px rgba(0,0,0,.06)}
+.desk-verdict[data-bias="buy"]{border-left-color:#4a9481;background:linear-gradient(125deg,var(--surface),var(--panel2))}
+.desk-verdict[data-bias="sell"]{border-left-color:#be7c76;background:linear-gradient(125deg,var(--surface),var(--panel2))}
+.desk-verdict strong{font-size:clamp(25px,3.5vw,39px);font-weight:800;letter-spacing:-.055em;line-height:1.06}
+.desk-verdict[data-bias="buy"] strong{color:var(--text)}
+.desk-verdict[data-bias="sell"] strong{color:var(--text)}
+.desk-metric{border-radius:17px;min-height:165px;box-shadow:0 5px 20px rgba(0,0,0,.035)}
+.desk-metric strong{font-weight:800;font-size:clamp(26px,3.1vw,38px)}
+.desk-actions{gap:10px;padding-top:20px}
+.desk-actions .desk-choice{min-height:50px;border-radius:13px;font-size:12px;transition:transform .16s,border-color .16s,background .16s}
+.desk-actions .desk-choice:hover{transform:translateY(-2px);border-color:var(--lime);background:var(--panel2)}
+.desk-actions .desk-risk{border-radius:13px;min-height:50px}
+.desk-plan{border:1px solid var(--border);border-radius:16px;background:var(--surface);padding:18px;margin-top:16px}
+.desk-plan-top{display:flex;justify-content:space-between;gap:12px;color:var(--muted);font-size:10px;font-weight:750;letter-spacing:.08em}
+.desk-plan-levels{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;padding-top:17px}
+.desk-plan-levels>div{border:1px solid var(--border);border-radius:12px;padding:13px;min-width:0;background:var(--panel)}
+.desk-plan-levels small{display:block;color:var(--muted);font-size:9px;letter-spacing:.09em;margin-bottom:6px}
+.desk-plan-levels strong{display:block;font-size:clamp(16px,2vw,24px);overflow-wrap:anywhere}
+.desk-plan p{color:var(--muted);font-size:11px;line-height:1.6;margin:12px 0 0}
+.desk-readiness{display:inline-flex;align-items:center;align-self:flex-start;border:1px solid var(--border);border-radius:40px;padding:6px 10px;font-size:10px;font-weight:700;letter-spacing:.08em}
+@media(max-width:650px){.decision-deck{padding:14px;border-radius:16px}.desk-verdict{min-height:0;padding:18px}.desk-verdict strong{font-size:27px}.desk-plan{padding:12px}.desk-plan-levels{gap:6px}.desk-plan-levels>div{padding:9px}.desk-plan-levels strong{font-size:15px}.desk-actions{gap:7px}}
