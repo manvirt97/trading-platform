@@ -139,7 +139,7 @@ window.renderTradeGuide=x=>{
  mount();active=x;const sig=direction(x),ind=x.indicators||{},stamp=x.last_bar_utc||'';
  $('deskSource').textContent=x.source==='twelvedata'?'TWELVE DATA · '+x.interval+' BARS':x.source==='user-csv'?'IMPORTED HISTORICAL DATA':'UNVERIFIED HISTORY';
  $('deskVerdict').dataset.bias=sig.kind;
- $('deskBias').textContent=sig.bias;$('deskLine').textContent=sig.kind==='wait'&&x.score>=65?'Bullish technical bias, but NOT a verified buy entry. '+sig.reason:sig.kind==='wait'&&x.score<=35?'Bearish technical bias, but NOT a verified sell entry. '+sig.reason:sig.detail;
+ $('deskBias').textContent=sig.kind==='wait'&&x.score>=65?'BUY WATCH · WAIT FOR ENTRY':sig.kind==='wait'&&x.score<=35?'SELL WATCH · WAIT FOR EXIT SIGNAL':sig.bias;$('deskLine').textContent=sig.kind==='wait'&&x.score>=65?'Bullish technical bias, but NOT a verified buy entry. '+sig.reason:sig.kind==='wait'&&x.score<=35?'Bearish technical bias, but NOT a verified sell entry. '+sig.reason:sig.detail;
  $('deskReadiness').textContent=sig.kind==='wait'?(x.score>=65?'BULLISH BIAS · ENTRY NOT CONFIRMED':x.score<=35?'BEARISH BIAS · EXIT NOT CONFIRMED':'NO VERIFIED SETUP'):'CONDITIONAL SETUP · VERIFY BROKER';
  $('deskScore').textContent=x.score+'/100';$('deskPrice').textContent=usd(x.last);
  $('deskTime').textContent=x.interval+' · '+(stamp?new Date(stamp).toLocaleString('en-CA',{timeZone:'America/New_York',month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'})+' ET':'Time unknown');
