@@ -1,3 +1,14 @@
+# Market Desk v6 — Public research + private workspace foundation
+
+**Open:** https://trading-platform-b56.pages.dev/  
+**Step-by-step owner setup:** [OWNER-SETUP-ACCOUNTS-AI.md](OWNER-SETUP-ACCOUNTS-AI.md)
+
+The public homepage has TradingView charts, a limited headline-based Opportunity Radar, Canadian/US region selection and a local-time clock. It is not a full-web crawler, real-time price scanner or validated forecasting system. Users can start without brokerage or market-data API accounts.
+
+`/account.html` saves watchlists and research history locally as a guest. Secure per-user cross-device syncing and optional Workers AI have been programmed to stay **disabled until a dedicated D1 database, verified Firebase authentication, and optional AI binding are set up**. See the owner guide before offering accounts publicly.
+
+---
+
 # Rangeform Research — GitHub / Cloudflare Pages edition (v3.1)
 
 **START HERE:** `START-HERE-GITHUB.md` (non-technical deployment walkthrough).
