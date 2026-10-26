@@ -54,3 +54,6 @@ body.standalone{overscroll-behavior-y:contain}
 .bar .brand b{font-size:20px;letter-spacing:-.045em;font-weight:760;text-transform:none;font-family:Inter,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif}
 .bar .brand small{letter-spacing:.12em}
 @media(max-width:780px){.bar .brand b{font-size:17px;letter-spacing:-.03em}.bar .brand small{font-size:8px}}
+
+/* App navigation is immediate; avoid costly cross-document snapshot animations. */
+@view-transition{navigation:none}
