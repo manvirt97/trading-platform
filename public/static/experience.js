@@ -4,6 +4,7 @@ const $=id=>document.getElementById(id);
 const escape=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const dec=(date)=>{let d=Date.parse(date),age=Date.now()-d;if(!Number.isFinite(age)||age<0)return 'Time unverified';if(age<3600000)return Math.max(1,Math.floor(age/60000))+'m ago';if(age<86400000)return Math.floor(age/3600000)+'h ago';return Math.floor(age/86400000)+'d ago'};
 let newsCache=new Map(),newsLast=0,newsCategory='all',currentUser=null,auth=null,authReady=false,aiReady=false,fetchSeq=0,commandItems=[],commandIndex=0;
+let pendingChart=null;
 const getJson=async(path,options={})=>{const resp=await fetch(path,{cache:'no-store',...options}),data=await resp.json().catch(()=>({}));if(!resp.ok)throw Error(data.error||'This service is temporarily unavailable');return data};
 const sleepDebounce=(func,delay=160)=>{let id;return(...args)=>{clearTimeout(id);id=setTimeout(()=>func(...args),delay)}};
 async function matches(term){try{return (await getJson('/api/symbol-search?q='+encodeURIComponent(term))).items||[]}catch{return []}}
@@ -118,7 +119,7 @@ async function setupAI(){
   onAuthStateChanged(auth,user=>{const old=currentUser?.uid||null;currentUser=user;if(old!==(user?.uid||null)){$('copilotThread').replaceChildren();chat('assistant','Private research session. I can use your saved watchlist and research notes from this Google account, but I will not invent live prices or remember this chat automatically.');const key=user?'rangeform_model_'+user.uid:null;$('copilotModel').value=key&&sessionStorage.getItem(key)||'balanced';}if(!user)aiState('Sign in with your own Google account to ask AI',false);else if(!aiReady)aiState('Signed in · AI binding not yet enabled',false);else aiState('Signed in as '+(user.email||'Google user')+' · ready',true)});
  }catch(e){aiState('Unable to initialize AI sign-in: '+e.message,false)}
 }
-async function sendAI(question){
+async function sendAI(question,chart=pendingChart){
  const text=String(question||'').trim();if(text.length<4){$('copilotQuestion').focus();return}
  if(!currentUser){chat('assistant','Google sign-in is required to protect your private questions and daily AI allowance. Open My workspace to sign in, then return here.');return}
  if(!aiReady){chat('assistant','The AI model is not activated in Cloudflare yet. You can still explore public news, interactive charts and signals.');return}
@@ -126,10 +127,10 @@ async function sendAI(question){
  const bubble=chat('assistant','Reviewing your question…');
  try{
   const token=await currentUser.getIdToken();
-  const res=await getJson('/api/research-ai',{method:'POST',headers:{'Authorization':'Bearer '+token,'Content-Type':'application/json'},body:JSON.stringify({question:text,symbol:'',model})});
+  const res=await getJson('/api/research-ai',{method:'POST',headers:{'Authorization':'Bearer '+token,'Content-Type':'application/json'},body:JSON.stringify({question:text,symbol:chart?.symbol||'',model,chart:chart?.source==='twelvedata'?{symbol:chart.symbol,interval:chart.interval}:null})});
   if(currentUser?.uid!==owner)return;bubble.textContent=(res.model||'Research model')+'\n\n'+(res.answer||'No answer was returned');bubble.textContent+='\n\n'+(res.limitations||'Confirm any current facts independently.');
  }catch(e){if(currentUser?.uid===owner)bubble.textContent='Could not complete that AI request: '+e.message}
- finally{$('copilotSend').disabled=!aiReady||!currentUser}
+ finally{pendingChart=null;$('copilotSend').disabled=!aiReady||!currentUser}
 }
 function updateSession(){if(!$('sessionLocal'))return;let now=new Date(),zone=Intl.DateTimeFormat().resolvedOptions().timeZone||'UTC',local=new Intl.DateTimeFormat('en-CA',{timeZone:zone,hour:'numeric',minute:'2-digit',timeZoneName:'short'}).format(now),name=zone==='America/Edmonton'?'Calgary':zone.split('/').at(-1).replaceAll('_',' ');$('sessionLocal').textContent=name+' · '+local;let parts=Object.fromEntries(new Intl.DateTimeFormat('en-US',{timeZone:'America/New_York',weekday:'short',hour:'2-digit',minute:'2-digit',hour12:false}).formatToParts(now).map(z=>[z.type,z.value]));let minutes=Number(parts.hour)*60+Number(parts.minute),weekday=!['Sat','Sun'].includes(parts.weekday),inside=weekday&&minutes>=570&&minutes<960;$('sessionMarket').textContent=inside?'Within regular session hours · verify holidays':'Outside regular session hours';$('sessionMarket').title='Standard regular session is 9:30 a.m.–4:00 p.m. ET on trading weekdays. Exchange holidays and exceptional closures are not checked.'}
 function bind(){
@@ -160,6 +161,15 @@ function bind(){
  const themeObserver=new MutationObserver(()=>{$('rfTradingChart')?.setAttribute('theme',document.body.dataset.theme==='light'?'light':'dark')});themeObserver.observe(document.body,{attributes:true,attributeFilter:['data-theme']});
  updateSession();setInterval(updateSession,60000);loadPulse();setupAI();
 }
-window.rangeformExperience={loadNews,loadPulse,selectNewsCategory:category=>{if(CATEGORY_CONTENT[category]){newsCategory=category;loadNews()}}};
+window.rangeformExperience={loadNews,loadPulse,askChart:x=>{
+ if(!x){window.toast?.('Analyze a chart before asking AI to interpret it.','error');return}
+ if(x.source!=='twelvedata'){window.toast?.('Chart-based AI needs an authorized market-data provider. Imported historical files are research-only.','error');document.querySelector('[data-page="settings"]')?.click();return}
+ pendingChart={symbol:x.symbol,interval:x.interval,source:x.source};
+ const question='Analyze the latest server-verified '+x.symbol+' '+x.interval+' chart. Compare BUY WATCH, SELL WATCH and WAIT, explain trend, support/resistance, volume, possible bullish and bearish outcomes, invalidation, risks and data freshness. Do not invent prices or promise a profitable trade.';
+ document.querySelector('[data-page="copilot"]')?.click();
+ $('copilotQuestion').value=question.slice(0,480);
+ if(currentUser&&aiReady)sendAI(question,pendingChart);
+ else window.toast?.('Sign in to use AI chart analysis. Your analysis question is ready in Research AI.','error');
+},selectNewsCategory:category=>{if(CATEGORY_CONTENT[category]){newsCategory=category;loadNews()}}};
 document.addEventListener('DOMContentLoaded',bind);
 })();
