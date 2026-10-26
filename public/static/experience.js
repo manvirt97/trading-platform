@@ -88,6 +88,7 @@ async function sendAI(question){
  }catch(e){bubble.textContent='Could not complete that AI request: '+e.message}
  finally{$('copilotSend').disabled=!aiReady||!currentUser}
 }
+function updateSession(){if(!$('sessionLocal'))return;let now=new Date(),zone=Intl.DateTimeFormat().resolvedOptions().timeZone||'UTC',local=new Intl.DateTimeFormat('en-CA',{timeZone:zone,hour:'numeric',minute:'2-digit',timeZoneName:'short'}).format(now),name=zone==='America/Edmonton'?'Calgary':zone.split('/').at(-1).replaceAll('_',' ');$('sessionLocal').textContent=name+' · '+local;let parts=Object.fromEntries(new Intl.DateTimeFormat('en-US',{timeZone:'America/New_York',weekday:'short',hour:'2-digit',minute:'2-digit',hour12:false}).formatToParts(now).map(z=>[z.type,z.value]));let minutes=Number(parts.hour)*60+Number(parts.minute),weekday=!['Sat','Sun'].includes(parts.weekday),inside=weekday&&minutes>=570&&minutes<960;$('sessionMarket').textContent=inside?'Within regular session hours · verify holidays':'Outside regular session hours';$('sessionMarket').title='Standard regular session is 9:30 a.m.–4:00 p.m. ET on trading weekdays. Exchange holidays and exceptional closures are not checked.'}
 function bind(){
  if(!$('commandTrigger'))return;
  $('commandTrigger').onclick=()=>commandShow(true);$('commandClose').onclick=()=>commandShow(false);
@@ -113,7 +114,7 @@ function bind(){
  document.querySelectorAll('[data-ask]').forEach(b=>b.onclick=()=>{$('copilotQuestion').value=b.dataset.ask;$('copilotQuestion').focus()});
  $('copilotQuestion').addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();$('copilotForm').requestSubmit()}});
  const themeObserver=new MutationObserver(()=>{$('rfTradingChart')?.setAttribute('theme',document.body.dataset.theme==='light'?'light':'dark')});themeObserver.observe(document.body,{attributes:true,attributeFilter:['data-theme']});
- loadPulse();setupAI();
+ updateSession();setInterval(updateSession,60000);loadPulse();setupAI();
 }
 window.rangeformExperience={loadNews,loadPulse};
 document.addEventListener('DOMContentLoaded',bind);
