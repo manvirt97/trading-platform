@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#f6f8fb">
+<meta name="description" content="Rangeform: evidence-first market research, conditional trade plans and market news.">
+<title>Rangeform — Market intelligence</title>
+<link rel="icon" type="image/png" href="/static/rangeform-official-icon.png">
+<link rel="stylesheet" href="/static/v9.css?v=1">
+<script src="/static/v9.js?v=1" defer></script>
+</head>
+<body data-view="overview" data-theme="light">
+<div class="app">
+ <aside class="sidebar" id="sidebar">
+  <a class="brand" href="/v9.html" aria-label="Rangeform home"><img src="/static/rangeform-official-icon.png" alt="" width="37" height="37"><span><strong>Rangeform</strong><small>MARKET INTELLIGENCE</small></span></a>
+  <div class="nav-label">WORKSPACE</div>
+  <nav class="side-nav" aria-label="Main navigation">
+   <button class="nav-link active" data-page="overview"><span class="nav-icon">◫</span> Overview</button>
+   <button class="nav-link" data-page="signals"><span class="nav-icon">↗</span> Trade signals</button>
+   <button class="nav-link" data-page="scanner"><span class="nav-icon">◎</span> Market scanner</button>
+   <button class="nav-link" data-page="news"><span class="nav-icon">▤</span> News &amp; catalysts</button>
+   <a class="nav-link" href="/research.html?classic=1#copilot"><span class="nav-icon">✳</span> Research AI <small class="nav-hint">Existing</small></a>
+  </nav>
+  <div class="nav-label border-label">YOUR TOOLS</div>
+  <nav class="side-nav" aria-label="Research tools">
+   <a class="nav-link" href="/research.html?classic=1#risk"><span class="nav-icon">◇</span> Risk planner</a>
+   <a class="nav-link" href="/research.html?classic=1#journal"><span class="nav-icon">▣</span> Journal</a>
+   <a class="nav-link" href="/research.html?classic=1#settings"><span class="nav-icon">⚙</span> Data &amp; settings</a>
+  </nav>
+  <div class="side-footer"><div class="side-status"><span id="sideStatusDot" class="status-dot amber"></span><div><strong id="sideStatus">Checking market data</strong><small id="sideStatusDetail">Verifying provider configuration</small></div></div><a href="/research.html?classic=1">Open classic workspace ↗</a></div>
+ </aside>
+ <div class="content-shell">
+  <header class="topbar">
+   <button id="mobileMenu" class="icon-button mobile-menu" type="button" aria-label="Open navigation">☰</button>
+   <div class="top-search"><span aria-hidden="true">⌕</span><input type="search" id="globalSearch" maxlength="12" placeholder="Search a symbol (e.g. NVDA, SHOP)" aria-label="Search stock symbol"><kbd>↵</kbd></div>
+   <div class="top-right"><div class="market-time"><span>CALGARY</span><strong id="localTime">--:--</strong></div><button id="providerBadge" type="button" class="provider-pill"><span id="feedDot" class="status-dot amber"></span><span id="feedLabel">Checking feed</span></button><button id="themeToggle" class="icon-button" type="button" aria-label="Toggle light and dark theme">◐</button><a class="user-circle" href="/account.html" title="My workspace" aria-label="My workspace">↗</a></div>
+  </header>
+  <main class="main" id="main">
+   <section class="page visible" data-section="overview">
+    <div class="page-heading"><div><div class="eyebrow">OVERVIEW / MARKET INTELLIGENCE</div><h1>Find promising setups.<br><em>Know exactly why.</em></h1><p>Scan your watchlist, compare technical evidence, and understand the risks—without the noise.</p></div><button type="button" class="primary-btn" id="overviewScan">Scan my watchlist <span>↗</span></button></div>
+    <div class="market-strip" id="marketStrip" aria-label="Market snapshot">
+     <div class="strip-cell"><span>SPY · US LARGE CAP</span><strong data-quote="SPY">—</strong><small data-change="SPY">Provider required</small></div>
+     <div class="strip-cell"><span>NVDA · SEMICONDUCTORS</span><strong data-quote="NVDA">—</strong><small data-change="NVDA">Provider required</small></div>
+     <div class="strip-cell"><span>TSLA · EV</span><strong data-quote="TSLA">—</strong><small data-change="TSLA">Provider required</small></div>
+     <div class="strip-cell"><span>SHOP · CANADIAN TECH</span><strong data-quote="SHOP">—</strong><small data-change="SHOP">Provider required</small></div>
+    </div>
+    <div class="overview-grid">
+     <section class="card opportunity-card"><div class="card-head"><div><div class="eyebrow">WATCHLIST SCANNER</div><h2>Strongest available setups</h2><p>Ranks only symbols you scan with your authorized feed. No fabricated scores.</p></div><button class="subtle-btn" data-page="scanner">Open scanner ↗</button></div>
+       <div class="table-scroller"><table class="scanner-table"><thead><tr><th>SYMBOL</th><th>DIRECTION</th><th>SETUP QUALITY</th><th>DATA AGE</th><th>RESEARCH</th></tr></thead><tbody id="overviewResults"><tr><td colspan="5"><div class="empty-inline">Run a watchlist scan to see verified historical setups. There is no live scan yet.</div></td></tr></tbody></table></div>
+     </section>
+     <aside class="card watch-card"><div class="card-head"><div><div class="eyebrow">PERSONAL WORKSPACE</div><h2>My watchlist</h2></div><button class="text-action" id="watchAdd" title="Add another symbol">+ Add</button></div><div class="watch-list" id="watchList"></div><p class="subtle-note">Symbols saved locally. Prices appear only when authorized bars are loaded.</p></aside>
+     <section class="card explain-card"><div class="card-head"><div><div class="eyebrow">HOW TO READ THE RESULTS</div><h2>What makes a strong setup?</h2></div></div><div class="explain-tiles"><div><span class="mini-icon blue">↗</span><strong>Price structure</strong><p>Trend, breakout or pullback tested against completed bars.</p></div><div><span class="mini-icon green">▥</span><strong>Participation</strong><p>Volume must support the move; old bars cannot confirm an entry now.</p></div><div><span class="mini-icon amber">◇</span><strong>Defined downside</strong><p>Know invalidation and position risk before considering a trade.</p></div></div></section>
+     <aside class="card filter-card"><div class="eyebrow">DATA &amp; QUALITY</div><h2>What we exclude</h2><div class="filter-row"><span>◌</span><div><strong>Stale information</strong><small>Old bars are not current trade signals</small></div></div><div class="filter-row"><span>◌</span><div><strong>Incomplete history</strong><small>OHLCV must pass data validation</small></div></div><div class="filter-row"><span>◌</span><div><strong>Unverified execution</strong><small>No bid–ask spread or broker quote confirmed</small></div></div></aside>
+    </div>
+   </section>
+   <section class="page" data-section="signals">
+    <div class="page-heading compact"><div><div class="eyebrow">TRADE DECISION / EVIDENCE FIRST</div><h1>Trade decision desk</h1><p>Clear bullish and bearish conditions, chart levels, and risk before any decision.</p></div><div class="symbol-select"><label for="symbolInput">SYMBOL</label><div><input id="symbolInput" value="NVDA" aria-label="Symbol"><button id="analyzeBtn" class="primary-btn" type="button">Analyze ↗</button></div></div></div>
+    <div class="security-strip" id="signalFeedNotice"><span class="status-dot amber"></span><span>Historical analysis only until verified data is available. No brokerage execution.</span></div>
+    <div class="quote-strip"><div><span id="selectedSymbol" class="ticker-title">NVDA</span><small>US equities · technical context</small></div><div class="quote-number"><strong id="selectedPrice">—</strong><small id="selectedChange">Awaiting completed price bars</small></div><div><small>LAST COMPLETED BAR</small><strong id="lastBarTime">—</strong></div><div><small>INDICATOR ALIGNMENT</small><strong id="indicatorScore">—</strong></div></div>
+    <div class="signal-grid">
+      <div class="left-flow">
+       <article class="card verdict-card" id="verdictCard"><div class="eyebrow">THE CURRENT RESEARCH VERDICT</div><div class="verdict-layout"><div><h2 id="verdictText">DATA NOT CONNECTED</h2><p id="verdictDetail">Connect authorized market history to review bullish, bearish or wait conditions.</p></div><div class="reason-mini" id="verdictFactors"><div>Evidence and confirmation requirements will appear after analysis.</div></div></div></article>
+       <article class="card chart-card"><div class="chart-title"><div><div class="eyebrow">PRICE STRUCTURE</div><h2>Verified historical chart</h2></div><div class="chart-controls"><label for="barInterval">Bars</label><select id="barInterval"><option value="1day">Daily</option><option value="15min">15 min</option><option value="5min">5 min</option><option value="1min">1 min</option></select></div></div><div class="chart-wrap"><canvas id="priceChart" aria-label="Candlestick price chart. A text summary of the loaded prices is available above." role="img"></canvas><div id="chartPlaceholder" class="chart-placeholder"><span class="chart-art">▥</span><strong>No verified price history loaded</strong><p>Choose Analyze to load completed bars. Data from public widgets is not used to calculate these signals.</p></div></div><div class="chart-footer"><span><i class="key-dot green"></i> Candles</span><span><i class="key-dot blue"></i> Previous resistance</span><span><i class="key-dot red"></i> Previous support</span><span>Scenario lines are conditional illustrations, not forecasts</span></div></article>
+       <article class="card rationale-card"><div class="eyebrow">EVIDENCE EXPLAINED</div><h2>Why the verdict?</h2><div id="evidenceText" class="rationale-content">Technical evidence appears here after provider analysis. Scores reflect indicator alignment—not probability of profit.</div></article>
+      </div>
+      <div class="right-flow">
+       <article class="card conditions-card"><div class="eyebrow">THREE POSSIBLE OUTCOMES</div><h2>What would change the outlook?</h2><div class="condition buy"><span class="condition-icon">↗</span><div><strong>Possible long</strong><p id="longCondition">Wait for validated resistance and volume confirmation.</p></div></div><div class="condition sell"><span class="condition-icon">↘</span><div><strong>Possible exit / bearish watch</strong><p id="shortCondition">Wait for validated support and downside confirmation.</p></div></div><div class="condition wait"><span class="condition-icon">—</span><div><strong>Wait</strong><p id="waitCondition">No data, conflicting evidence or stale bars mean no actionable signal.</p></div></div></article>
+       <article class="card risk-card"><div class="card-head"><div><div class="eyebrow">HYPOTHETICAL TRADE PLAN</div><h2>Plan your risk</h2></div></div><div class="risk-fields"><label>ACCOUNT VALUE ($)<input id="riskAccount" type="number" min="1" step="100" value="10000"></label><label>RISK PER TRADE (%)<input id="riskPercent" type="number" min=".1" max="1" step=".1" value=".5"></label></div><div class="risk-details" id="riskResults"><p>Entry, stop and position size require validated chart levels.</p></div><p class="subtle-note">Educational position sizing only. Stops can slip; actual losses can exceed estimates.</p></article>
+       <article class="card data-card"><div class="eyebrow">SOURCE TRANSPARENCY</div><h2>Market data connection</h2><div id="connectionDetails"><p>Checking provider settings…</p></div><a class="subtle-btn button-link" href="/research.html?classic=1#settings">Data setup &amp; connection ↗</a></article>
+      </div>
+    </div>
+   </section>
+   <section class="page" data-section="scanner">
+    <div class="page-heading"><div><div class="eyebrow">SCANNER / YOUR SYMBOLS</div><h1>Opportunity scanner</h1><p>Compare up to six watchlist symbols on completed real market bars—not a fake market-wide sweep.</p></div><button id="scanButton" class="primary-btn" type="button">Run watchlist scan ↗</button></div><div class="security-strip"><span class="status-dot amber"></span><span>Requires an authorized Twelve Data subscription. Historical scores are not forecasts or orders.</span></div><div class="card"><div class="card-head"><div><h2>Technical candidates</h2><p id="scanSummary">No scan completed. Rankings will appear only after actual data is retrieved.</p></div></div><div class="table-scroller"><table class="scanner-table"><thead><tr><th>SYMBOL</th><th>PRICE</th><th>TECHNICAL BIAS</th><th>ALIGNMENT</th><th>BAR TIME</th><th></th></tr></thead><tbody id="scannerResults"><tr><td colspan="6" class="empty-inline">No scan results. Use Run watchlist scan after connecting market data.</td></tr></tbody></table></div></div>
+   </section>
+   <section class="page" data-section="news">
+    <div class="page-heading"><div><div class="eyebrow">DISCOVER / TRUSTED PUBLISHERS</div><h1>News &amp; catalysts<br><em>that matter.</em></h1><p>Company developments, earnings and macro events. Each story links to its source.</p></div></div>
+    <div class="news-tools"><div class="news-search"><span>⌕</span><input id="newsQuery" type="search" placeholder="Company, ticker or topic..." aria-label="Search market news"><button id="newsSearchBtn" class="primary-btn" type="button">Search ↗</button></div><div id="newsCategories" class="news-cats"><button class="selected" data-category="all">All markets</button><button data-category="earnings">Earnings</button><button data-category="rates">Fed &amp; rates</button><button data-category="energy">Energy</button><button data-category="canada">Canada</button><button data-category="technology">Technology</button></div></div>
+    <div class="news-layout"><section class="card news-card"><div class="card-head"><div><div class="eyebrow">SOURCE-LINKED HEADLINES</div><h2 id="newsHeading">Latest market stories</h2></div><small id="newsChecked">Not checked</small></div><div class="news-items" id="newsItems"><p class="empty-inline">Opening latest financial headlines…</p></div></section><aside class="right-flow"><div class="card"><div class="eyebrow">WHY THIS MATTERS</div><h2>Read the story. Then the reaction.</h2><p>News is not a trading signal. Examine what changed, which companies are affected, whether markets have already priced it in, and how fresh the source is.</p><div class="filter-row"><span>✓</span><div><strong>Original publisher</strong><small>Open the source to check details</small></div></div><div class="filter-row"><span>✓</span><div><strong>Category-specific results</strong><small>Changing a filter requests new headlines</small></div></div></div><div class="card"><div class="eyebrow">SELECTED ARTICLE</div><h2 id="articleContextTitle">Choose a story</h2><p id="articleContext">Selecting a headline displays its publisher and publication time. News summaries are not generated without a grounded AI source.</p><a id="articleOriginal" href="https://news.google.com/" target="_blank" rel="noopener noreferrer" class="button-link subtle-btn" hidden>Read publisher ↗</a></div></aside></div>
+   </section>
+  </main>
+  <footer class="site-footer"><span>RANGEFORM · MARKET RESEARCH</span><span>No automatic orders · Delayed or historical data may not reflect tradable prices</span></footer>
+ </div>
+</div>
+<div id="toast" role="status" aria-live="polite" class="toast" hidden></div>
+<div id="navShade" class="nav-shade" hidden></div>
+</body></html>
