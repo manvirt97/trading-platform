@@ -392,3 +392,17 @@ body[data-theme=light] .news-columns .tv-news-frame{background:#fff}
  @keyframes fadeAway{to{opacity:.6}}
  @keyframes fadeAppear{from{opacity:.75}to{opacity:1}}
 }
+
+
+/* Real, rate-limited AI model choice */
+.copilot-head .model-select{display:flex;flex-direction:column;gap:5px;min-width:190px;max-width:225px;margin-left:auto}
+.copilot-head .model-select span{font-size:9px;letter-spacing:.12em;font-weight:800;color:var(--muted)}
+.copilot-head .model-select select{min-width:0;width:100%;color:var(--text);background:var(--panel2);border:1px solid var(--border);border-radius:9px;padding:10px 9px;font-size:11px;font-weight:650;cursor:pointer}
+.copilot-head .model-select select:focus-visible{outline:2px solid var(--lime);outline-offset:2px}
+.copilot-head .copilot-chip{margin-left:0}
+.copilot-head{flex-wrap:wrap}
+@media(max-width:680px){
+ .copilot-head .model-select{min-width:0;max-width:none;width:100%;order:3;margin:4px 0 0}
+ .copilot-head .model-select select{padding:12px}
+ .copilot-head .copilot-inline-signin{margin-left:auto;white-space:nowrap}
+}
