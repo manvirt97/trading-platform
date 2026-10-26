@@ -38,7 +38,7 @@
  .bar .head-actions{grid-column:2;grid-row:1;justify-self:end}
 }
 @media(max-width:780px){.bar .brand .mark{width:35px;height:35px;flex-basis:35px}.bar .nav a{display:inline-flex!important}}
-@view-transition{navigation:auto}
+@view-transition{navigation:none}
 @media(prefers-reduced-motion:no-preference){
  ::view-transition-old(root){animation:.12s ease-out both rfFadeOut}
  ::view-transition-new(root){animation:.18s ease-out both rfFadeIn}
