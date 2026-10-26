@@ -45,3 +45,7 @@
  @keyframes rfFadeOut{to{opacity:.68}}
  @keyframes rfFadeIn{from{opacity:.7}to{opacity:1}}
 }
+
+
+@media(max-width:780px){html,body{max-width:100%;overflow-x:clip}.bar{padding-top:calc(5px + env(safe-area-inset-top,0px));padding-left:calc(13px + env(safe-area-inset-left,0px));padding-right:calc(13px + env(safe-area-inset-right,0px))}}
+body.standalone{overscroll-behavior-y:contain}
