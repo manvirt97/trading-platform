@@ -124,3 +124,24 @@
  .news-scope-eyebrow{font-size:9px}
 }
 @media(prefers-reduced-motion:reduce){.news-story,.topic,.desk-actions button{transition:none!important}}
+
+
+/* Decision-first refinement: historical levels remain distinct from executable orders. */
+#page-signals .page-heading{margin-bottom:18px}
+#page-signals .controls-panel{box-shadow:0 5px 24px rgba(20,36,55,.045);border:1px solid var(--border)}
+.desk-watch-levels{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin-top:13px}
+.desk-watch-levels[hidden]{display:none!important}
+.desk-watch-levels span{display:block;background:var(--panel2);border:1px solid var(--border);border-radius:11px;padding:12px 14px;font-size:11px;line-height:1.65;color:var(--muted)}
+.desk-watch-levels b{color:var(--text);font-variant-numeric:tabular-nums;font-size:14px;letter-spacing:-.02em}
+.desk-watch-levels span:first-child{border-left:3px solid var(--green)}
+.desk-watch-levels span:last-child{border-left:3px solid var(--red)}
+.desk-verdict strong{letter-spacing:-.045em;line-height:1.16}
+.desk-readiness{letter-spacing:.035em}
+.news-story{transition:transform .16s ease,background .16s ease,border-color .16s ease}
+.news-story:focus-visible{box-shadow:0 0 0 3px var(--rf-focus-ring)}
+@media(max-width:600px){
+ .desk-watch-levels{grid-template-columns:1fr}
+ .desk-watch-levels span{padding:11px 12px}
+ #page-signals .page-heading{margin-bottom:15px}
+}
+@media(prefers-reduced-motion:reduce){.news-story{transition:none}}
