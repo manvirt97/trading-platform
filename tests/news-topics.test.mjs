@@ -19,7 +19,7 @@ test('news categories have independent relevance rules, never duplicate the same
 
 test('each selected category returns genuinely relevant headlines, without recycling all-markets stories',async()=>{
  const fixtures=[
-  'Apple posts quarterly earnings and higher profit',
+  'Retailer reports quarterly earnings and higher profit',
   'Federal Reserve interest rate decision affects bonds',
   'OPEC crude oil production update',
   'TSX Canadian markets rebound',
