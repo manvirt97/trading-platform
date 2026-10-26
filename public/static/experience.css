@@ -178,3 +178,13 @@ tv-advanced-chart{width:100%;height:100%;display:block}
  .app-footer{padding-bottom:10px}
 }
 @media(prefers-reduced-motion:reduce){.page,.skeleton-card,.loading-orbit{animation:none!important}*,*:before,*:after{scroll-behavior:auto!important}}
+
+/* Unavailable provider results remain visibly separate from market prices. */
+.coverage-empty{grid-column:1/-1;display:flex;align-items:center;gap:18px;min-height:116px;padding:21px;background:var(--surface);border:1px solid var(--border);border-radius:16px}
+.coverage-empty .coverage-icon{font-size:30px;color:var(--muted)}
+.coverage-empty>div{flex:1;min-width:0}
+.coverage-empty strong{font-size:15px;display:block}
+.coverage-empty p{font-size:12px;color:var(--muted);margin:7px 0 0;line-height:1.5}
+.coverage-empty .btn{white-space:nowrap}
+.ticker-card.unavailable{opacity:.72}
+@media(max-width:680px){.coverage-empty{flex-wrap:wrap;padding:16px;gap:10px}.coverage-empty .btn{width:100%}}
