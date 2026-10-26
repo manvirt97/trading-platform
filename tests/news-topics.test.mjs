@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {normalizeTopic,relevantToTopic,relevantToQuery,primaryTopic,TOPICS} from '../functions/_shared/news-topics.js';
+import {normalizeTopic,relevantToTopic,relevantToQuery,primaryTopic,marketRelevant,TOPICS} from '../functions/_shared/news-topics.js';
 import {onRequestGet} from '../functions/api/news.js';
 
 test('news categories have independent relevance rules, never duplicate the same broad results by fallback',()=>{
@@ -55,4 +55,11 @@ test('news headlines have one primary category even when keywords overlap',()=>{
  assert.equal(primaryTopic('TSX Canadian stocks rebound'),'canada');
  assert.equal(primaryTopic('Nvidia AI semiconductor chip development'),'technology');
  assert.equal(primaryTopic('A general article without a matching market topic'),'all');
+});
+
+test('all-markets excludes unrelated general news without hiding financial catalysts',()=>{
+ assert.equal(marketRelevant('DOJ charges former FBI director in new case'),false);
+ assert.equal(marketRelevant('Nvidia stock rises as semiconductor demand accelerates'),true);
+ assert.equal(marketRelevant('Federal Reserve holds interest rates as inflation falls'),true);
+ assert.equal(marketRelevant('Oil prices rally on unexpected OPEC supply cuts'),true);
 });
