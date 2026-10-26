@@ -349,7 +349,7 @@ body[data-theme=light] .news-columns .tv-news-frame{background:#fff}
 .sidebar-backdrop[hidden]{display:none!important}
 @media(min-width:1081px){
  .topbar{position:sticky}
- .topbar .global-nav{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);display:grid;grid-template-columns:repeat(3,minmax(0,1fr));width:465px;min-width:465px;max-width:465px;gap:5px;margin:0;padding:4px;border:1px solid var(--border);border-radius:13px;background:var(--surface)}
+ .topbar .global-nav{position:absolute;left:calc(50% - 126px);top:50%;transform:translate(-50%,-50%);display:grid;grid-template-columns:repeat(3,minmax(0,1fr));width:465px;min-width:465px;max-width:465px;gap:5px;margin:0;padding:4px;border:1px solid var(--border);border-radius:13px;background:var(--surface)}
  .topbar .global-nav a{min-width:0;text-align:center;overflow:hidden;text-overflow:ellipsis;padding:11px 6px}
  .topbar .top-actions{margin-left:auto}
  .topbar .crumb{max-width:135px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
