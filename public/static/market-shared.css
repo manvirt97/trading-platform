@@ -1,0 +1,18 @@
+/* Shared Rangeform navigation across Market Desk and My Workspace */
+.bar{position:sticky;top:0;z-index:25;min-height:76px;background:var(--panel);box-shadow:0 4px 24px #13283908}
+.bar .nav{gap:5px}
+.bar .nav a{display:inline-flex!important;align-items:center;justify-content:center;white-space:nowrap;min-height:39px;padding:0 14px;border-radius:10px;border:1px solid transparent;transition:background .15s,color .15s}
+.bar .nav a:hover{background:var(--soft);color:var(--text)}
+.bar .nav a.active{background:var(--soft);border-color:var(--edge);color:var(--text)}
+.bar .brand{gap:11px}.bar .mark{border-radius:12px}
+@media(max-width:780px){
+ .bar{height:auto;min-height:110px;display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-rows:54px 45px;row-gap:0;padding:5px 13px;align-items:center}
+ .bar .brand{grid-column:1;grid-row:1}
+ .bar .head-actions{grid-column:2;grid-row:1}
+ .bar .nav{grid-column:1/-1;grid-row:2;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px;width:100%;margin:0}
+ .bar .nav a{white-space:nowrap;font-size:11px;padding:0 5px;min-height:38px;text-align:center}
+ .bar .brand b{font-size:12px}.bar .brand small{font-size:8px}
+ .bar .head-actions .label-chip{display:none}
+ .bar .mark{width:34px;height:34px}
+}
+@media(max-width:370px){.bar .nav a{font-size:10px}.bar .brand b{font-size:11px}}
