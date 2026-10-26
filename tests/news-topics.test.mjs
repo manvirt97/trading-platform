@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {normalizeTopic,relevantToTopic,relevantToQuery,TOPICS} from '../functions/_shared/news-topics.js';
+import {normalizeTopic,relevantToTopic,relevantToQuery,primaryTopic,TOPICS} from '../functions/_shared/news-topics.js';
 import {onRequestGet} from '../functions/api/news.js';
 
 test('news categories have independent relevance rules, never duplicate the same broad results by fallback',()=>{
@@ -46,4 +46,13 @@ test('each selected category returns genuinely relevant headlines, without recyc
   const narrow=await onRequestGet({request:new Request('https://rangeform.pages.dev/api/news?category=energy&q=Apple')});
   assert.equal((await narrow.json()).items.length,0,'Do not fill an empty category with unrelated articles');
  }finally{globalThis.fetch=original}
+});
+
+test('news headlines have one primary category even when keywords overlap',()=>{
+ assert.equal(primaryTopic('Nvidia reports quarterly earnings and guidance'),'earnings');
+ assert.equal(primaryTopic('Bank of Canada announces interest rate decision'),'rates');
+ assert.equal(primaryTopic('Cenovus pipeline expands Canadian oil production'),'energy');
+ assert.equal(primaryTopic('TSX Canadian stocks rebound'),'canada');
+ assert.equal(primaryTopic('Nvidia AI semiconductor chip development'),'technology');
+ assert.equal(primaryTopic('A general article without a matching market topic'),'all');
 });
