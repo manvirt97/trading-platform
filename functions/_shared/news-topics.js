@@ -9,7 +9,7 @@ export const TOPICS={
 };
 export function normalizeTopic(value){const key=String(value||'').trim().toLowerCase();return Object.hasOwn(TOPICS,key)?key:'all'}
 export function relevantToTopic(title,topic){const key=normalizeTopic(topic);return !TOPICS[key].terms||TOPICS[key].terms.test(String(title||''))}
-export function relevantToQuery(title,query){const term=String(query||'').trim().toLowerCase();if(!term)return true;const stripped=term.replace(/\b(what|when|where|does|is|are|the|a|an|about|news|latest|share|shares|stock|stocks|price|company|this|tell|me)\b/g,' ').trim();const words=stripped.split(/\s+/).filter(x=>x.length>2);if(!words.length)return true;const lower=String(title||'').toLowerCase();return words.some(word=>lower.includes(word))}
+export function relevantToQuery(title,query){const term=String(query||'').trim().toLowerCase();if(!term)return true;const stripped=term.replace(/[^a-z0-9]+/g,' ').replace(/\b(what|when|where|does|is|are|the|a|an|about|news|latest|share|shares|stock|stocks|price|company|this|tell|me|inc|corp|corporation|ltd)\b/g,' ').trim();const words=stripped.split(/\s+/).filter(x=>x.length>2);if(!words.length)return true;const lower=String(title||'').toLowerCase();return words.some(word=>lower.includes(word))}
 
 /**
  * A single primary desk for each headline. Broad keyword overlap previously
