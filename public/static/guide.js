@@ -52,11 +52,12 @@ function mount(){
  const controls=document.querySelector('#page-signals .controls-panel');
  if(controls&&!$('decisionDeck')){
   const panel=document.createElement('section');panel.id='decisionDeck';panel.className='decision-deck';panel.innerHTML=`<div class="desk-title"><span class="eyebrow">THE OPPORTUNITY DESK / EVIDENCE FIRST</span><span id="deskSource" class="desk-data">AWAITING VERIFIED DATA</span></div>
- <div class="desk-row"><div class="desk-verdict" id="deskVerdict" data-bias="wait"><span class="desk-eyebrow">SIGNAL · WHAT IT MEANS</span><strong id="deskBias">WAIT · NO CONFIRMED SETUP</strong><span id="deskLine">No validated price feed is connected. Charts and news are available, but there is no verified entry yet.</span><span id="deskReadiness" class="desk-readiness">DATA CHECK REQUIRED</span></div>
+ <div class="desk-row"><div class="desk-verdict" id="deskVerdict" data-bias="wait"><span class="desk-eyebrow">TRADE READINESS · WHAT TO DO NEXT</span><strong id="deskBias">WAIT · NO CONFIRMED SETUP</strong><span id="deskLine">No validated price feed is connected. Charts and news are available, but there is no verified entry yet.</span><span id="deskReadiness" class="desk-readiness">DATA CHECK REQUIRED</span></div>
  <div class="desk-metric"><small>INDICATORS AGREE</small><strong id="deskScore">—</strong><span>Technical factors agreeing, not the chance of profit.</span></div>
  <div class="desk-metric"><small>LAST COMPLETED PRICE</small><strong id="deskPrice">—</strong><span id="deskTime">Verify the timestamp</span></div></div>
  <div class="desk-plan"><div class="desk-plan-top"><span>CONDITIONAL TRADE PLAN</span><span id="deskGate">WAIT FOR REAL MARKET DATA</span></div>
  <div class="desk-plan-levels"><div><small>REFERENCE ENTRY</small><strong id="deskEntry">—</strong></div><div><small>INVALIDATION / STOP</small><strong id="deskInvalid">—</strong></div><div><small>ILLUSTRATIVE 2R TARGET</small><strong id="deskTarget">—</strong></div></div>
+ <div class="desk-watch-levels" id="deskWatchLevels" hidden><span>WATCH ABOVE <b id="deskBullLevel">—</b> for a possible bullish breakout</span><span>WATCH BELOW <b id="deskBearLevel">—</b> for a possible bearish breakdown</span></div>
  <p id="deskPlanNote">No current entry or target is shown without a validated provider bar and confirmed rules. Even a detected setup needs a live broker quote and risk review.</p></div>
  <div class="desk-guide"><div><b>WHY?</b><p id="deskWhy">Waiting for valid quantitative evidence.</p></div><div><b>WHAT TO WATCH</b><p id="deskWatch">Confirm price, market hours, volume and upcoming events.</p></div><div><b>CONFIRMATION CHECKLIST</b><div class="desk-checklist" id="deskChecklist">Source • Freshness • Range • Volume • Broker confirmation</div></div></div>
  <div class="desk-actions"><button type="button" class="desk-choice" id="deskBuy" aria-pressed="false">↗ When to consider buying</button><button type="button" class="desk-choice" id="deskSell" aria-pressed="false">↘ When to consider selling</button><button type="button" class="desk-choice chosen" id="deskWait" aria-pressed="true">◷ Wait for confirmation</button><button type="button" class="desk-risk" id="deskRisk">Plan position risk ↗</button></div>
@@ -86,17 +87,22 @@ function mount(){
 }
 window.renderTradeGuide=x=>{
  mount();active=x;const sig=direction(x),ind=x.indicators||{},stamp=x.last_bar_utc||'';
- $('deskSource').textContent=x.source==='twelvedata'?'LICENSED PROVIDER · '+x.interval:x.source==='user-csv'?'IMPORTED HISTORICAL DATA':'UNVERIFIED HISTORY';
+ $('deskSource').textContent=x.source==='twelvedata'?'TWELVE DATA · '+x.interval+' BARS':x.source==='user-csv'?'IMPORTED HISTORICAL DATA':'UNVERIFIED HISTORY';
  $('deskVerdict').dataset.bias=sig.kind;
  $('deskBias').textContent=sig.bias;$('deskLine').textContent=sig.detail;
- $('deskReadiness').textContent=sig.kind==='wait'?'NO VERIFIED SETUP':'CONDITIONAL SETUP · VERIFY BROKER';
+ $('deskReadiness').textContent=sig.kind==='wait'?(x.score>=65?'BULLISH BIAS · ENTRY NOT CONFIRMED':x.score<=35?'BEARISH BIAS · EXIT NOT CONFIRMED':'NO VERIFIED SETUP'):'CONDITIONAL SETUP · VERIFY BROKER';
  $('deskScore').textContent=x.score+'/100';$('deskPrice').textContent=usd(x.last);
  $('deskTime').textContent=x.interval+' · '+(stamp?new Date(stamp).toLocaleString('en-CA',{timeZone:'America/New_York',month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'})+' ET':'Time unknown');
  $('deskGate').textContent=sig.kind==='wait'?'NOT ACTIONABLE':sig.kind==='buy'?'BULLISH CONDITIONS MET':'BEARISH CONDITIONS MET';
  $('deskEntry').textContent=sig.entry==null?'—':usd(sig.entry);
  $('deskInvalid').textContent=sig.stop==null?'—':usd(sig.stop);
  $('deskTarget').textContent=sig.target==null?'—':usd(sig.target);
- $('deskPlanNote').textContent=sig.kind==='wait'?'No trade levels without validated current bars and confirmed rules. '+sig.reason:'Illustrative 2R is arithmetic, not a predicted profit. Confirm market price and upcoming catalysts before making any decision.';
+  const researchLevels=x.source==='twelvedata'||x.source==='user-csv';
+  const high=Number(ind.resistance20),low=Number(ind.support20);
+  const canWatch=researchLevels&&Number.isFinite(high)&&Number.isFinite(low)&&high>0&&low>0;
+  $('deskWatchLevels').hidden=!canWatch;
+  if(canWatch){$('deskBullLevel').textContent=usd(high);$('deskBearLevel').textContent=usd(low)}
+ $('deskPlanNote').textContent=sig.kind==='wait'?'No current entry or stop is confirmed. Watch levels above are historical reference points, not orders. '+sig.reason:'Illustrative 2R is arithmetic, not a predicted profit. Confirm market price and upcoming catalysts before making any decision.';
  $('deskWhy').textContent=sig.impact.join(' · ')||'Not enough reliable inputs.';
  $('deskWatch').textContent=sig.watch;
  const checklist=$('deskChecklist');checklist.replaceChildren();
