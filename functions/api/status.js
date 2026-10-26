@@ -1,0 +1,2 @@
+import {json,WATCH} from '../_shared/http.js';
+export function onRequestGet({env}){return json({app:'Rangeform',execution:'DISABLED — research only',twelvedata_configured:Boolean(env.TWELVEDATA_API_KEY),finnhub_configured:Boolean(env.FINNHUB_API_KEY),default:'demo',watchlist:WATCH,local_only:false,storage:'browser only',polling:'browser-initiated, not streaming',app_version:'3.1 Cloudflare'})}

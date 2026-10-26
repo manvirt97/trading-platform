@@ -1,0 +1,16 @@
+RANGEFORM — GITHUB + CLOUDFLARE (NO TERMINAL)
+
+1. Unzip Rangeform_GitHub_Cloudflare_Ready.zip.
+2. Get free GitHub Desktop: https://desktop.github.com/
+3. Sign in. Choose File > Add Local Repository. Select the extracted folder.
+4. Click Create a Repository Here if prompted. Name it trading-platform.
+5. Click Publish repository, and KEEP it private.
+6. Open https://dash.cloudflare.com/ > Workers & Pages > Create > Pages > Connect to Git.
+7. Choose NEW trading-platform repo (NOT equityclimb).
+8. Framework: None | Build command: blank | Build output: public | Branch: main.
+9. Deploy and open the Pages URL shown on screen.
+
+Already have a private trading-platform repo? Contact ChatGPT with its link; it can use your connected GitHub account to assist with code changes.
+
+IMPORTANT: The default sample is SYNTHETIC, not real quotes. Trading is disabled.
+READ START-HERE-GITHUB.md FOR MORE DETAIL.
