@@ -72,14 +72,14 @@ window.renderOverviewGuide=(x,radar)=>{
  mount();let fresh=freshness(x),n=(radar?.rows||[]).filter(y=>y.source==='twelvedata'&&!y.error).length;
  $('liveStripDot').classList.toggle('on',x.source==='twelvedata'&&fresh.fresh);
  $('liveStripTitle').textContent=x.source==='twelvedata'?'Twelve Data connected • '+x.symbol+' '+x.interval:'Synthetic demo • no live quotes';
- $('liveStripSub').textContent=x.source==='twelvedata'?(fresh.reason+' • '+n+' watchlist symbols loaded. Data may be delayed.'):'To view real bars, configure your private data provider in Cloudflare settings.';
+ $('liveStripSub').textContent=x.source==='twelvedata'?(fresh.reason+' • '+n+' watchlist symbols loaded. Data may be delayed.'):'See the TradingView chart above. The rule-based model is illustrative until licensed market history is available.';
  $('liveStripAction').textContent=x.source==='twelvedata'?'Review setup →':'Connect market data →';
 };
 window.renderOverviewError=message=>{mount();$('liveStripTitle').textContent='Market data unavailable';$('liveStripSub').textContent=message};
 async function checkProvider(show){mount();let msg=$('connectionMessage');if(msg)msg.textContent='Checking connection…';
- try{let r=await fetch('/api/status',{cache:'no-store'}),d=await r.json();connected=Boolean(d.twelvedata_configured);enabled=Boolean(d.twelvedata_enabled);if(msg)msg.textContent=enabled?'Provider configured and authorized. Check prices and time stamps.':connected?'API key found, but live data is locked. Protect the website and set LIVE_DATA_ENABLED=on.':'No provider key detected. Follow the steps above.';
-  const live=$('sourceSelect');if(live){live.value=enabled?'twelvedata':'demo';$('intervalSelect').value=enabled?'5min':'1day';}
-  if(enabled && !liveMode){liveMode=true;state.source='twelvedata';state.interval='5min';$('autoRefresh').value='300';window.scheduleRefresh?.();window.loadOverview?.();}
+ try{let r=await fetch('/api/status',{cache:'no-store'}),d=await r.json();connected=Boolean(d.twelvedata_configured);enabled=Boolean(d.twelvedata_enabled);if(msg)msg.textContent=enabled?'Personal provider detected. Public redistribution needs licensing review and timestamps must be checked.':connected?'API key found, but live data is locked. Protect the website and set LIVE_DATA_ENABLED=on.':'No provider key detected. Follow the steps above.';
+  const live=$('sourceSelect');if(live){live.value='demo';$('intervalSelect').value='1day';}
+  if(enabled && !liveMode){liveMode=true;/* Public landing never silently exhausts a personal data subscription. */}
   if(show){let check=$('checkConnection');if(check){check.classList.add('pressed');setTimeout(()=>check.classList.remove('pressed'),300)}}
  }catch(e){if(msg)msg.textContent='Cannot reach app status API. '+e.message;}
 }
