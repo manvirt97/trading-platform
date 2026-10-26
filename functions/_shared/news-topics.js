@@ -1,0 +1,12 @@
+// Auditable editorial topic rules. Headlines can overlap categories when genuinely relevant.
+export const TOPICS={
+ all:{label:'All markets',query:'(stock market OR stocks OR Wall Street OR TSX OR earnings OR inflation) when:3d',terms:null},
+ earnings:{label:'Earnings',query:'(earnings OR quarterly results OR profit forecast OR revenue guidance) stocks when:5d',terms:/\b(earnings?|quarterly|quarter|revenue|profit|profits|eps|guidance|results|outlook|forecast|beat|miss|dividend|financial report)\b/i},
+ rates:{label:'Fed & rates',query:'(Federal Reserve OR Jerome Powell OR inflation OR interest rates OR bond yields OR central bank) stocks when:5d',terms:/\b(fed|federal reserve|powell|central bank|interest rates?|inflation|cpi|pce|treasury|bond yields?|monetary policy|rate cut|rate hike|boc|bank of canada)\b/i},
+ energy:{label:'Energy',query:'(oil OR crude OR WTI OR OPEC OR natural gas OR LNG OR oil sands OR energy shares) when:5d',terms:/\b(oil|crude|wti|brent|opec|natural gas|lng|pipeline|refinery|refining|energy|petroleum|gasoline|oil sands|cenovus|suncor)\b/i},
+ canada:{label:'Canada',query:'(TSX OR Canadian stocks OR Bank of Canada OR Canadian economy OR Canadian energy) when:5d',terms:/\b(canada|canadian|tsx|toronto stocks?|bank of canada|boc|loonie|s&p\/tsx|oil sands|ontario|alberta|montreal|vancouver|cenovus|suncor|shopify|royal bank of canada)\b/i},
+ technology:{label:'Technology',query:'(Nvidia OR AMD OR Apple OR AI chips OR semiconductors OR tech stocks OR Microsoft) when:5d',terms:/\b(ai|artificial intelligence|nvidia|amd|semiconductor|chip|chips|technology|tech|apple|microsoft|alphabet|google|tesla|cloud|software|data center|data centre)\b/i}
+};
+export function normalizeTopic(value){const key=String(value||'').trim().toLowerCase();return Object.hasOwn(TOPICS,key)?key:'all'}
+export function relevantToTopic(title,topic){const key=normalizeTopic(topic);return !TOPICS[key].terms||TOPICS[key].terms.test(String(title||''))}
+export function relevantToQuery(title,query){const term=String(query||'').trim().toLowerCase();if(!term)return true;const stripped=term.replace(/\b(what|when|where|does|is|are|the|a|an|about|news|latest|share|shares|stock|stocks|price|company|this|tell|me)\b/g,' ').trim();const words=stripped.split(/\s+/).filter(x=>x.length>2);if(!words.length)return true;const lower=String(title||'').toLowerCase();return words.some(word=>lower.includes(word))}
