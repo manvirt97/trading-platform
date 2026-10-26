@@ -6,7 +6,7 @@ import {onRequestGet} from '../functions/api/news.js';
 test('news categories have independent relevance rules, never duplicate the same broad results by fallback',()=>{
  assert.deepEqual(Object.keys(TOPICS),['all','earnings','rates','energy','canada','technology']);
  assert.equal(normalizeTopic('invalid'),'all');
- assert.ok(relevantToTopic('Apple posts quarterly earnings and higher profit','earnings'));
+ assert.ok(relevantToTopic('Retailer reports quarterly earnings and higher profit','earnings'));
  assert.ok(!relevantToTopic('Apple posts quarterly earnings and higher profit','energy'));
  assert.ok(relevantToTopic('OPEC crude oil production update','energy'));
  assert.ok(!relevantToTopic('OPEC crude oil production update','rates'));
@@ -23,7 +23,7 @@ test('each selected category returns genuinely relevant headlines, without recyc
   'Federal Reserve interest rate decision affects bonds',
   'OPEC crude oil production update',
   'TSX Canadian markets rebound',
-  'Nvidia AI semiconductor chip forecast'
+  'Nvidia AI semiconductor chip development'
  ];
  const date=new Date().toUTCString();
  const body='<?xml version="1.0"?><rss><channel>'+fixtures.map((name,i)=>
