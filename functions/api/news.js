@@ -38,9 +38,9 @@ export async function onRequestGet({request}){
  const symbol=known?.symbol||typed||null;
  const base=TOPICS[category].query;
  const clean=raw.replace(/[^A-Za-z0-9 .&-]/g,'').slice(0,48);
- const q=clean?('('+clean+' OR '+(symbol||clean)+') '+(category==='all'?'stock market':TOPICS[category].label)+' when:5d'):base;
- const sources=RSS.map(src=>({...src,url:src.url||googleUrl(q,region)}));
- if(symbol)sources.push({id:'yahoo',name:'Yahoo Finance',url:yahooUrl(symbol)});
+ const q=clean?('('+clean+' OR '+(symbol||clean)+') ('+TOPICS[category].query.replace(/ when:\d+d$/,'')+') when:5d'):base;
+ const sources=category==='all' ? RSS.map(src=>({...src,url:src.url||googleUrl(q,region)})) : [{id:'google-topic',name:'Google News · '+TOPICS[category].label,url:googleUrl(q,region)}];
+ if(symbol&&category==='all')sources.push({id:'yahoo',name:'Yahoo Finance',url:yahooUrl(symbol)});
  const outcomes=await Promise.allSettled(sources.map(src=>readRSS(src.url,src.name)));
  const availability=outcomes.every(x=>x.status==='rejected')?'unavailable':outcomes.some(x=>x.status==='rejected')?'partial':'available';
  const data=outcomes.flatMap((outcome,i)=>outcome.status==='fulfilled'?outcome.value.map(item=>({...item,feed:sources[i].name})):[]);
