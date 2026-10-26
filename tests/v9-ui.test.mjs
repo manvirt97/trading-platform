@@ -44,3 +44,12 @@ test('V9 links existing research tools rather than removing them',()=>{
  assert.match(legacy,/id="page-risk"/);
  assert.match(legacy,/id="page-journal"/);
 });
+
+
+test('new homepage is the default but classic research remains an explicit opt-in',()=>{
+ const index=file('public/index.html'),research=file('public/research.html');
+ assert.match(index,/location\.replace\('\/v9\.html'/);
+ assert.match(research,/URLSearchParams\(location\.search\)\.has\('classic'\)/);
+ assert.match(research,/location\.replace\('\/v9\.html'/);
+ assert.match(file('public/static/app.js'),/classicPage=location\.hash\.slice\(1\)/);
+});
