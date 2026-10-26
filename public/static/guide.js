@@ -112,6 +112,27 @@ window.renderTradeGuide=x=>{
  if(sig.kind!=='wait'&&shownFor!==x.symbol+'|'+x.interval+'|'+stamp+'|'+sig.kind){shownFor=x.symbol+'|'+x.interval+'|'+stamp+'|'+sig.kind;if(localStorage.getItem('rangeform_alerts')==='yes')window.toast?.('Conditional '+sig.kind+' setup on '+x.symbol+'. Independently verify quote and news.')}
 };
 
+window.resetTradeGuide=reason=>{
+ mount();active=null;
+ $('deskVerdict').dataset.bias='wait';
+ $('deskBias').textContent='WAIT · NO CURRENT VERIFIED SETUP';
+ $('deskLine').textContent=reason||'Select a source and analyze a symbol to load current evidence.';
+ $('deskReadiness').textContent='FRESH ANALYSIS REQUIRED';
+ $('deskSource').textContent='AWAITING VERIFIED DATA';
+ $('deskScore').textContent='—';
+ $('deskPrice').textContent='—';
+ $('deskTime').textContent='No verified bar';
+ $('deskGate').textContent='NOT ACTIONABLE';
+ for(const id of ['deskEntry','deskInvalid','deskTarget','deskBullLevel','deskBearLevel'])$(id).textContent='—';
+ $('deskWatchLevels').hidden=true;
+ $('deskPlanNote').textContent='Historical research levels and position plans are cleared until an analysis succeeds.';
+ $('deskWhy').textContent='No current validated technical analysis.';
+ $('deskWatch').textContent='Check source, market data age, completed bars and provider coverage.';
+ $('deskChecklist').textContent='Source and freshness verification required';
+ $('deskChoiceNote').textContent='No prior analysis is carried forward after a source change or provider error.';
+ for(const id of ['deskBuy','deskSell','deskWait']){$(id).classList.toggle('chosen',id==='deskWait');$(id).setAttribute('aria-pressed',String(id==='deskWait'))}
+};
+
 window.renderOverviewGuide=(x,radar)=>{
  mount();let fresh=freshness(x),n=(radar?.rows||[]).filter(y=>y.source==='twelvedata'&&!y.error).length;
  $('liveStripDot').classList.toggle('on',x.source==='twelvedata'&&fresh.fresh);
