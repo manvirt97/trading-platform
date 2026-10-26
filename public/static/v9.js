@@ -42,7 +42,7 @@ function renderScan(rows){for(const id of ['scannerResults','overviewResults']){
 async function scan(){if(state.scanning)return;if(!state.configured){toast('Connect a permitted Twelve Data feed before scanning.');setPage('signals');return}state.scanning=true;for(const id of ['scanButton','overviewScan']){$(id).disabled=true;$(id).textContent='Analyzing verified bars…'}
 const results=[];for(const sym of state.watch){try{const x=await analyzeSymbol(sym,'1day');results.push([sym,x])}catch(e){results.push([sym,{error:e.message}])}renderScan(results)}
 results.sort((a,b)=>{const sa=a[1]?.score, sb=b[1]?.score;return (Number.isFinite(sb)?sb:-1)-(Number.isFinite(sa)?sa:-1)});renderScan(results);
-for(const sym of ['SPY','QQQ','DIA','SHOP']){const x=state.market.get(sym);const q=document.querySelector('[data-quote="'+sym+'"]'),delta=document.querySelector('[data-change="'+sym+'"]');if(x){q.textContent=money(x.last);delta.textContent=pct(x.change_pct)+' · '+ageLabel(x.last_bar_utc);delta.className=Number(x.change_pct)>=0?'positive':'negative'}}
+for(const sym of ['SPY','NVDA','TSLA','SHOP']){const x=state.market.get(sym);const q=document.querySelector('[data-quote="'+sym+'"]'),delta=document.querySelector('[data-change="'+sym+'"]');if(x){q.textContent=money(x.last);delta.textContent=pct(x.change_pct)+' · '+ageLabel(x.last_bar_utc);delta.className=Number(x.change_pct)>=0?'positive':'negative'}}
 state.scanning=false;for(const id of ['scanButton','overviewScan']){$(id).disabled=false;$(id).innerHTML=id==='scanButton'?'Run watchlist scan ↗':'Scan my watchlist <span>↗</span>'}
 toast(results.filter(x=>!x[1]?.error).length+' of '+results.length+' symbols analyzed. Review data age before acting.')}
 async function inspect(sym){state.symbol=sym;$('symbolInput').value=sym;setPage('signals');await runAnalysis()}
@@ -72,7 +72,16 @@ ctx.clearRect(0,0,w,h);ctx.strokeStyle=colors.grid;ctx.lineWidth=1;for(let i=0;i
 for(let i=0;i<bars.length;i++){const b=bars[i],cx=left+(i+.5)*width,o=y(b.open),c=y(b.close),high=y(b.high),low=y(b.low),up=Number(b.close)>=Number(b.open);ctx.strokeStyle=ctx.fillStyle=up?colors.up:colors.down;ctx.beginPath();ctx.moveTo(cx,high);ctx.lineTo(cx,low);ctx.stroke();ctx.fillRect(cx-Math.min(width*.32,5),Math.min(o,c),Math.max(1,Math.min(width*.64,10)),Math.max(1,Math.abs(c-o)));
 const v=Math.max(0,Number(b.volume)||0),maxVol=maximumVolume;ctx.globalAlpha=.35;ctx.fillRect(cx-width*.28,priceBottom+13,Math.max(1,width*.55),v/maxVol*volumeHeight);ctx.globalAlpha=1}
 const levs=[[Number(x.indicators?.resistance20),colors.res,'PRIOR HIGH'],[Number(x.indicators?.support20),colors.down,'PRIOR LOW']];for(const [value,color,label]of levs){if(!Number.isFinite(value)||value<min-pad||value>max+pad)continue;const Y=y(value);ctx.strokeStyle=color;ctx.setLineDash([5,5]);ctx.beginPath();ctx.moveTo(left,Y);ctx.lineTo(plotRight,Y);ctx.stroke();ctx.setLineDash([]);ctx.fillStyle=color;ctx.font='bold 10px DM Sans';ctx.fillText(label,plotRight+5,Y-7)}
-ctx.fillStyle=colors.label;ctx.font='10px DM Sans';for(let i=0;i<5;i++){let idx=Math.min(bars.length-1,Math.round(i*(bars.length-1)/4)),date=new Date(bars[idx].time||bars[idx].timestamp);if(Number.isFinite(+date))ctx.fillText(date.toLocaleDateString('en-CA',{month:'short',day:'numeric',timeZone:'UTC'}),left+idx*width-6,h-9)}
+// Conditional scenarios in a separate right-hand lane, never simulated OHLCV.
+ const last=bars.at(-1),lastY=y(Number(last.close)),sourceX=plotRight-width/2,atr=Number(x.indicators?.atr14);
+ if(Number.isFinite(atr)&&atr>0){
+  for(const [direction,colour,caption] of [[1,colors.up,'BULL CASE'],[-1,colors.down,'BEAR CASE']]){
+   const endX=Math.min(w-8,plotRight+52),endY=Math.max(top+12,Math.min(priceBottom-8,y(Number(last.close)+direction*atr)));
+   ctx.strokeStyle=colour;ctx.lineWidth=1.5;ctx.setLineDash([5,5]);ctx.beginPath();ctx.moveTo(sourceX,lastY);ctx.quadraticCurveTo(plotRight+8,lastY,endX,endY);ctx.stroke();ctx.setLineDash([]);
+   ctx.fillStyle=colour;ctx.font='bold 9px DM Sans';ctx.fillText(caption,plotRight+7,Math.max(top+8,Math.min(priceBottom-2,endY+(direction===1?-7:11))));
+  }
+ }
+ ctx.fillStyle=colors.label;ctx.font='10px DM Sans';for(let i=0;i<5;i++){let idx=Math.min(bars.length-1,Math.round(i*(bars.length-1)/4)),date=new Date(bars[idx].time||bars[idx].timestamp);if(Number.isFinite(+date))ctx.fillText(date.toLocaleDateString('en-CA',{month:'short',day:'numeric',timeZone:'UTC'}),left+idx*width-6,h-9)}
 ctx.fillStyle=colors.label;ctx.font='11px DM Sans';ctx.fillText('COMPLETED CANDLES ONLY · NO FORECAST',left,16);
 }
 const css=name=>getComputedStyle(document.body).getPropertyValue(name).trim();
