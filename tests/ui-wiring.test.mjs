@@ -54,3 +54,16 @@ test('model selector is a real backend allowlist, not unsupported model branding
  assert.match(server,/env\.AI\.run\(selected\.id/);
  assert.doesNotMatch(server,/env\.AI\.run\(data\.model/);
 });
+
+
+test('mobile dock is compact and visible logo has a full R',()=>{
+ const html=load('public/research.html'),css=load('public/static/mobile-polish.css'),svg=load('public/static/rangeform-mark.svg');
+ assert.match(html,/mobile-polish\.css\?v=1/);
+ assert.match(html,/class="mobile-brand-mark"/);
+ assert.match(css,/height:62px/);
+ assert.match(css,/height:50px/);
+ assert.match(css,/bottom:7px/);
+ assert.match(css,/body\.standalone \.mobile-dock/);
+ assert.match(svg,/>R<\/text>/);
+ for(const path of ['public/market.html','public/account.html'])assert.match(load(path),/rangeform-mark\.svg/);
+});
