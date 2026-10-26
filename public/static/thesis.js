@@ -97,7 +97,7 @@ async function refreshNews(){
 function init(){
  $('thesisSwitch')?.querySelectorAll('[data-thesis]').forEach(btn=>btn.onclick=()=>{caseMode=btn.dataset.thesis;$('thesisSwitch').querySelectorAll('button').forEach(b=>b.classList.toggle('chosen',b===btn));render()});
  $('thesisNewsRefresh')?.addEventListener('click',refreshNews);
- $('thesisAskAI')?.addEventListener('click',()=>{if(!current)return;const x=current,p=x.indicators||{},text='Evaluate the historical '+x.symbol+' research thesis in beginner-friendly language. Data source: '+x.source+', last completed bar '+x.last_bar_utc+', interval '+x.interval+', alignment score '+x.score+'/100, RSI14 '+p.rsi14+', 5-bar momentum '+p.momentum5_pct+'%, relative volume '+p.rel_volume+'x, 20-bar support '+p.support20+', resistance '+p.resistance20+'. Explain the bullish and bearish conditions, what news could invalidate the idea, common behavioral traps, and why historical patterns cannot guarantee profits. Do not assume the numbers are live quotes.';document.querySelector('[data-page="copilot"]')?.click();const input=$('copilotQuestion');if(input){input.value=text.slice(0,480);input.focus()}});
+ $('thesisAskAI')?.addEventListener('click',()=>{if(current)window.rangeformExperience?.askChart?.(current)});
 
 }
 window.renderQuantThesis=x=>{current=x;render();refreshNews()};
