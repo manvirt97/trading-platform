@@ -13,7 +13,7 @@ export async function onRequestGet({env}){
   if(!r.ok)return json({state:'unavailable',connected:false,message:'Provider returned HTTP '+r.status,checked_at:new Date().toISOString()},503);
   const raw=await r.json();
   const date=String(raw?.values?.[0]?.datetime||'');
-  if(!/^\d{4}-\d{2}-\d{2}$/.test(date)||!Number.isFinite(Number(raw.values[0].close))){
+  if(!/^\d{4}-\d{2}-\d{2}$/.test(date)||(!Number.isFinite(Number(raw.values[0].close))||Number(raw.values[0].close)<=0)){
    const code=String(raw?.code||'');
    return json({state:'unavailable',connected:false,message:code==='429'?'Provider request limit reached.':'Provider returned no valid historical bars. Check your subscription, exchange coverage and rate limits.',checked_at:new Date().toISOString()},503);
   }
