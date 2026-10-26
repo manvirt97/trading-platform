@@ -2,7 +2,7 @@
 (()=>{'use strict';
  const key='rangeform_theme';
  const choices=['dark','light','warm'];
- const read=()=>{try{const x=localStorage.getItem(key);return choices.includes(x)?x:'dark'}catch{return 'dark'}};
+ const read=()=>{try{const x=localStorage.getItem(key);return choices.includes(x)?x:'light'}catch{return 'light'}};
  const paint=theme=>{
    const t=choices.includes(theme)?theme:'dark';
    document.documentElement.dataset.rfTheme=t;
