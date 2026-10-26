@@ -49,3 +49,8 @@
 
 @media(max-width:780px){html,body{max-width:100%;overflow-x:clip}.bar{padding-top:calc(5px + env(safe-area-inset-top,0px));padding-left:calc(13px + env(safe-area-inset-left,0px));padding-right:calc(13px + env(safe-area-inset-right,0px))}}
 body.standalone{overscroll-behavior-y:contain}
+
+/* Match the selected layered logo wordmark across all three destinations */
+.bar .brand b{font-size:20px;letter-spacing:-.045em;font-weight:760;text-transform:none;font-family:Inter,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif}
+.bar .brand small{letter-spacing:.12em}
+@media(max-width:780px){.bar .brand b{font-size:17px;letter-spacing:-.03em}.bar .brand small{font-size:8px}}
