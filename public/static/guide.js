@@ -39,7 +39,7 @@ function direction(x){
    {ok:false,label:'Independent broker quote, spread and event calendar must still be checked'}
  ];
  return {
-  kind,bias:kind==='buy'?'BUY SETUP · REVIEW':kind==='sell'?'SELL / REDUCE · REVIEW':'WAIT · NO VERIFIED ENTRY',
+  kind,bias:kind==='buy'?'BUY SETUP':kind==='sell'?'SELL / REDUCE SETUP':'WAIT · NO CONFIRMED SETUP',
   reason:kind==='wait'?waitWhy:status.reason,fresh:status.fresh,bullish,bearish,checks,
   impact:(x.components||[]).slice().sort((a,b)=>Math.abs(b.impact)-Math.abs(a.impact)).slice(0,3).map(z=>z.name+': '+(z.impact>0?'+':'')+z.impact+' pts'),
   entry:kind==='wait'?null:price,stop,target,
@@ -52,15 +52,15 @@ function mount(){
  const controls=document.querySelector('#page-signals .controls-panel');
  if(controls&&!$('decisionDeck')){
   const panel=document.createElement('section');panel.id='decisionDeck';panel.className='decision-deck';panel.innerHTML=`<div class="desk-title"><span class="eyebrow">THE OPPORTUNITY DESK / EVIDENCE FIRST</span><span id="deskSource" class="desk-data">AWAITING VERIFIED DATA</span></div>
- <div class="desk-row"><div class="desk-verdict" id="deskVerdict" data-bias="wait"><span class="desk-eyebrow">WHAT SHOULD I DO?</span><strong id="deskBias">WAIT · NO VERIFIED ENTRY</strong><span id="deskLine">No connected, current market-data bars. Don't trade a generated signal.</span><span id="deskReadiness" class="desk-readiness">DATA CHECK REQUIRED</span></div>
- <div class="desk-metric"><small>RULE ALIGNMENT</small><strong id="deskScore">—</strong><span>Technical factors agreeing, not the chance of profit.</span></div>
+ <div class="desk-row"><div class="desk-verdict" id="deskVerdict" data-bias="wait"><span class="desk-eyebrow">SIGNAL · WHAT IT MEANS</span><strong id="deskBias">WAIT · NO CONFIRMED SETUP</strong><span id="deskLine">No validated price feed is connected. Charts and news are available, but there is no verified entry yet.</span><span id="deskReadiness" class="desk-readiness">DATA CHECK REQUIRED</span></div>
+ <div class="desk-metric"><small>INDICATORS AGREE</small><strong id="deskScore">—</strong><span>Technical factors agreeing, not the chance of profit.</span></div>
  <div class="desk-metric"><small>LAST COMPLETED PRICE</small><strong id="deskPrice">—</strong><span id="deskTime">Verify the timestamp</span></div></div>
  <div class="desk-plan"><div class="desk-plan-top"><span>CONDITIONAL TRADE PLAN</span><span id="deskGate">WAIT FOR REAL MARKET DATA</span></div>
  <div class="desk-plan-levels"><div><small>REFERENCE ENTRY</small><strong id="deskEntry">—</strong></div><div><small>INVALIDATION / STOP</small><strong id="deskInvalid">—</strong></div><div><small>ILLUSTRATIVE 2R TARGET</small><strong id="deskTarget">—</strong></div></div>
  <p id="deskPlanNote">No current entry or target is shown without a validated provider bar and confirmed rules. Even a detected setup needs a live broker quote and risk review.</p></div>
  <div class="desk-guide"><div><b>WHY?</b><p id="deskWhy">Waiting for valid quantitative evidence.</p></div><div><b>WHAT TO WATCH</b><p id="deskWatch">Confirm price, market hours, volume and upcoming events.</p></div><div><b>CONFIRMATION CHECKLIST</b><div class="desk-checklist" id="deskChecklist">Source • Freshness • Range • Volume • Broker confirmation</div></div></div>
- <div class="desk-actions"><button type="button" class="desk-choice" id="deskBuy" aria-pressed="false">↗ Explore bullish case</button><button type="button" class="desk-choice" id="deskSell" aria-pressed="false">↘ Explore bearish case</button><button type="button" class="desk-choice chosen" id="deskWait" aria-pressed="true">◷ Wait / avoid</button><button type="button" class="desk-risk" id="deskRisk">Plan position risk ↗</button></div>
- <div id="deskChoiceNote" class="desk-choice-note">Scenarios are educational. There are no brokerage orders or guaranteed profitable trades.</div></section>`;
+ <div class="desk-actions"><button type="button" class="desk-choice" id="deskBuy" aria-pressed="false">↗ When to consider buying</button><button type="button" class="desk-choice" id="deskSell" aria-pressed="false">↘ When to consider selling</button><button type="button" class="desk-choice chosen" id="deskWait" aria-pressed="true">◷ Wait for confirmation</button><button type="button" class="desk-risk" id="deskRisk">Plan position risk ↗</button></div>
+ <div id="deskChoiceNote" class="desk-choice-note">Conditional setups, not guaranteed trades. A verified quote, costs, market hours and news must be checked before any decision.</div></section>`;
   controls.after(panel);
   for(let [id,type] of [['deskBuy','buy'],['deskSell','sell'],['deskWait','wait']])$(id).onclick=()=>{
    document.querySelectorAll('.desk-choice').forEach(btn=>{btn.classList.remove('chosen');btn.setAttribute('aria-pressed','false')});$(id).classList.add('chosen');$(id).setAttribute('aria-pressed','true');
