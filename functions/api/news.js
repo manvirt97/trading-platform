@@ -1,7 +1,7 @@
 // Multi-source best-effort market headlines. No credentials, AI fabrication or cached fixed headlines.
 import {json} from '../_shared/http.js';
 import {resolveSymbol,suggestSymbols} from '../_shared/symbols.js';
-import {TOPICS,normalizeTopic,relevantToTopic,relevantToQuery} from '../_shared/news-topics.js';
+import {TOPICS,normalizeTopic,relevantToTopic,relevantToQuery,primaryTopic,marketRelevant} from '../_shared/news-topics.js';
 const RSS=[
  {id:'cnbc',name:'CNBC Markets',url:'https://search.cnbc.com/rs/search/combinedcms/view.xml?partnerId=wrss01&id=15839069'},
  {id:'mw',name:'MarketWatch',url:'https://feeds.content.dowjones.io/public/rss/mw_topstories'},
@@ -46,10 +46,13 @@ export async function onRequestGet({request}){
  const data=outcomes.flatMap((outcome,i)=>outcome.status==='fulfilled'?outcome.value.map(item=>({...item,feed:sources[i].name})):[]);
  const searchName=known?.name||raw;
  // A category is a real filter. Do NOT fall back to broad unrelated headlines.
- const matches=data.filter(item=>relevantToTopic(item.title,category)&&relevantToQuery(item.title,searchName));
+ const matches=data.filter(item=>{
+  const primary=primaryTopic(item.title);
+  return (category!=='all'||marketRelevant(item.title))&&(category==='all'||(relevantToTopic(item.title,category)&&primary===category))&&relevantToQuery(item.title,searchName);
+ });
  const unique=[...new Map(matches.map(item=>[item.url,item])).values()]
   .sort((a,b)=>Date.parse(b.date)-Date.parse(a.date)).slice(0,32)
-  .map(item=>({...item,topic:TOPICS[category].label.toUpperCase()}));
+  .map(item=>({...item,topic:TOPICS[primaryTopic(item.title)].label.toUpperCase(),primary_topic:primaryTopic(item.title)}));
  const errors=outcomes.map((o,i)=>o.status==='rejected'?sources[i].name+': '+String(o.reason?.message||'connection unavailable').slice(0,95):null).filter(Boolean);
  const noMatchMessage=availability==='unavailable'
   ?'Every configured public headline source is unavailable. No stories were invented.'

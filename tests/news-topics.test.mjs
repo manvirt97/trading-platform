@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {normalizeTopic,relevantToTopic,relevantToQuery,TOPICS} from '../functions/_shared/news-topics.js';
+import {normalizeTopic,relevantToTopic,relevantToQuery,primaryTopic,marketRelevant,TOPICS} from '../functions/_shared/news-topics.js';
 import {onRequestGet} from '../functions/api/news.js';
 
 test('news categories have independent relevance rules, never duplicate the same broad results by fallback',()=>{
@@ -14,6 +14,7 @@ test('news categories have independent relevance rules, never duplicate the same
  assert.ok(relevantToTopic('TSX Canadian markets rebound','canada'));
  assert.ok(relevantToTopic('Nvidia AI semiconductor outlook','technology'));
  assert.ok(relevantToQuery('Apple rallies on earnings','Apple'));
+ assert.ok(relevantToQuery('Tesla shares react to results','Tesla, Inc.'));
  assert.ok(!relevantToQuery('Apple rallies on earnings','Microsoft'));
 });
 
@@ -46,4 +47,20 @@ test('each selected category returns genuinely relevant headlines, without recyc
   const narrow=await onRequestGet({request:new Request('https://rangeform.pages.dev/api/news?category=energy&q=Apple')});
   assert.equal((await narrow.json()).items.length,0,'Do not fill an empty category with unrelated articles');
  }finally{globalThis.fetch=original}
+});
+
+test('news headlines have one primary category even when keywords overlap',()=>{
+ assert.equal(primaryTopic('Nvidia reports quarterly earnings and guidance'),'earnings');
+ assert.equal(primaryTopic('Bank of Canada announces interest rate decision'),'rates');
+ assert.equal(primaryTopic('Cenovus pipeline expands Canadian oil production'),'energy');
+ assert.equal(primaryTopic('TSX Canadian stocks rebound'),'canada');
+ assert.equal(primaryTopic('Nvidia AI semiconductor chip development'),'technology');
+ assert.equal(primaryTopic('A general article without a matching market topic'),'all');
+});
+
+test('all-markets excludes unrelated general news without hiding financial catalysts',()=>{
+ assert.equal(marketRelevant('DOJ charges former FBI director in new case'),false);
+ assert.equal(marketRelevant('Nvidia stock rises as semiconductor demand accelerates'),true);
+ assert.equal(marketRelevant('Federal Reserve holds interest rates as inflation falls'),true);
+ assert.equal(marketRelevant('Oil prices rally on unexpected OPEC supply cuts'),true);
 });
