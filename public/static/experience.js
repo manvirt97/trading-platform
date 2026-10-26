@@ -70,7 +70,7 @@ async function setupAI(){
   const config=await getJson('/api/profile-config');aiReady=Boolean(config.ai_enabled);
   if(!config.enabled){aiState('Account setup incomplete; use My workspace',false);return}
   const [{initializeApp},{getAuth,onAuthStateChanged,GoogleAuthProvider,signInWithPopup,setPersistence,browserSessionPersistence}]=await Promise.all([import('https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js'),import('https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js')]);
-  auth=getAuth(initializeApp(config.firebase,'rangeform-intelligence'));await setPersistence(auth,browserSessionPersistence);authReady=true;
+  auth=getAuth(initializeApp(config.firebase));await setPersistence(auth,browserSessionPersistence);authReady=true;
   const provider=new GoogleAuthProvider();provider.setCustomParameters({prompt:'select_account'});
   window.rangeformGoogleSignIn=()=>signInWithPopup(auth,provider);
   onAuthStateChanged(auth,user=>{const old=currentUser?.uid||null;currentUser=user;if(old!==(user?.uid||null)){$('copilotThread').replaceChildren();chat('assistant','Private research session. I can use your saved watchlist and research notes from this Google account, but I will not invent live prices or remember this chat automatically.');const key=user?'rangeform_model_'+user.uid:null;$('copilotModel').value=key&&sessionStorage.getItem(key)||'balanced';}if(!user)aiState('Sign in with your own Google account to ask AI',false);else if(!aiReady)aiState('Signed in · AI binding not yet enabled',false);else aiState('Signed in as '+(user.email||'Google user')+' · ready',true)});
