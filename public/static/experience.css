@@ -188,3 +188,7 @@ tv-advanced-chart{width:100%;height:100%;display:block}
 .coverage-empty .btn{white-space:nowrap}
 .ticker-card.unavailable{opacity:.72}
 @media(max-width:680px){.coverage-empty{flex-wrap:wrap;padding:16px;gap:10px}.coverage-empty .btn{width:100%}}
+
+.copilot-inline-signin{border:1px solid var(--lime);background:var(--panel2);color:var(--text);padding:8px 10px;border-radius:9px;font-size:11px;font-weight:750;margin-left:auto;white-space:nowrap}
+.copilot-inline-signin:hover{background:var(--panel)}
+@media(max-width:680px){.copilot-inline-signin{font-size:10px;padding:8px}.copilot-head .copilot-chip{display:none}}
