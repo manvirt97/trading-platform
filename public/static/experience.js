@@ -96,7 +96,7 @@ function bind(){
  $('commandInput').oninput=sleepDebounce(e=>drawCommand(e.target.value));
  $('commandInput').onkeydown=e=>{if(['ArrowDown','ArrowUp'].includes(e.key)){e.preventDefault();commandItems[commandIndex]?.classList.remove('active');commandIndex=(commandIndex+(e.key==='ArrowDown'?1:-1)+commandItems.length)%Math.max(commandItems.length,1);commandItems[commandIndex]?.classList.add('active');commandItems[commandIndex]?.scrollIntoView({block:'nearest'})}if(e.key==='Enter'){e.preventDefault();commandItems[commandIndex]?.click()}};
  document.addEventListener('keydown',e=>{if((e.metaKey||e.ctrlKey)&&e.key.toLowerCase()==='k'){e.preventDefault();commandShow($('commandOverlay').hidden)}if(e.key==='Escape'&&!$('commandOverlay').hidden)commandShow(false)});
- $('mobileMore').onclick=()=>$('sidebar').classList.add('open');
+ $('mobileMore').onclick=()=>window.rangeformSidebar?.open();
  document.querySelectorAll('[data-dock]').forEach(b=>b.onclick=()=>go(b.dataset.dock));
  window.addEventListener('rangeform:navigate',e=>{document.querySelectorAll('[data-dock]').forEach(b=>b.classList.toggle('on',b.dataset.dock===e.detail.page))});
  $('fetchNews').onclick=loadNews;
