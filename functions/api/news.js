@@ -1,7 +1,7 @@
 // Multi-source best-effort market headlines. No credentials, AI fabrication or cached fixed headlines.
 import {json} from '../_shared/http.js';
 import {resolveSymbol,suggestSymbols} from '../_shared/symbols.js';
-import {TOPICS,normalizeTopic,relevantToTopic,relevantToQuery,primaryTopic} from '../_shared/news-topics.js';
+import {TOPICS,normalizeTopic,relevantToTopic,relevantToQuery,primaryTopic,marketRelevant} from '../_shared/news-topics.js';
 const RSS=[
  {id:'cnbc',name:'CNBC Markets',url:'https://search.cnbc.com/rs/search/combinedcms/view.xml?partnerId=wrss01&id=15839069'},
  {id:'mw',name:'MarketWatch',url:'https://feeds.content.dowjones.io/public/rss/mw_topstories'},
@@ -48,7 +48,7 @@ export async function onRequestGet({request}){
  // A category is a real filter. Do NOT fall back to broad unrelated headlines.
  const matches=data.filter(item=>{
   const primary=primaryTopic(item.title);
-  return (category==='all'||(relevantToTopic(item.title,category)&&primary===category))&&relevantToQuery(item.title,searchName);
+  return (category!=='all'||marketRelevant(item.title))&&(category==='all'||(relevantToTopic(item.title,category)&&primary===category))&&relevantToQuery(item.title,searchName);
  });
  const unique=[...new Map(matches.map(item=>[item.url,item])).values()]
   .sort((a,b)=>Date.parse(b.date)-Date.parse(a.date)).slice(0,32)
