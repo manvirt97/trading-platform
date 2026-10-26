@@ -10,14 +10,14 @@ test('all Rangeform screens have identical primary navigation and standalone man
   assert.match(html,/href="\/research"/);
   assert.match(html,/href="\/account\.html"/);
   assert.match(html,/rel="manifest" href="\/manifest\.webmanifest"/);
-  assert.match(html,/href="\/static\/apple-touch-icon\.png"/);
-  assert.match(html,/rangeform-mark\.svg/);
+  assert.match(html,/href="\/static\/rangeform-official-icon\.png\?v=1"/);
+  assert.match(html,/rangeform-official-icon\.png/);
  }
  const manifest=JSON.parse(load('public/manifest.webmanifest'));
  assert.equal(manifest.display,'standalone');
  assert.equal(manifest.scope,'/');
- assert.ok(manifest.icons.some(x=>x.sizes==='192x192'));
- assert.ok(manifest.icons.some(x=>x.sizes==='512x512'));
+ assert.ok(manifest.icons.some(x=>x.sizes==='96x96'));
+ assert.ok(manifest.icons.some(x=>x.type==='image/png'));
 });
 
 test('mobile navigation drawer closes on backdrop and buttons',()=>{
@@ -57,7 +57,7 @@ test('model selector is a real backend allowlist, not unsupported model branding
 
 
 test('mobile dock is solid, edge-attached and never exposes scrolling content',()=>{
- const html=load('public/research.html'),css=load('public/static/mobile-polish.css'),svg=load('public/static/rangeform-mark.svg');
+ const html=load('public/research.html'),css=load('public/static/mobile-polish.css'),manifest=JSON.parse(load('public/manifest.webmanifest'));
  assert.match(html,/mobile-polish\.css\?v=2/);
  assert.match(html,/class="mobile-brand-mark"/);
  assert.match(css,/--rf-dock-bar-height:64px/);
@@ -71,6 +71,6 @@ test('mobile dock is solid, edge-attached and never exposes scrolling content',(
  assert.match(css,/padding-bottom:calc\(var\(--rf-dock-total-height\) \+ 24px\)!important/);
  assert.match(css,/\.app-footer\{display:none!important\}/);
  assert.match(css,/body\.standalone \.mobile-dock/);
- assert.match(svg,/>R<\/text>/);
- for(const path of ['public/market.html','public/account.html'])assert.match(load(path),/rangeform-mark\.svg/);
+ assert.equal(manifest.icons[0].src,'/static/rangeform-official-icon.png');
+ for(const path of ['public/market.html','public/account.html'])assert.match(load(path),/rangeform-official-icon\.png/);
 });
