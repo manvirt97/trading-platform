@@ -8,3 +8,8 @@ html[data-rf-theme="light"] body{--bg:#f1f4f8;--panel:#fff;--edge:#dae4ee;--text
 html[data-rf-theme="dark"] body{--bg:#0a1018;--panel:#111b27;--edge:#2b3d4e;--text:#edf3fa;--sub:#98acbf;--accent:#bdd1df;--soft:#1d2b39}
 html[data-rf-theme="warm"] body{--bg:#181713;--panel:#2b2721;--edge:#4a4033;--text:#f4eee4;--sub:#c2b39e;--accent:#d8c5aa;--soft:#383228}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+
+/* Set all Research variables before DOMContentLoaded, preventing dark-to-light flashes. */
+html[data-rf-theme="light"] body{--surface:#fff;--panel:#f7f9fc;--panel2:#e8eff6;--border:#dae4ee;--muted:#566b7d;--lime:#315778;--text:#192b3b;--bg:#f1f4f8}
+html[data-rf-theme="dark"] body{--surface:#111b27;--panel:#172330;--panel2:#1d2b39;--border:#2b3d4e;--muted:#98acbf;--lime:#bdd1df;--text:#edf3fa;--bg:#0a1018}
+html[data-rf-theme="warm"] body{--surface:#24211d;--panel:#2b2721;--panel2:#383228;--border:#4a4033;--muted:#c2b39e;--lime:#d8c5aa;--text:#f4eee4;--bg:#181713}
