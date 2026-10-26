@@ -63,7 +63,7 @@ async function loadPulse(){
  }catch{root.innerHTML='<div class="loading-news">Market headlines are unavailable right now. <a href="https://news.google.com/" target="_blank" rel="noopener noreferrer">Browse the source ↗</a></div>'}
 }
 function chat(role,message){const root=$('copilotThread'),row=document.createElement('div'),span=document.createElement('span');row.className='chat-row '+role;span.className='chat-bubble';span.textContent=message;row.append(span);root.append(row);root.scrollTop=root.scrollHeight;return span}
-function aiState(label,isEnabled){$('copilotState').textContent=label;$('copilotBadge').textContent=isEnabled?'AI READY':'SIGN-IN / SETUP';$('copilotSend').disabled=!isEnabled}
+function aiState(label,isEnabled){$('copilotState').textContent=label;$('copilotBadge').textContent=isEnabled?'AI READY':'SIGN-IN / SETUP';$('copilotSend').disabled=!isEnabled;if($('copilotSignIn'))$('copilotSignIn').hidden=!(authReady&&!currentUser)}
 async function setupAI(){
  aiState('Checking your secure research account…',false);
  try{
@@ -108,6 +108,7 @@ function bind(){
  for(const id of ['symbolInput','liveChartSearch','newsSymbol']){const input=$(id);if(!input)continue;input.setAttribute('list','rangeformSymbols');input.addEventListener('input',()=>updateSuggestions(input.value))}
  const analyze=$('analyzeBtn');analyze.onclick=async()=>{let input=$('symbolInput'),original=input.value,known=await resolveInput(original);if(!known){window.toast?.('Select a suggested company or enter a valid ticker.','error');return}input.value=known.symbol;state.symbol=known.symbol;loadSignal()};
  $('symbolInput').onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();analyze.click()}};
+ $('copilotSignIn').onclick=async()=>{if(!authReady)return;try{await window.rangeformGoogleSignIn()}catch(e){aiState('Google sign-in could not complete: '+(e.code||e.message||'Unknown error'),false)}};
  $('copilotForm').onsubmit=e=>{e.preventDefault();sendAI($('copilotQuestion').value)};
  document.querySelectorAll('[data-ask]').forEach(b=>b.onclick=()=>{$('copilotQuestion').value=b.dataset.ask;$('copilotQuestion').focus()});
  $('copilotQuestion').addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();$('copilotForm').requestSubmit()}});
