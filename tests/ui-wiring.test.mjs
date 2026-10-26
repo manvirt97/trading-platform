@@ -56,13 +56,20 @@ test('model selector is a real backend allowlist, not unsupported model branding
 });
 
 
-test('mobile dock is compact and visible logo has a full R',()=>{
+test('mobile dock is solid, edge-attached and never exposes scrolling content',()=>{
  const html=load('public/research.html'),css=load('public/static/mobile-polish.css'),svg=load('public/static/rangeform-mark.svg');
- assert.match(html,/mobile-polish\.css\?v=1/);
+ assert.match(html,/mobile-polish\.css\?v=2/);
  assert.match(html,/class="mobile-brand-mark"/);
- assert.match(css,/height:62px/);
- assert.match(css,/height:50px/);
- assert.match(css,/bottom:7px/);
+ assert.match(css,/--rf-dock-bar-height:64px/);
+ assert.match(css,/height:49px/);
+ assert.match(css,/bottom:0/);
+ assert.match(css,/left:0/);
+ assert.match(css,/right:0/);
+ assert.match(css,/background:var\(--surface\)/);
+ assert.match(css,/backdrop-filter:none/);
+ assert.match(css,/border-radius:0/);
+ assert.match(css,/padding-bottom:calc\(var\(--rf-dock-total-height\) \+ 24px\)!important/);
+ assert.match(css,/\.app-footer\{display:none!important\}/);
  assert.match(css,/body\.standalone \.mobile-dock/);
  assert.match(svg,/>R<\/text>/);
  for(const path of ['public/market.html','public/account.html'])assert.match(load(path),/rangeform-mark\.svg/);
