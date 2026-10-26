@@ -17,3 +17,8 @@ FIREBASE_PROJECT_ID = "rangeform-7e8d2"
 FIREBASE_API_KEY = "AIzaSyDuW6AYo89yiDQXFQWG_Ea0b3U1iaShbdk"
 FIREBASE_AUTH_DOMAIN = "rangeform-7e8d2.firebaseapp.com"
 FIREBASE_APP_ID = "1:1048284129093:web:d93cc7eda8dc14ea96402c"
+# Set on only for rate-limited, signed-in Cloudflare Workers AI. There is no exposed private AI key.
+AI_ENABLED = "on"
+
+[ai]
+binding = "AI"
