@@ -1,0 +1,80 @@
+/* Rangeform mobile polish v1 — one compact, consistent navigation layout. */
+.mobile-brand-mark{display:none}
+@media(max-width:680px){
+  /* The browser chrome is separate from our navigation; don't add another tall footer. */
+  .mobile-dock{
+    position:fixed;left:11px;right:11px;bottom:7px;top:auto;
+    width:auto;height:62px;min-height:0;
+    box-sizing:border-box;
+    display:grid;grid-template-columns:repeat(5,minmax(0,1fr));
+    align-items:center;gap:3px;
+    padding:5px 6px;
+    background:color-mix(in srgb,var(--surface) 93%,transparent);
+    border:1px solid var(--border);border-radius:18px;
+    box-shadow:0 10px 36px rgba(0,0,0,.25),0 1px 0 rgba(255,255,255,.035) inset;
+    -webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px);
+    z-index:75;
+  }
+  .mobile-dock button{
+    box-sizing:border-box;
+    min-width:0;min-height:0;height:50px;max-height:50px;
+    padding:4px 2px;gap:2px;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    border:1px solid transparent;border-radius:13px;
+    color:var(--muted);background:transparent;
+    -webkit-tap-highlight-color:transparent;
+    touch-action:manipulation;
+  }
+  .mobile-dock button>span{
+    font-size:19px;line-height:21px;height:21px;width:28px;
+    display:grid;place-items:center;font-weight:500;
+    color:inherit;
+  }
+  .mobile-dock button>small{
+    display:block;white-space:nowrap;font-size:10px;
+    line-height:13px;font-weight:660;letter-spacing:0;
+    color:inherit;
+  }
+  .mobile-dock button.on{
+    background:var(--panel2);border-color:var(--border);
+    color:var(--text);
+  }
+  .mobile-dock button:active{transform:scale(.96)}
+  .mobile-dock button:focus-visible{outline:2px solid var(--lime);outline-offset:1px}
+  /* Ensure all AI marks render as calm monochrome text, never a fluorescent emoji. */
+  .ai-glyph{font-family:ui-sans-serif,system-ui,-apple-system,sans-serif!important;font-variant-emoji:text;color:inherit!important}
+  .main-content{
+    padding-bottom:83px!important;
+  }
+  .mobile-brand-mark{
+    display:block;width:27px;height:27px;min-width:27px;min-height:27px;
+    flex:none;object-fit:contain;border-radius:8px;
+  }
+  .topbar .top-left{display:flex;gap:7px;min-width:0;align-items:center}
+  .topbar .top-left .crumb{min-width:0;max-width:77px;overflow:hidden;white-space:nowrap}
+  .topbar .top-left .crumb b{overflow:hidden;text-overflow:ellipsis}
+  .topbar .top-actions{gap:7px}
+  /* The logo remains unobstructed when the drawer is open. */
+  .sidebar .brand{height:76px;min-height:76px;padding:13px 14px;gap:9px;overflow:visible}
+  .sidebar .brand-mark{width:43px;height:43px;min-width:43px;min-height:43px;flex:0 0 43px;overflow:visible}
+  .sidebar .brand-mark img{width:43px;height:43px;display:block;object-fit:contain}
+  .sidebar .brand-type{min-width:0;flex:1}
+  .sidebar .brand-type strong{font-size:18px;letter-spacing:-.045em;line-height:1.15;overflow:visible;text-overflow:clip}
+  .sidebar .brand-type small{font-size:7px;letter-spacing:.11em}
+  .sidebar .close-mobile{flex:0 0 32px;width:32px;min-width:32px;height:32px;padding:0}
+  /* safe-area padding is applied only in real standalone PWA mode. */
+  body.standalone .mobile-dock{
+    bottom:calc(7px + env(safe-area-inset-bottom,0px));
+    height:62px;padding:5px 6px;
+  }
+  body.standalone .main-content{
+    padding-bottom:calc(83px + env(safe-area-inset-bottom,0px))!important
+  }
+}
+@media(max-width:365px){
+ .mobile-dock{left:7px;right:7px}
+ .mobile-dock button>small{font-size:9px}
+ .mobile-brand-mark{width:23px;height:23px;min-width:23px;min-height:23px}
+ .topbar .top-actions{gap:4px}
+ .topbar .demo-pill{max-width:80px}
+}
