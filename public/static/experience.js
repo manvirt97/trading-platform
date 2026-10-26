@@ -63,29 +63,30 @@ async function loadPulse(){
  }catch{root.innerHTML='<div class="loading-news">Market headlines are unavailable right now. <a href="https://news.google.com/" target="_blank" rel="noopener noreferrer">Browse the source ↗</a></div>'}
 }
 function chat(role,message){const root=$('copilotThread'),row=document.createElement('div'),span=document.createElement('span');row.className='chat-row '+role;span.className='chat-bubble';span.textContent=message;row.append(span);root.append(row);root.scrollTop=root.scrollHeight;return span}
-function aiState(label,isEnabled){$('copilotState').textContent=label;$('copilotBadge').textContent=isEnabled?'AI READY':'SIGN-IN / SETUP';$('copilotSend').disabled=!isEnabled;if($('copilotSignIn'))$('copilotSignIn').hidden=!(authReady&&!currentUser)}
+function aiState(label,isEnabled){$('copilotState').textContent=label;$('copilotBadge').textContent=isEnabled?'AI READY':'SIGN-IN / SETUP';$('copilotSend').disabled=!isEnabled;if($('copilotSignIn'))$('copilotSignIn').hidden=!authReady;$('copilotSignIn').textContent=currentUser?'Switch account':'Sign in with Google'}
 async function setupAI(){
  aiState('Checking your secure research account…',false);
  try{
   const config=await getJson('/api/profile-config');aiReady=Boolean(config.ai_enabled);
   if(!config.enabled){aiState('Account setup incomplete; use My workspace',false);return}
-  const [{initializeApp},{getAuth,onAuthStateChanged,GoogleAuthProvider,signInWithPopup}]=await Promise.all([import('https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js'),import('https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js')]);
-  auth=getAuth(initializeApp(config.firebase,'rangeform-intelligence'));authReady=true;
-  window.rangeformGoogleSignIn=()=>signInWithPopup(auth,new GoogleAuthProvider());
-  onAuthStateChanged(auth,user=>{currentUser=user;if(!user)aiState('Sign in with Google to ask the AI',false);else if(!aiReady)aiState('Signed in · AI binding not yet enabled',false);else aiState('Signed in · ready to analyze research questions',true)});
+  const [{initializeApp},{getAuth,onAuthStateChanged,GoogleAuthProvider,signInWithPopup,setPersistence,browserSessionPersistence}]=await Promise.all([import('https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js'),import('https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js')]);
+  auth=getAuth(initializeApp(config.firebase,'rangeform-intelligence'));await setPersistence(auth,browserSessionPersistence);authReady=true;
+  const provider=new GoogleAuthProvider();provider.setCustomParameters({prompt:'select_account'});
+  window.rangeformGoogleSignIn=()=>signInWithPopup(auth,provider);
+  onAuthStateChanged(auth,user=>{const old=currentUser?.uid||null;currentUser=user;if(old!==(user?.uid||null)){$('copilotThread').replaceChildren();chat('assistant','Private research session. I can use your saved watchlist and research notes from this Google account, but I will not invent live prices or remember this chat automatically.');const key=user?'rangeform_model_'+user.uid:null;$('copilotModel').value=key&&sessionStorage.getItem(key)||'balanced';}if(!user)aiState('Sign in with your own Google account to ask AI',false);else if(!aiReady)aiState('Signed in · AI binding not yet enabled',false);else aiState('Signed in as '+(user.email||'Google user')+' · ready',true)});
  }catch(e){aiState('Unable to initialize AI sign-in: '+e.message,false)}
 }
 async function sendAI(question){
  const text=String(question||'').trim();if(text.length<4){$('copilotQuestion').focus();return}
  if(!currentUser){chat('assistant','Google sign-in is required to protect your private questions and daily AI allowance. Open My workspace to sign in, then return here.');return}
  if(!aiReady){chat('assistant','The AI model is not activated in Cloudflare yet. You can still explore public news, interactive charts and signals.');return}
- chat('user',text);$('copilotQuestion').value='';$('copilotSend').disabled=true;
+ const owner=currentUser.uid,model=$('copilotModel').value;chat('user',text);$('copilotQuestion').value='';$('copilotSend').disabled=true;
  const bubble=chat('assistant','Reviewing your question…');
  try{
   const token=await currentUser.getIdToken();
-  const res=await getJson('/api/research-ai',{method:'POST',headers:{'Authorization':'Bearer '+token,'Content-Type':'application/json'},body:JSON.stringify({question:text,symbol:''})});
-  bubble.textContent=res.answer||'No answer was returned';bubble.textContent+='\n\n'+(res.limitations||'Confirm any current facts independently.');
- }catch(e){bubble.textContent='Could not complete that AI request: '+e.message}
+  const res=await getJson('/api/research-ai',{method:'POST',headers:{'Authorization':'Bearer '+token,'Content-Type':'application/json'},body:JSON.stringify({question:text,symbol:'',model})});
+  if(currentUser?.uid!==owner)return;bubble.textContent=(res.model||'Research model')+'\n\n'+(res.answer||'No answer was returned');bubble.textContent+='\n\n'+(res.limitations||'Confirm any current facts independently.');
+ }catch(e){if(currentUser?.uid===owner)bubble.textContent='Could not complete that AI request: '+e.message}
  finally{$('copilotSend').disabled=!aiReady||!currentUser}
 }
 function updateSession(){if(!$('sessionLocal'))return;let now=new Date(),zone=Intl.DateTimeFormat().resolvedOptions().timeZone||'UTC',local=new Intl.DateTimeFormat('en-CA',{timeZone:zone,hour:'numeric',minute:'2-digit',timeZoneName:'short'}).format(now),name=zone==='America/Edmonton'?'Calgary':zone.split('/').at(-1).replaceAll('_',' ');$('sessionLocal').textContent=name+' · '+local;let parts=Object.fromEntries(new Intl.DateTimeFormat('en-US',{timeZone:'America/New_York',weekday:'short',hour:'2-digit',minute:'2-digit',hour12:false}).formatToParts(now).map(z=>[z.type,z.value]));let minutes=Number(parts.hour)*60+Number(parts.minute),weekday=!['Sat','Sun'].includes(parts.weekday),inside=weekday&&minutes>=570&&minutes<960;$('sessionMarket').textContent=inside?'Within regular session hours · verify holidays':'Outside regular session hours';$('sessionMarket').title='Standard regular session is 9:30 a.m.–4:00 p.m. ET on trading weekdays. Exchange holidays and exceptional closures are not checked.'}
@@ -109,7 +110,8 @@ function bind(){
  for(const id of ['symbolInput','liveChartSearch','newsSymbol']){const input=$(id);if(!input)continue;input.setAttribute('list','rangeformSymbols');input.addEventListener('input',()=>updateSuggestions(input.value))}
  const analyze=$('analyzeBtn');analyze.onclick=async()=>{let input=$('symbolInput'),original=input.value,known=await resolveInput(original);if(!known){window.toast?.('Select a suggested company or enter a valid ticker.','error');return}input.value=known.symbol;state.symbol=known.symbol;loadSignal()};
  $('symbolInput').onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();analyze.click()}};
- $('copilotSignIn').onclick=async()=>{if(!authReady)return;try{await window.rangeformGoogleSignIn()}catch(e){aiState('Google sign-in could not complete: '+(e.code||e.message||'Unknown error'),false)}};
+ $('copilotSignIn').onclick=async()=>{if(!authReady)return;try{await window.rangeformGoogleSignIn()}catch(e){aiState('Google account selection did not complete: '+(e.code||e.message||'Unknown error'),Boolean(currentUser&&aiReady))}};
+ $('copilotModel').onchange=()=>{if(currentUser)sessionStorage.setItem('rangeform_model_'+currentUser.uid,$('copilotModel').value)};
  $('copilotForm').onsubmit=e=>{e.preventDefault();sendAI($('copilotQuestion').value)};
  document.querySelectorAll('[data-ask]').forEach(b=>b.onclick=()=>{$('copilotQuestion').value=b.dataset.ask;$('copilotQuestion').focus()});
  $('copilotQuestion').addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();$('copilotForm').requestSubmit()}});
