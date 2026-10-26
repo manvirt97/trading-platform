@@ -33,6 +33,6 @@ async function init(){const chosen=String(localStorage.getItem('rangeform_brand'
  $('signOut').onclick=async()=>await signOut(auth);
  onAuthStateChanged(auth,async u=>{activeUser=u;signed=Boolean(u);$('signIn').hidden=signed;$('signOut').hidden=!signed;$('askAI').disabled=!signed||!aiReady;
  if(signed){$('authHeading').textContent='Signed in';$('authText').textContent=u.email||'Account connected';await refresh()}else{$('authHeading').textContent='Sign in for private sync';$('authText').textContent='Sign in with Google to save research across your devices.';profile=read('trader_guest_profile',blank());history=read('trader_guest_history',[]);fields();histories();status('Browsing as a guest. Notes stay on this device until you sign in.')}})
- }catch(e){$('signIn').hidden=true;$('signOut').hidden=true;status('Google sign-in is unavailable: '+(e.message||'Configuration did not finish')+'. Your guest notes remain on this device.');$('authText').textContent='Account sign-in is not ready. Try refreshing this page after deployment.'}}
+ }catch(e){$('signIn').hidden=true;$('signOut').hidden=true;status('Google sign-in is unavailable: '+(e.message||'Configuration did not finish')+'. Your guest notes remain on this device.');$('authText').textContent='Account sign-in is not ready. Try refreshing this page after deployment.'}
 }
 init();
