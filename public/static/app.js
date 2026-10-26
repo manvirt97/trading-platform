@@ -89,7 +89,7 @@ function scheduleRefresh(){if(state.refreshTimer)clearInterval(state.refreshTime
 
 function initBrandSettings(){
  const makeName=(raw)=>{let name=String(raw||'').replace(/[^a-zA-Z0-9 &.'-]/g,'').trim().replace(/\s+/g,' ');return name.slice(0,22)||'Rangeform';};
- const updateName=(value,announce)=>{const name=makeName(value);$('brandWordmark').textContent=name.toUpperCase();$('footerBrand').textContent=name.toUpperCase();$('workspaceName').value=name;document.title=name+' — Market intelligence';config.name=name;setPref('brand',name);if(announce)toast('Workspace name updated.');};
+ const updateName=(value,announce)=>{const name=makeName(value);$('brandWordmark').textContent=name;$('footerBrand').textContent=name.toUpperCase();$('workspaceName').value=name;document.title=name+' — Market intelligence';config.name=name;setPref('brand',name);if(announce)toast('Workspace name updated.');};
  updateName(getPref('brand','Rangeform'),false);
  $('applyWorkspaceName').onclick=()=>updateName($('workspaceName').value,true);
  $('workspaceName').onkeydown=e=>{if(e.key==='Enter')updateName(e.target.value,true)};
