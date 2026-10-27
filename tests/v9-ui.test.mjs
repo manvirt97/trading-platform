@@ -36,12 +36,14 @@ test('V9 supports explicit provider caution and does not submit brokerage orders
  assert.match(js,/risk>1/);
  assert.doesNotMatch(js,/\/api\/order|\/api\/trade\b/);
 });
-test('V10 keeps AI, risk, paper journal and data status inside one modern workspace',()=>{
+test('V10 keeps AI, risk, paper journal and dedicated settings inside one modern workspace',()=>{
  const html=file('public/v9.html'),js=file('public/static/v9.js'),legacy=file('public/research.html');
  for(const id of ['assistantTitle','riskAccount','paperTitle','connectionDetails'])
    assert.match(html,new RegExp('id="'+id+'"'));
- for(const focus of ['assistantTitle','riskAccount','paperTitle','connectionDetails'])
+ for(const focus of ['assistantTitle','riskAccount','paperTitle'])
    assert.match(html,new RegExp('data-focus="'+focus+'"'));
+ assert.match(html,/data-page="settings"/);
+ assert.match(html,/data-section="settings"/);
  assert.match(js,/function routeFromHash/);
  assert.match(js,/oldRoutes=/);
  assert.match(js,/scrollIntoView/);
