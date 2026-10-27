@@ -168,7 +168,8 @@ function discoveryReset(note){
 }
 function discoveryRender(result){
  state.discovery=result;
- $('discoveryStatus').textContent=result.scanned+' of '+result.universe_size+' symbols checked · '+(result.actionable||0)+' conditional watches. Not a whole-market scan.';
+ $('discoveryStatus').textContent=result.scanned+' of '+result.universe_size+' symbols checked · '+(result.actionable||0)+' conditional watches.'+(result.rate_limited?' Provider credit limit reached; remaining symbols were not scanned.':' Not a whole-market scan.');
+ if(result.rate_limited){providerRetryAt=Date.now()+Math.max(65,result.retry_after_seconds||65)*1000;refreshFeedHealth()}
  $('discoveryTimestamp').textContent='Checked '+stamp(result.checked_at)+' · '+(result.cache==='edge-cache'?'cached up to 10 min':'new analysis');
  const root=$('discoveryResults');root.replaceChildren();
  if(!result.items?.length){discoveryReset('No verified results. '+(result.errors?.[0]?.reason||'Check exchange coverage.'));return}
@@ -186,13 +187,13 @@ function discoveryRender(result){
 async function discoverMarket(){
  if(providerRetryAt>Date.now()){toast('Twelve Data quota cooldown active. Check again later; no market prices were invented.');return}
  if(state.discoveryLoading){discoveryQueued=true;return;}
- if(!state.configured){discoveryReset('No authorized price-data provider. Automatic discovery is unavailable.');return}
+ if(!state.configured){discoveryReset('No authorized price-data provider. Manual discovery is unavailable.');return}
  const target=state.discoveryUniverse;state.discoveryLoading=true;$('discoveryRefresh').disabled=true;$('discoveryRefresh').textContent='Checking sample…';
  try{
   const result=await request('/api/market-discovery?'+new URLSearchParams({universe:target}));
   if(target!==state.discoveryUniverse)return;
   discoveryRender(result);
- }catch(e){if(target===state.discoveryUniverse)discoveryReset('Automatic scan unavailable: '+e.message)}
+ }catch(e){if(target===state.discoveryUniverse)discoveryReset('Market scan unavailable: '+e.message)}
  finally{state.discoveryLoading=false;$('discoveryRefresh').disabled=false;$('discoveryRefresh').textContent='Scan sample ↻';if(discoveryQueued){discoveryQueued=false;discoverMarket()}}
 }
 function scheduleDiscovery(){
@@ -210,14 +211,25 @@ async function analyzeSymbol(symbol,interval='1day',force=false){if(!state.confi
 function setRow(root,symbol,x){const tr=create('tr');const result=x&&!x.error?assessment(x):null;const label=!x?'Not scanned':x.error?'Unavailable':result.kind==='bull'?'Bullish watch':result.kind==='bear'?'Bearish watch':result.fresh?'Wait':'Historical only';const td=(value,tag='td')=>{const el=create(tag,'',value);tr.append(el);return el};let asset=td(symbol);asset.append(create('small','',x?.error||'Completed bars'));if(root.id==='overviewResults'){const dir=td('');dir.append(create('span','signal-tag '+(result?.kind||''),label));td(result?.score!=null?result.score+'/100':'—');td(x?.last_bar_utc?ageLabel(x.last_bar_utc):'—');const last=td('');const b=create('button','cell-btn','Inspect ↗');b.onclick=()=>inspect(symbol);b.disabled=!x||Boolean(x.error);last.append(b)}else{td(x&&!x.error?money(x.last):'—');const dir=td('');dir.append(create('span','signal-tag '+(result?.kind||''),label));td(result?.score!=null?result.score+'/100':'—');td(x?.last_bar_utc?stamp(x.last_bar_utc):'—');const last=td('');const b=create('button','cell-btn','View chart ↗');b.onclick=()=>inspect(symbol);b.disabled=!x||Boolean(x.error);last.append(b)}root.append(tr)}
 function renderScan(rows){for(const id of ['scannerResults','overviewResults']){let el=$(id);el.replaceChildren();if(!rows.length){let row=create('tr'),cell=create('td','empty-inline','No real provider results available.');cell.colSpan=id==='scannerResults'?6:5;row.append(cell);el.append(row)}else for(const [sym,x] of rows)setRow(el,sym,x)}renderWatch();let loaded=rows.filter(([,x])=>x&&!x.error).length;$('scanSummary').textContent=loaded+' of '+rows.length+' symbols returned dated historical evidence. Technical scores are NOT win probabilities.'}
 async function scan(){if(state.scanning)return;if(!state.configured){toast('Connect a permitted Twelve Data feed before scanning.');setPage('signals');return}state.scanning=true;for(const id of ['scanButton','overviewScan']){$(id).disabled=true;$(id).textContent='Analyzing verified bars…'}
-const results=[];for(const sym of state.watch){try{const x=await analyzeSymbol(sym,'1day');results.push([sym,x])}catch(e){results.push([sym,{error:e.message}])}renderScan(results)}
+const results=[];for(let i=0;i<state.watch.length;i++){
+ const sym=state.watch[i];
+ try{const x=await analyzeSymbol(sym,'1day');results.push([sym,x])}
+ catch(e){
+  results.push([sym,{error:e.message}]);
+  if(e.code==='PROVIDER_RATE_LIMIT'){
+   for(const rest of state.watch.slice(i+1))results.push([rest,{error:'Not checked · provider cooldown'}]);
+   renderScan(results);break;
+  }
+ }
+ renderScan(results)
+}
 results.sort((a,b)=>{const sa=a[1]?.score, sb=b[1]?.score;return (Number.isFinite(sb)?sb:-1)-(Number.isFinite(sa)?sa:-1)});renderScan(results);
 for(const sym of ['SPY','NVDA','TSLA','SHOP']){const x=state.market.get(sym);const q=document.querySelector('[data-quote="'+sym+'"]'),delta=document.querySelector('[data-change="'+sym+'"]');if(x){q.textContent=money(x.last);delta.textContent=pct(x.change_pct)+' · '+ageLabel(x.last_bar_utc);delta.className=Number(x.change_pct)>=0?'positive':'negative'}}
 state.scanning=false;for(const id of ['scanButton','overviewScan']){$(id).disabled=false;$(id).innerHTML=id==='scanButton'?'Run watchlist scan ↗':'Explore opportunities <span>↗</span>'}
 toast(results.filter(x=>!x[1]?.error).length+' of '+results.length+' symbols analyzed. Review data age before acting.')}
 async function inspect(sym){setMonitor(false);state.symbol=sym;$('symbolInput').value=sym;setPage('signals');await runAnalysis()}
 function clearAnalysis(message){state.analysis=null;state.opportunity=null;state.agentRoom=null;resetAgentRoom(message);resetOpportunity(message);
- window.dispatchEvent(new CustomEvent('rangeform:agent-report',{detail:{analysis:null,opportunity:null,agent_room:null}}));$('selectedPrice').textContent='—';$('selectedChange').textContent='Awaiting completed price bars';$('lastBarTime').textContent='—';$('indicatorScore').textContent='—';$('verdictCard').className='card verdict-card';$('verdictText').textContent='DATA NOT CONNECTED';$('verdictDetail').textContent=message;$('verdictFactors').textContent='No verified technical evidence. No trade levels will be invented.';$('evidenceText').textContent='The model requires real completed candles and a valid provider response.';$('longCondition').textContent='Connect validated candles to determine a buy-watch trigger.';$('shortCondition').textContent='Connect validated candles to determine a bearish invalidation.';$('waitCondition').textContent='Avoid trading without fresh, verified market data.';$('chartPlaceholder').hidden=false;$('riskResults').textContent='Entry, stop and position size require valid completed bars.'}
+ window.dispatchEvent(new CustomEvent('rangeform:agent-report',{detail:{analysis:null,opportunity:null,agent_room:null}}));$('selectedPrice').textContent='—';$('selectedChange').textContent='Awaiting completed price bars';$('lastBarTime').textContent='—';$('indicatorScore').textContent='—';$('verdictCard').className='card verdict-card';$('verdictText').textContent=/429|quota|rate.limit|credit limit/i.test(message)?'DATA TEMPORARILY LIMITED':'MARKET DATA UNAVAILABLE';$('verdictDetail').textContent=message;$('verdictFactors').textContent='No verified technical evidence. No trade levels will be invented.';$('evidenceText').textContent='The model requires real completed candles and a valid provider response.';$('longCondition').textContent='Connect validated candles to determine a buy-watch trigger.';$('shortCondition').textContent='Connect validated candles to determine a bearish invalidation.';$('waitCondition').textContent='Avoid trading without fresh, verified market data.';$('chartPlaceholder').hidden=false;$('riskResults').textContent='Entry, stop and position size require valid completed bars.'}
 async function runAnalysis(options={}){if(monitor.busy)return;
  if(providerRetryAt>Date.now()){if(!options?.silent)toast('Provider quota paused. Retry after the cooldown shown in Settings.');return}const silent=options?.silent===true;
  const symbol=$('symbolInput').value.trim().toUpperCase(),interval=$('barInterval').value;
