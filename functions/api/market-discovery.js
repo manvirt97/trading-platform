@@ -67,7 +67,7 @@ export async function onRequestGet({request,env}){
   note:'On-demand research across a fixed 6-symbol sample only. Ranked alignment is not probability of profit. Market-closed or stale candles never produce actionable watches.'
  };
  const code=ranked.length?200:limited?429:503;
- const response=reply(data,code);
+ const response=reply(code===429?{...data,error:'Twelve Data API quota reached. Scanning paused until the provider limit resets.',code:'PROVIDER_RATE_LIMIT'}:data,code);
  if(cache&&ranked.length&&!limited){try{await cache.put(key,response.clone())}catch{/* Cache is optional. */}}
  return response;
 }
