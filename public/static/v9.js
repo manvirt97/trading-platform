@@ -8,7 +8,7 @@ const pct=v=>Number.isFinite(Number(v))?(Number(v)>0?'+':'')+number(v,2)+'%':'�
 const stamp=v=>{const date=new Date(v);return Number.isFinite(+date)?date.toLocaleString('en-CA',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit',timeZone:'America/New_York'})+' ET':'Time unavailable'};
 const ageLabel=v=>{let t=Date.parse(v);if(!Number.isFinite(t))return 'Unknown';let m=Math.max(0,Math.floor((Date.now()-t)/60000));return m<60?m+' min old':m<1440?Math.floor(m/60)+'h old':Math.floor(m/1440)+'d old'};
 const symbolOK=s=>/^[A-Z][A-Z0-9.-]{0,9}$/.test(s);
-const state={view:'overview',symbol:'NVDA',watch:[],configured:false,newsCategory:'all',newsCache:new Map(),market:new Map(),analysis:null,opportunity:null,discovery:null,discoveryLoading:false,discoveryUniverse:'leaders',scanning:false,newsLoading:false,provider:'Not configured'};
+const state={view:'overview',symbol:'NVDA',watch:[],configured:false,newsCategory:'all',newsCache:new Map(),market:new Map(),analysis:null,opportunity:null,agentRoom:null,agentFilter:'all',discovery:null,discoveryLoading:false,discoveryUniverse:'leaders',scanning:false,newsLoading:false,provider:'Not configured'};
 let toastTimeout=0;
 const monitor={enabled:false,timer:null,lastAlertKey:'',busy:false};
 const toast=(message)=>{const el=$('toast');el.textContent=String(message).slice(0,250);el.hidden=false;clearTimeout(toastTimeout);toastTimeout=setTimeout(()=>{el.hidden=true},4800)};
@@ -89,7 +89,7 @@ for(const sym of ['SPY','NVDA','TSLA','SHOP']){const x=state.market.get(sym);con
 state.scanning=false;for(const id of ['scanButton','overviewScan']){$(id).disabled=false;$(id).innerHTML=id==='scanButton'?'Run watchlist scan ↗':'Scan my watchlist <span>↗</span>'}
 toast(results.filter(x=>!x[1]?.error).length+' of '+results.length+' symbols analyzed. Review data age before acting.')}
 async function inspect(sym){setMonitor(false);state.symbol=sym;$('symbolInput').value=sym;setPage('signals');await runAnalysis()}
-function clearAnalysis(message){state.analysis=null;state.opportunity=null;resetOpportunity(message);$('selectedPrice').textContent='—';$('selectedChange').textContent='Awaiting completed price bars';$('lastBarTime').textContent='—';$('indicatorScore').textContent='—';$('verdictCard').className='card verdict-card';$('verdictText').textContent='DATA NOT CONNECTED';$('verdictDetail').textContent=message;$('verdictFactors').textContent='No verified technical evidence. No trade levels will be invented.';$('evidenceText').textContent='The model requires real completed candles and a valid provider response.';$('longCondition').textContent='Connect validated candles to determine a buy-watch trigger.';$('shortCondition').textContent='Connect validated candles to determine a bearish invalidation.';$('waitCondition').textContent='Avoid trading without fresh, verified market data.';$('chartPlaceholder').hidden=false;$('riskResults').textContent='Entry, stop and position size require valid completed bars.'}
+function clearAnalysis(message){state.analysis=null;state.opportunity=null;state.agentRoom=null;resetAgentRoom(message);resetOpportunity(message);$('selectedPrice').textContent='—';$('selectedChange').textContent='Awaiting completed price bars';$('lastBarTime').textContent='—';$('indicatorScore').textContent='—';$('verdictCard').className='card verdict-card';$('verdictText').textContent='DATA NOT CONNECTED';$('verdictDetail').textContent=message;$('verdictFactors').textContent='No verified technical evidence. No trade levels will be invented.';$('evidenceText').textContent='The model requires real completed candles and a valid provider response.';$('longCondition').textContent='Connect validated candles to determine a buy-watch trigger.';$('shortCondition').textContent='Connect validated candles to determine a bearish invalidation.';$('waitCondition').textContent='Avoid trading without fresh, verified market data.';$('chartPlaceholder').hidden=false;$('riskResults').textContent='Entry, stop and position size require valid completed bars.'}
 async function runAnalysis(options={}){if(monitor.busy)return;const silent=options?.silent===true;
  const symbol=$('symbolInput').value.trim().toUpperCase(),interval=$('barInterval').value;
  if(!symbolOK(symbol)){if(!silent)toast('Enter a valid ticker such as NVDA or SHOP.');return}
@@ -102,12 +102,12 @@ async function runAnalysis(options={}){if(monitor.busy)return;const silent=optio
    throw Error('Provider response missing verified market evidence.');
   // Ignore late results after a symbol or interval change.
   if($('symbolInput').value.trim().toUpperCase()!==symbol||$('barInterval').value!==interval)return;
-  const previous=state.opportunity;state.analysis=payload.analysis;state.opportunity=payload.opportunity;
+  const previous=state.opportunity;state.analysis=payload.analysis;state.opportunity=payload.opportunity;state.agentRoom=payload.agent_room||null;
   state.market.set(cacheKey(symbol,interval),payload.analysis);
-  renderAnalysis(payload.analysis);renderOpportunity(payload.opportunity);
+  renderAnalysis(payload.analysis);renderOpportunity(payload.opportunity,payload.agent_room);renderAgentRoom(payload.agent_room);
   const signal=payload.opportunity;
   const key=[signal.symbol,signal.status,signal.last_completed_bar_utc].join('|');
-  const actionableWatch=['BUY_WATCH','SELL_WATCH'].includes(signal.status);
+  const actionableWatch=['BUY_WATCH','SELL_WATCH'].includes(payload.agent_room?.verdict);
   if(monitor.enabled&&actionableWatch&&key!==monitor.lastAlertKey&&(!previous||previous.status!==signal.status||previous.last_completed_bar_utc!==signal.last_completed_bar_utc)){
    monitor.lastAlertKey=key;toast(signal.symbol+': '+(signal.status==='BUY_WATCH'?'bullish':'bearish')+' pattern watch. Confirm with your broker before acting.');
   }
@@ -125,8 +125,49 @@ function resetOpportunity(message){
  $('catalystList').replaceChildren();$('catalystList').append(create('p','', 'No verified news context loaded.'));
  $('volumeProfile').replaceChildren();$('volumeProfile').append(create('p','', 'No historical candle volume loaded.'));
 }
-function renderOpportunity(op){
- const status=op.status;
+// All agent votes are computed on the server from independently retrieved bars.
+// UI filters never change the supervisor, safety blocks or trade eligibility.
+function resetAgentRoom(reason){
+ const grid=$('agentRoomGrid');if(!grid)return;
+ grid.replaceChildren();
+ grid.append(create('p','subtle-note',reason||'No specialist report loaded.'));
+ $('agentRoomVerdict').textContent='Awaiting data';$('agentRoomVerdict').className='signal-tag';
+ $('agentRoomSummary').textContent='No verified specialist evidence.';
+ $('agentRoomVeto').hidden=true;$('agentRoomVeto').textContent='';
+}
+function renderAgentRoom(report){
+ if(!report?.agents){resetAgentRoom('Agent report unavailable. No multi-agent confirmation is claimed.');return}
+ const result=report.verdict||'WAIT';
+ $('agentRoomVerdict').textContent=result==='BUY_WATCH'?'BUY WATCH':result==='SELL_WATCH'?'BEARISH WATCH':'WAIT';
+ $('agentRoomVerdict').className='signal-tag '+(result==='BUY_WATCH'?'bull':result==='SELL_WATCH'?'bear':'');
+ $('agentRoomSummary').textContent=report.specialist_count+' specialist checks · '+report.available_votes+' evidenced votes · '+report.abstentions+' unavailable · '+report.agreement_pct+'% directional agreement · consensus '+(report.score>0?'+':'')+report.score+'. Agreement is not profit probability.';
+ const warnings=$('agentRoomVeto');warnings.replaceChildren();warnings.hidden=!(report.vetoes?.length);
+ for(const v of report.vetoes||[])warnings.append(create('p','',v.agent+': '+v.reason));
+ const root=$('agentRoomGrid');root.replaceChildren();
+ const selected=state.agentFilter||'all';
+ const visible=report.agents.filter(a=>selected==='all'||(selected==='unavailable'?a.state==='unavailable':a.group===selected));
+ if(!visible.length)root.append(create('p','subtle-note','No specialists match this filter.'));
+ for(const a of visible){
+  const item=create('div','agent-tile'),top=create('div','agent-tile-head');
+  top.append(create('strong','',a.name),create('span','agent-pill '+a.state,String(a.state).toUpperCase()));
+  item.append(top,create('p','',a.note||'No evidence available'));
+  if(typeof a.vote==='number')item.append(create('small','', 'Directional vote '+(a.vote>0?'+':'')+a.vote+' / 100 · rule weight '+a.weight));
+  if(a.veto)item.append(create('strong','agent-block','BLOCKS ENTRY: '+a.veto));
+  root.append(item);
+ }
+}
+function bindAgentFilters(){
+ document.querySelectorAll('[data-agent-filter]').forEach(button=>button.onclick=()=>{
+  state.agentFilter=button.dataset.agentFilter;
+  document.querySelectorAll('[data-agent-filter]').forEach(b=>{
+   const selected=b===button;b.classList.toggle('selected',selected);
+   b.setAttribute('aria-pressed',String(selected));
+  });
+  if(state.agentRoom)renderAgentRoom(state.agentRoom);
+ });
+}
+function renderOpportunity(op,room){
+ const status=room?.verdict==='WAIT'?'WAIT':op.status;
  const condition=status==='BUY_WATCH'?'Bullish watch':status==='SELL_WATCH'?'Bearish watch':status==='WAIT'?'No pattern confirmed':status==='WAIT_STALE'?'Not current':'Data unavailable';
  $('monitorStatus').textContent=condition+' · '+op.explanation;
  $('monitorChecked').textContent='Checked '+stamp(op.as_of)+' · '+(op.market_session==='regular-us-equity-session'?'US session':'outside US session');
@@ -157,9 +198,9 @@ function renderOpportunity(op){
  const color=status==='BUY_WATCH'?'bull':status==='SELL_WATCH'?'bear':'';
  $('verdictCard').className='card verdict-card '+color;
  $('verdictText').textContent=status==='BUY_WATCH'?'BUY WATCH · CHECK BROKER':status==='SELL_WATCH'?'SELL WATCH · CHECK BROKER':'WAIT · NO CURRENT TRADE';
- $('verdictDetail').textContent=op.explanation;
+ $('verdictDetail').textContent=room?.verdict==='WAIT'&&['BUY_WATCH','SELL_WATCH'].includes(op.status)?'Underlying pattern was rejected by the specialist supervisor. '+room.next_step:op.explanation;
  $('waitCondition').textContent=op.market_session!=='regular-us-equity-session'?'US regular market session is closed. This is historical research, not a current entry.':op.explanation;
- if(op.plan){$('longCondition').textContent=op.plan.direction==='long'?'Conditional bullish reference entry '+money(op.plan.reference_entry)+'; invalidation '+money(op.plan.invalidation)+'. Confirm broker spread and news.':'Bullish entry not confirmed.';
+ if(op.plan&&status!=='WAIT'){$('longCondition').textContent=op.plan.direction==='long'?'Conditional bullish reference entry '+money(op.plan.reference_entry)+'; invalidation '+money(op.plan.invalidation)+'. Confirm broker spread and news.':'Bullish entry not confirmed.';
  $('shortCondition').textContent=op.plan.direction!=='long'?'Bearish watch around '+money(op.plan.reference_entry)+' with invalidation '+money(op.plan.invalidation)+'. Not an automatic short.':'Bearish entry not confirmed.'}
  renderRisk();
 }
@@ -185,7 +226,7 @@ if(rv!=null&&Number.isFinite(rv))expl.append(create('p','','Relative volume: '+n
 $('chartPlaceholder').hidden=false;try{drawChart(x);$('chartPlaceholder').hidden=true}catch{$('chartPlaceholder').hidden=false}
 renderRisk()}
 function renderRisk(){const x=state.analysis,root=$('riskResults');root.replaceChildren();if(!x||x.data_quality!=='complete-ohlcv'){root.append(create('p','','Validated OHLCV and a scenario are needed for a hypothetical plan.'));return}
-if(state.opportunity?.status!=='BUY_WATCH'||state.opportunity?.plan?.direction!=='long'){
+if(state.opportunity?.status!=='BUY_WATCH'||state.agentRoom?.verdict!=='BUY_WATCH'||state.opportunity?.plan?.direction!=='long'){
  root.append(create('p','','No confirmed bullish watch. The calculator does not present stale price levels as a current trade plan. Use the separate Risk Planner for hypothetical examples.'));
  return;
 }
@@ -223,7 +264,7 @@ function renderNews(data){$('newsChecked').textContent='Checked '+dateString(dat
 data.items.forEach((item,i)=>{if(!/^https:\/\//.test(item.url))return;const row=create('article','news-item'),num=create('span','news-item-num',String(i+1).padStart(2,'0')),content=create('div','news-item-content'),meta=create('div','story-meta'),link=create('a','',item.title),info=create('small','',(item.source||'Publisher')+' · '+ageLabel(item.date));meta.append(create('span','',item.topic||'MARKETS'),create('span','',ageLabel(item.date)),create('span','',item.source||'Public news'));link.href=item.url;link.target='_blank';link.rel='noopener noreferrer';link.className='story-link';link.append(create('span','sr-only',''));const h=create('h3');h.append(link);content.append(meta,h,info);row.append(num,content);row.addEventListener('click',e=>{if(e.target.closest('a'))return;selectArticle(item)});const select=create('button','cell-btn','Details');select.type='button';select.title='View source details';select.onclick=()=>selectArticle(item);row.append(select);root.append(row)})
 }
 function selectArticle(item){$('articleContextTitle').textContent=item.title;$('articleContext').textContent=(item.source||'Source')+' · published '+stamp(item.date)+'. Verify the full article and price reaction before drawing conclusions. The headline is not a trade signal.';const link=$('articleOriginal');link.href=item.url;link.hidden=false}
-function bind(){initTheme();state.watch=readWatch();renderWatch();scheduleDiscovery();localClock();setInterval(localClock,60000);
+function bind(){initTheme();state.watch=readWatch();renderWatch();bindAgentFilters();scheduleDiscovery();localClock();setInterval(localClock,60000);
 $$('[data-page]').forEach(el=>el.addEventListener('click',()=>setPage(el.dataset.page)));
 $('mobileMenu').onclick=()=>{$('sidebar').classList.toggle('open');$('navShade').hidden=!$('sidebar').classList.contains('open')};$('navShade').onclick=closeNav;
 $('themeToggle').onclick=()=>setTheme(document.body.dataset.theme==='dark'?'light':'dark');
