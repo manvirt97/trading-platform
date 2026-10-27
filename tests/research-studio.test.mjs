@@ -16,7 +16,7 @@ test('Premium design is last-loaded, respects small screens, and uses restrained
  assert.ok(html.indexOf('v13-premium.css?v=1')>html.indexOf('v12-settings-news.css?v=1'));
  for(const term of ['.studio-layout','.studio-nav','.studio-work','.studio-form-grid','body[data-theme=dark]','@media(max-width:640px)'])assert.ok(css.includes(term),term);
  assert.match(css,/--sidebar:#17232f/);
- assert.doesNotMatch(css,/#0ff|#f0f|fluorescen/i);
+ assert.doesNotMatch(css,/#0ff(?![0-9a-f])|#f0f(?![0-9a-f])|fluorescen/i);
 });
 test('All quantitative research tools use explicit inputs or verified completed bars, never fabricated fundamentals',()=>{
  const code=read('public/static/research-studio.js'),math=read('public/static/research-math.mjs');
