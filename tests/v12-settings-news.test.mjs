@@ -9,7 +9,7 @@ test('Settings is a first-class sidebar page, not a link to the signal data pane
  assert.match(html,/data-page="settings"[^>]*>\s*<span class="nav-icon">⚙<\/span> Settings/);
  assert.match(html,/<section class="page settings-page" data-section="settings"/);
  for(const id of ['settingsTheme','settingsNewsDensity','settingsNewsCategory','settingsProviderState','settingsProviderDescription','settingsCheckProvider'])assert.match(html,new RegExp('id="'+id+'"'));
- assert.match(js,/\['overview','signals','scanner','news','settings','studio'\]/);
+ assert.match(js,/\['overview','daydesk','signals','scanner','news','settings','studio'\]/);
  assert.match(js,/settings:'Settings'/);
  assert.match(js,/page==='settings'/);
  assert.doesNotMatch(js,/settings:\{page:'signals',focus:'connectionDetails'\}/);
