@@ -25,7 +25,7 @@ async function enrichNews(request,rows){
 export async function onRequestGet({request,env}){
  const u=new URL(request.url),universe=u.searchParams.get('universe')||'leaders';
  if(!Object.hasOwn(UNIVERSES,universe))return json({error:'Choose a supported scanner universe.'},400);
- if(!env.TWELVEDATA_API_KEY||env.LIVE_DATA_ENABLED!=='on')return json({error:'Automatic discovery requires an authorized Twelve Data feed. Configure TWELVEDATA_API_KEY and LIVE_DATA_ENABLED in Cloudflare.',code:'PROVIDER_OFF',items:[]},503);
+ if(env.LIVE_DATA_ENABLED!=='on'||(!env.TWELVEDATA_API_KEY&&!(env.FINNHUB_API_KEY&&env.FINNHUB_FALLBACK_ENABLED==='on')))return json({error:'Automatic discovery requires an authorized Twelve Data feed. Configure TWELVEDATA_API_KEY and LIVE_DATA_ENABLED in Cloudflare.',code:'PROVIDER_OFF',items:[]},503);
  // Fixed server-approved 6-symbol baskets; no arbitrary universe or unbounded
  // number of provider requests, even if the client crafts a URL.
  const key=new Request(new URL('/api/market-discovery?universe='+universe,u.origin).toString());
