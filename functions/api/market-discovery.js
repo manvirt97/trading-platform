@@ -5,7 +5,7 @@ import {UNIVERSES,candidateFromAnalysis,rankCandidates} from '../_shared/discove
 import {onRequestGet as getNews} from './news.js';
 
 const expiryMs=10*60*1000;
-const headers={'cache-control':'public, max-age=600','x-content-type-options':'nosniff'};
+const headers={'cache-control':'no-store','x-content-type-options':'nosniff'};
 const reply=(obj,status=200)=>new Response(JSON.stringify(obj),{status,headers:{'content-type':'application/json; charset=utf-8',...headers}});
 async function enrichNews(request,rows){
  // Only the highest-ranked candidate gets a headline cross-check in the
