@@ -19,6 +19,7 @@ const ageLabel=v=>{let t=Date.parse(v);if(!Number.isFinite(t))return 'Unknown';l
 const symbolOK=s=>/^[A-Z][A-Z0-9.-]{0,9}$/.test(s);
 const state={view:'overview',symbol:'NVDA',watch:[],configured:false,newsCategory:'all',newsCache:new Map(),market:new Map(),analysis:null,opportunity:null,agentRoom:null,agentFilter:'all',discovery:null,discoveryLoading:false,discoveryUniverse:'leaders',scanning:false,newsLoading:false,provider:'Not configured'};
 let toastTimeout=0;
+let providerRetryAt=0;let feedPollBusy=false;
 let newsController=null,discoveryQueued=false;
 const monitor={enabled:false,timer:null,lastAlertKey:'',busy:false};
 const toast=(message)=>{const el=$('toast');el.textContent=String(message).slice(0,250);el.hidden=false;clearTimeout(toastTimeout);toastTimeout=setTimeout(()=>{el.hidden=true},4800)};
@@ -32,7 +33,22 @@ function setTheme(v){
  if($('settingsTheme'))$('settingsTheme').value=document.body.dataset.theme;
 }
 const create=(tag,className,text)=>{let el=document.createElement(tag);if(className)el.className=className;if(text!=null)el.textContent=String(text);return el};
-async function request(url){const res=await fetch(url,{cache:'no-store',headers:{Accept:'application/json'}});let d;try{d=await res.json()}catch{throw Error('Received an invalid response.')}if(!res.ok||d.error)throw Error(d.error||d.note||'Request unavailable ('+res.status+')');return d}
+async function request(url){
+ const res=await fetch(url,{cache:'no-store',headers:{Accept:'application/json'}});
+ let d;try{d=await res.json()}catch{throw Error('Received an invalid response.')}
+ if(!res.ok||d.error){
+  const e=new Error(d.error||d.note||'Request unavailable ('+res.status+')');
+  e.code=d.code||'';e.retryAfterSeconds=Number(d.retry_after_seconds||res.headers.get('retry-after'))||65;
+  if((e.code==='PROVIDER_RATE_LIMIT'||res.status===429)&&/api\/(analyze|opportunity|market-discovery)/.test(url)){
+   providerRetryAt=Date.now()+e.retryAfterSeconds*1000;
+   if(typeof setMonitor==='function')setMonitor(false);
+   renderFeedHealth({state:'rate-limited',retry_after_seconds:e.retryAfterSeconds,note:'Twelve Data API credits exhausted. Paused automatic checks; wait before retrying.'});
+  }
+  throw e;
+ }
+ if(/api\/(analyze|opportunity|market-discovery)/.test(url))refreshFeedHealth();
+ return d;
+}
 const oldRoutes={
   copilot:{page:'overview',focus:'assistantTitle'},ai:{page:'overview',focus:'assistantTitle'},
   radar:{page:'scanner'},market:{page:'overview'},
@@ -57,7 +73,7 @@ function setPage(page,focus=null){
  if(page==='news'&&!state.newsCache.has(state.newsCategory+'|'+$('newsQuery').value.trim()))loadNews();
  if(page==='signals'&&state.analysis)renderAnalysis(state.analysis);
  if(page==='settings')syncSettingsControls();
- if((page==='overview'||page==='scanner')&&state.configured&&!state.discovery)discoverMarket();
+ // No implicit six-stock scan on every page visit: preserve API credits for manual research.
  if(focus){
   requestAnimationFrame(()=>{
    const el=$(focus);if(el)el.closest('.card,.assistant-card,.paper-card')?.scrollIntoView({behavior:'smooth',block:'start'});
@@ -100,16 +116,47 @@ function syncProviderSettings(message,configured){
  description.textContent=message;
 }
 function localClock(){try{$('localTime').textContent=new Intl.DateTimeFormat('en-CA',{timeZone:'America/Edmonton',hour:'numeric',minute:'2-digit'}).format(new Date())}catch{$('localTime').textContent='—'}}
+function renderFeedHealth(status){
+ const stateName=status?.state||'configured-unverified',configured=state.configured;
+ const rate=stateName==='rate-limited',okay=stateName==='responding';
+ if(rate&&status.retry_after_seconds)providerRetryAt=Math.max(providerRetryAt,Date.now()+status.retry_after_seconds*1000);
+ const kind=okay?'green':rate?'red':'amber';
+ const label=okay?'Historical bars checked':rate?'API quota exhausted':configured?'Feed not verified':'Feed not configured';
+ for(const id of ['feedDot','sideStatusDot'])if($(id))$(id).className='status-dot '+kind;
+ $('feedLabel').textContent=label;
+ $('sideStatus').textContent=label;
+ const details=rate?'Twelve Data HTTP 429 · '+Math.max(1,Math.ceil((providerRetryAt-Date.now())/60000))+' min until next retry.':okay?'Historical bars retrieved · not a live streaming quote.':configured?'API configured; response not yet verified.':'Add authorized provider credentials in Cloudflare.';
+ $('sideStatusDetail').textContent=details;
+ $('settingsProviderState').textContent=label;
+ $('settingsProviderDot').className='status-dot '+kind;
+ $('settingsProviderDescription').textContent=details+(status?.credits_left!=null?' · Provider credits remaining (last response): '+status.credits_left:'');
+ $('signalFeedNotice').lastElementChild.textContent=rate?'Market-history quota reached. Do not treat a provider-enabled flag as live trading data.':okay?'Verified historical bars available. Confirm timestamp, exchange delay and spread.':'No successful verified market-data response. Research remains unavailable until checked.';
+ $('providerBadge').title=label+' — '+details;
+ if(rate){discoveryReset('Price-history provider temporarily limited. Check again after quota reset.');setMonitor(false)}
+}
+async function refreshFeedHealth(){
+ if(feedPollBusy)return;
+ feedPollBusy=true;
+ try{
+  const r=await fetch('/api/feed-state',{cache:'no-store'});
+  const x=await r.json();
+  if(r.ok)renderFeedHealth(x);
+ }catch{if(state.configured)renderFeedHealth({state:'configured-unverified'})}
+ finally{feedPollBusy=false}
+}
 async function loadProvider(){
  try{const p=await request('/api/status');state.configured=Boolean(p.twelvedata_enabled||p.finnhub_fallback_enabled);state.provider=p.twelvedata_enabled?'Twelve Data enabled':p.finnhub_fallback_enabled?'Finnhub authorized backup enabled':'No authorized bars';
-  $('feedDot').className='status-dot '+(state.configured?'green':'amber');$('sideStatusDot').className='status-dot '+(state.configured?'green':'amber');
-  $('feedLabel').textContent=state.configured?'Provider enabled':'Market feed not connected';$('sideStatus').textContent=state.configured?'History feed configured':'Market data not connected';
+  // Configuration is not verified live market access. Start amber, then inspect
+  // the passive health endpoint without spending any more provider API credits.
+  renderFeedHealth({state:state.configured?'configured-unverified':'not-configured'});
   $('sideStatusDetail').textContent=state.configured?'Bars may be delayed. Check timestamps.':'Connect a private provider in settings.';
   const detail=$('connectionDetails');detail.replaceChildren();
   detail.append(create('p','',state.configured?state.provider+' in Cloudflare. Completed historical bars are fetched on demand. Exchange permissions, delay and broker execution must be independently checked.':'Twelve Data is not enabled for chart analysis. You can still read public financial news. To unlock technical signals, connect an authorized API in Data & settings.'));
   $('signalFeedNotice').lastElementChild.textContent=state.configured?'Provider configured. Always check the completed bar timestamp, market status and execution spread.':'No verified market-data feed. Historical analysis and trades are unavailable until connected.';
   syncProviderSettings(state.configured?state.provider+' is enabled. Confirm recent bars and entitlements; this does not prove live quotes.':'No authorized historical price feed is enabled. Cloudflare server secrets are configured outside the browser.',state.configured);
-  if(state.configured&&['overview','scanner'].includes(state.view))discoverMarket();else if(!state.configured)discoveryReset('No authorized price-data feed. Connect Twelve Data to enable automatic discovery.');
+  if(!state.configured)discoveryReset('No authorized price-data feed. Connect Twelve Data to enable discovery.');
+  else discoveryReset('On-demand scanning is ready. Select Scan sample to avoid exhausting API credits automatically.');
+  await refreshFeedHealth();
  }catch(e){syncProviderSettings('Could not check the server-side data connection: '+e.message,false);discoveryReset('Could not verify market-data configuration: '+e.message);$('feedLabel').textContent='Data status unavailable';$('sideStatus').textContent='Status unavailable';$('connectionDetails').textContent='Could not check provider settings: '+e.message}
 }
 // Fixed-universe discovery: never present research alignment as guaranteed profit.
@@ -137,6 +184,7 @@ function discoveryRender(result){
  window.dispatchEvent(new CustomEvent('rangeform:discovery',{detail:result}));
 }
 async function discoverMarket(){
+ if(providerRetryAt>Date.now()){toast('Twelve Data quota cooldown active. Check again later; no market prices were invented.');return}
  if(state.discoveryLoading){discoveryQueued=true;return;}
  if(!state.configured){discoveryReset('No authorized price-data provider. Automatic discovery is unavailable.');return}
  const target=state.discoveryUniverse;state.discoveryLoading=true;$('discoveryRefresh').disabled=true;$('discoveryRefresh').textContent='Checking sample…';
@@ -148,9 +196,8 @@ async function discoverMarket(){
  finally{state.discoveryLoading=false;$('discoveryRefresh').disabled=false;$('discoveryRefresh').textContent='Scan sample ↻';if(discoveryQueued){discoveryQueued=false;discoverMarket()}}
 }
 function scheduleDiscovery(){
- const due=()=>{const time=Date.parse(state.discovery?.checked_at);return !Number.isFinite(time)||Date.now()-time>=600000};
- setInterval(()=>{if(!document.hidden&&state.configured&&!state.discoveryLoading&&(state.view==='overview'||state.view==='scanner')&&due())discoverMarket()},60000);
- document.addEventListener('visibilitychange',()=>{if(!document.hidden&&(state.view==='overview'||state.view==='scanner')&&state.configured&&due())discoverMarket()});
+ // Intentional: automatic six-ticker polling is disabled on small credit plans.
+ // Keep manual scanning, server caching and truthful timestamps.
 }
 
 function renderWatch(){let root=$('watchList');root.replaceChildren();for(const symbol of state.watch){const row=create('div','watch-item'),open=create('button',''),rm=create('button','delete-symbol','×');open.type='button';open.append(create('strong','',symbol),create('small','',state.market.has(symbol)?money(state.market.get(symbol).last)+' · '+pct(state.market.get(symbol).change_pct):'Price not requested'));open.addEventListener('click',()=>inspect(symbol));rm.title='Remove '+symbol;rm.setAttribute('aria-label','Remove '+symbol);rm.addEventListener('click',()=>{state.watch=state.watch.filter(x=>x!==symbol);saveWatch();renderWatch()});row.append(open,rm);root.append(row)}}
@@ -171,7 +218,8 @@ toast(results.filter(x=>!x[1]?.error).length+' of '+results.length+' symbols ana
 async function inspect(sym){setMonitor(false);state.symbol=sym;$('symbolInput').value=sym;setPage('signals');await runAnalysis()}
 function clearAnalysis(message){state.analysis=null;state.opportunity=null;state.agentRoom=null;resetAgentRoom(message);resetOpportunity(message);
  window.dispatchEvent(new CustomEvent('rangeform:agent-report',{detail:{analysis:null,opportunity:null,agent_room:null}}));$('selectedPrice').textContent='—';$('selectedChange').textContent='Awaiting completed price bars';$('lastBarTime').textContent='—';$('indicatorScore').textContent='—';$('verdictCard').className='card verdict-card';$('verdictText').textContent='DATA NOT CONNECTED';$('verdictDetail').textContent=message;$('verdictFactors').textContent='No verified technical evidence. No trade levels will be invented.';$('evidenceText').textContent='The model requires real completed candles and a valid provider response.';$('longCondition').textContent='Connect validated candles to determine a buy-watch trigger.';$('shortCondition').textContent='Connect validated candles to determine a bearish invalidation.';$('waitCondition').textContent='Avoid trading without fresh, verified market data.';$('chartPlaceholder').hidden=false;$('riskResults').textContent='Entry, stop and position size require valid completed bars.'}
-async function runAnalysis(options={}){if(monitor.busy)return;const silent=options?.silent===true;
+async function runAnalysis(options={}){if(monitor.busy)return;
+ if(providerRetryAt>Date.now()){if(!options?.silent)toast('Provider quota paused. Retry after the cooldown shown in Settings.');return}const silent=options?.silent===true;
  const symbol=$('symbolInput').value.trim().toUpperCase(),interval=$('barInterval').value;
  if(!symbolOK(symbol)){if(!silent)toast('Enter a valid ticker such as NVDA or SHOP.');return}
  if(!state.configured){if(!silent)toast('Connect authorized market data before running an opportunity check.');clearAnalysis('No authorized data connection.');return}
@@ -296,8 +344,9 @@ function renderOpportunity(op,room){
 function setMonitor(enabled){
  monitor.enabled=Boolean(enabled)&&state.configured;
  if(monitor.timer){clearInterval(monitor.timer);monitor.timer=null}
+ if(monitor.enabled&&providerRetryAt>Date.now()){monitor.enabled=false;toast('Automatic checks paused until the provider quota resets.')}
  if(monitor.enabled)monitor.timer=setInterval(()=>{
-  if(!document.hidden&&state.view==='signals'&&!monitor.busy)runAnalysis({silent:true});
+  if(!document.hidden&&state.view==='signals'&&!monitor.busy&&providerRetryAt<=Date.now())runAnalysis({silent:true});
  },60000);
  $('monitorToggle').setAttribute('aria-pressed',String(monitor.enabled));
  $('monitorToggle').textContent=monitor.enabled?'Auto-check: every 60s':'Auto-check: off';
