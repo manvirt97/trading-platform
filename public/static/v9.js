@@ -1,5 +1,14 @@
 /* Rangeform V9: real-source research UI. No synthetic prices, promises or trade execution. */
 (()=>{'use strict';
+/* Home Screen Safari sometimes exposes a zero top inset even while the
+   native iOS status bar overlays the viewport. Mark the installed app so
+   the mobile stylesheet reserves a physical status-bar zone. */
+try {
+ const installed=window.navigator.standalone===true||
+  window.matchMedia('(display-mode: standalone)').matches;
+ if(installed)document.documentElement.classList.add('rangeform-ios-standalone');
+}catch{}
+
 const $=id=>document.getElementById(id);
 const $$=sel=>Array.from(document.querySelectorAll(sel));
 const money=(v,d=2)=>Number.isFinite(Number(v))?'$'+Number(v).toLocaleString('en-CA',{minimumFractionDigits:d,maximumFractionDigits:d}):'—';
@@ -15,7 +24,12 @@ const monitor={enabled:false,timer:null,lastAlertKey:'',busy:false};
 const toast=(message)=>{const el=$('toast');el.textContent=String(message).slice(0,250);el.hidden=false;clearTimeout(toastTimeout);toastTimeout=setTimeout(()=>{el.hidden=true},4800)};
 function readWatch(){let a;try{a=JSON.parse(localStorage.getItem('rf_v9_watch')||'null')}catch{}const clean=Array.isArray(a)?a.filter(x=>typeof x==='string').map(x=>x.toUpperCase()).filter(symbolOK):[];return [...new Set(clean.length?clean:['NVDA','TSLA','SHOP','AAPL','SPY'])].slice(0,6)}
 function saveWatch(){try{localStorage.setItem('rf_v9_watch',JSON.stringify(state.watch))}catch{}}
-function setTheme(v){document.body.dataset.theme=v==='dark'?'dark':'light';try{localStorage.setItem('rf_v9_theme',document.body.dataset.theme)}catch{}}
+function setTheme(v){
+ document.body.dataset.theme=v==='dark'?'dark':'light';
+ const themeMeta=document.querySelector('meta[name="theme-color"]');
+ if(themeMeta)themeMeta.setAttribute('content',document.body.dataset.theme==='dark'?'#101923':'#f6f8fb');
+ try{localStorage.setItem('rf_v9_theme',document.body.dataset.theme)}catch{}
+}
 const create=(tag,className,text)=>{let el=document.createElement(tag);if(className)el.className=className;if(text!=null)el.textContent=String(text);return el};
 async function request(url){const res=await fetch(url,{cache:'no-store',headers:{Accept:'application/json'}});let d;try{d=await res.json()}catch{throw Error('Received an invalid response.')}if(!res.ok||d.error)throw Error(d.error||d.note||'Request unavailable ('+res.status+')');return d}
 const oldRoutes={
