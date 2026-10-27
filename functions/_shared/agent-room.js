@@ -65,8 +65,8 @@ export function runAgentRoom(analysis,opportunity,now=new Date()){
  a=agent('rsi','RSI Momentum','Momentum',.7);const currentRSI=rsi(p);
  agents.push(!numeric(currentRSI)?unavailable(a,'Need 15 recent closes for RSI.'):vote(a,currentRSI>55&&currentRSI<75?40:currentRSI<45&&currentRSI>25?-40:0,'RSI '+round(currentRSI,1)+' (extremes treated as caution).'));
  a=agent('macd','MACD Momentum','Momentum',1);
- const macd=ema(p,12)-ema(p,26),signal=ema(p.slice(0,-1),12)-ema(p.slice(0,-1),26);
- agents.push(!history||!numeric(macd)||!numeric(signal)?unavailable(a,'Insufficient data for MACD trend proxy.'):vote(a,macd>0&&macd>signal?50:macd<0&&macd<signal?-50:0,'MACD line trend approximation; not an execution trigger.'));
+ const macd=ema(p,12)-ema(p,26),priorMACD=ema(p.slice(0,-1),12)-ema(p.slice(0,-1),26);
+ agents.push(!history||!numeric(macd)||!numeric(priorMACD)?unavailable(a,'Insufficient data for MACD trend proxy.'):vote(a,macd>0&&macd>priorMACD?50:macd<0&&macd<priorMACD?-50:0,'MACD line trend approximation; not an execution trigger.'));
  a=agent('momentum','Five-Bar Momentum','Momentum',.8);
  const move=p.length>6?100*(close/p.at(-6)-1):NaN;
  agents.push(!numeric(move)?unavailable(a,'Need six closes for five-bar momentum.'):vote(a,Math.abs(move)<.08?0:Math.sign(move)*Math.min(65,Math.abs(move)*35),'Five-bar change '+round(move,2)+'%'));
