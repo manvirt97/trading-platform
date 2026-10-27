@@ -1,6 +1,20 @@
-# Rangeform V10 unified navigation. Use temporary redirects while old links update.
-# Keep /research.html available for explicit ?classic=1 deep links.
-# Cloudflare Pages processes redirects before static pages.
-/market.html /v9.html#overview 302
-/market /v9.html#overview 302
-/market/ /v9.html#overview 302
+# Rangeform V10.3 canonical routes: there is only one current interface.
+# Fallback for static Pages deployments; Pages Functions middleware handles
+# all legacy entry paths even when a Function route shadows _redirects.
+# Don't specify a Location fragment: preserve #risk/#journal/#copilot.
+# Do not redirect /account.html, /api/*, /static/*, or /v9.html.
+/ /v9.html 302
+/index.html /v9.html 302
+/research /v9.html 302
+/research/ /v9.html 302
+/research.html /v9.html 302
+/market /v9.html 302
+/market/ /v9.html 302
+/market.html /v9.html 302
+/market-classic /v9.html 302
+/market-classic/ /v9.html 302
+/market-classic.html /v9.html 302
+/v8 /v9.html 302
+/v8.html /v9.html 302
+/terminal /v9.html 302
+/terminal.html /v9.html 302

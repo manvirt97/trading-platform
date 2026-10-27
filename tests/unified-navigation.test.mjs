@@ -5,11 +5,11 @@ const read=p=>readFileSync(new URL('../'+p,import.meta.url),'utf8');
 
 test('legacy Market Desk links redirect to new workspace, not old HTML',()=>{
  const redirects=read('public/_redirects').trim().split('\n').filter(s=>!s.startsWith('#'));
- for(const path of ['/market.html','/market','/market/']){
-  assert.ok(redirects.includes(path+' /v9.html#overview 302'),path+' must redirect');
+ for(const path of ['/market.html','/market','/market/','/research','/research.html','/market-classic.html','/']){
+  assert.ok(redirects.includes(path+' /v9.html 302'),path+' must redirect');
  }
  assert.ok(read('public/market-classic.html').includes('Legacy Market Desk'));
- assert.match(read('public/research.html'),/new URLSearchParams\(location\.search\)\.has\('classic'\)/);
+ assert.match(read('public/research.html'),/location\.replace\('\/v9\.html'\+location\.hash\)/);
 });
 test('phone app manifests and each shortcut target modern pages',()=>{
  const m=JSON.parse(read('public/manifest.webmanifest'));
@@ -27,7 +27,7 @@ test('modern sidebar routes tools inside V10 without accidental classic navigati
  for(const focus of ['assistantTitle','riskAccount','paperTitle','connectionDetails'])
   assert.match(html,new RegExp('data-focus="'+focus+'"'));
  assert.doesNotMatch(html,/<a class="nav-link" href="\/research\.html\?classic=1#/);
- assert.match(html,/Open classic workspace/);
+ assert.doesNotMatch(html,/Open classic workspace/);
  assert.match(js,/function routeFromHash\(\)/);
  assert.match(js,/function setPage\(page,focus=null\)/);
  assert.match(js,/window\.addEventListener\('hashchange',routeFromHash\)/);

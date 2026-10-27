@@ -45,16 +45,16 @@ test('V10 keeps AI, risk, paper journal and data status inside one modern worksp
  assert.match(js,/function routeFromHash/);
  assert.match(js,/oldRoutes=/);
  assert.match(js,/scrollIntoView/);
- assert.match(html,/Open classic workspace/);
+ assert.doesNotMatch(html,/Open classic workspace/);
  assert.match(legacy,/id="page-risk"/);
  assert.match(legacy,/id="page-journal"/);
 });
 
 
-test('new homepage is the default but classic research remains an explicit opt-in',()=>{
+test('homepage and legacy research both redirect to the new app without bypass',()=>{
  const index=file('public/index.html'),research=file('public/research.html');
  assert.match(index,/location\.replace\('\/v9\.html'/);
- assert.match(research,/URLSearchParams\(location\.search\)\.has\('classic'\)/);
+ assert.doesNotMatch(research,/URLSearchParams\(location\.search\)\.has\('classic'\)/);
  assert.match(research,/location\.replace\('\/v9\.html'/);
  assert.match(file('public/static/app.js'),/classicPage=location\.hash\.slice\(1\)/);
 });
