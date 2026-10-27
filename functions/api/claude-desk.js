@@ -41,7 +41,7 @@ function compact(analysis,opportunity,room){
 async function callClaude(env,{model,system,content,maxTokens=220}){
  const response=await fetch('https://api.anthropic.com/v1/messages',{
   method:'POST',headers:{'content-type':'application/json','x-api-key':env.ANTHROPIC_API_KEY,'anthropic-version':'2023-06-01'},
-  body:JSON.stringify({model,max_tokens:maxTokens,temperature:0,system,messages:[{role:'user',content}]}),
+  body:JSON.stringify({model,max_tokens:maxTokens,thinking:{type:model==='claude-sonnet-5-5'?'between_tools':'disabled'},system,messages:[{role:'user',content}]}),
   signal:AbortSignal.timeout(16000)
  });
  const raw=await response.text();
