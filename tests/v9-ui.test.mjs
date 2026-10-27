@@ -53,3 +53,21 @@ test('new homepage is the default but classic research remains an explicit opt-i
  assert.match(research,/location\.replace\('\/v9\.html'/);
  assert.match(file('public/static/app.js'),/classicPage=location\.hash\.slice\(1\)/);
 });
+
+
+test('V9 makes conditional breakout watches visible without claiming streaming or orders',()=>{
+ const html=file('public/v9.html'),js=file('public/static/v9.js');
+ const css=file('public/static/v9.css');
+ for(const id of ['monitorToggle','monitorRefresh','openingHigh','openingLow','confirmedVolume','catalystList','volumeProfile']){
+  assert.match(html,new RegExp('id="'+id+'"'));
+ }
+ assert.match(html,/5 min · intraday/);
+ assert.match(js,/\/api\/opportunity/);
+ assert.match(js,/monitor\.enabled/);
+ assert.match(js,/!document\.hidden/);
+ assert.match(js,/60000/);
+ assert.match(js,/BUY_WATCH/);
+ assert.match(js,/SELL_WATCH/);
+ assert.match(css,/\.volume-profile/);
+ assert.match(html,/NOT an order|not a streaming feed|No brokerage execution/i);
+});
