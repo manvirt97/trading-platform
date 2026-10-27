@@ -17,7 +17,7 @@ function saveWatch(){try{localStorage.setItem('rf_v9_watch',JSON.stringify(state
 function setTheme(v){document.body.dataset.theme=v==='dark'?'dark':'light';try{localStorage.setItem('rf_v9_theme',document.body.dataset.theme)}catch{}}
 const create=(tag,className,text)=>{let el=document.createElement(tag);if(className)el.className=className;if(text!=null)el.textContent=String(text);return el};
 async function request(url){const res=await fetch(url,{cache:'no-store',headers:{Accept:'application/json'}});let d;try{d=await res.json()}catch{throw Error('Received an invalid response.')}if(!res.ok||d.error)throw Error(d.error||d.note||'Request unavailable ('+res.status+')');return d}
-function setPage(page){if(!['overview','signals','scanner','news'].includes(page))return;state.view=page;document.body.dataset.view=page;$$('[data-section]').forEach(p=>p.classList.toggle('visible',p.dataset.section===page));$$('.nav-link[data-page]').forEach(el=>{el.classList.toggle('active',el.dataset.page===page);el.setAttribute('aria-current',el.dataset.page===page?'page':'false')});document.title='Rangeform · '+({overview:'Overview',signals:'Trade decision desk',scanner:'Market scanner',news:'News & catalysts'}[page]);history.replaceState(null,'','#'+page);window.scrollTo({top:0,behavior:'instant'});closeNav();if(page==='news'&&!state.newsCache.has(state.newsCategory+'|'+$('newsQuery').value.trim()))loadNews();if(page==='signals'&&state.analysis)renderAnalysis(state.analysis);if(page==='overview'&&state.configured&&!state.discovery)discoverMarket()}
+function setPage(page){if(!['overview','signals','scanner','news'].includes(page))return;state.view=page;document.body.dataset.view=page;$$('[data-section]').forEach(p=>p.classList.toggle('visible',p.dataset.section===page));$$('.nav-link[data-page]').forEach(el=>{el.classList.toggle('active',el.dataset.page===page);el.setAttribute('aria-current',el.dataset.page===page?'page':'false')});document.title='Rangeform · '+({overview:'Overview',signals:'Trade decision desk',scanner:'Opportunity scanner',news:'News & catalysts'}[page]);history.replaceState(null,'','#'+page);window.scrollTo({top:0,behavior:'instant'});closeNav();const discovery=document.querySelector('.discovery-card');const host=page==='scanner'?$('discoveryScannerHost'):$('discoveryHome');if(discovery&&host)host.after(discovery);if(page==='news'&&!state.newsCache.has(state.newsCategory+'|'+$('newsQuery').value.trim()))loadNews();if(page==='signals'&&state.analysis)renderAnalysis(state.analysis);if((page==='overview'||page==='scanner')&&state.configured&&!state.discovery)discoverMarket()}
 function closeNav(){$('sidebar').classList.remove('open');$('navShade').hidden=true}
 function initTheme(){let theme;try{theme=localStorage.getItem('rf_v9_theme')||localStorage.getItem('rangeform_theme')||'light'}catch{}setTheme(theme)}
 function localClock(){try{$('localTime').textContent=new Intl.DateTimeFormat('en-CA',{timeZone:'America/Edmonton',hour:'numeric',minute:'2-digit'}).format(new Date())}catch{$('localTime').textContent='—'}}
@@ -29,7 +29,7 @@ async function loadProvider(){
   const detail=$('connectionDetails');detail.replaceChildren();
   detail.append(create('p','',state.configured?'Twelve Data is enabled in Cloudflare. Historical bars are retrieved on demand, subject to your plan and exchange permissions. This is not a verified live trading quote.':'Twelve Data is not enabled for chart analysis. You can still read public financial news. To unlock technical signals, connect an authorized API in Data & settings.'));
   $('signalFeedNotice').lastElementChild.textContent=state.configured?'Provider configured. Always check the completed bar timestamp, market status and execution spread.':'No verified market-data feed. Historical analysis and trades are unavailable until connected.';
-  if(state.configured&&state.view==='overview')discoverMarket();else if(!state.configured)discoveryReset('No authorized price-data feed. Connect Twelve Data to enable automatic discovery.');
+  if(state.configured&&['overview','scanner'].includes(state.view))discoverMarket();else if(!state.configured)discoveryReset('No authorized price-data feed. Connect Twelve Data to enable automatic discovery.');
  }catch(e){discoveryReset('Could not verify market-data configuration: '+e.message);$('feedLabel').textContent='Data status unavailable';$('sideStatus').textContent='Status unavailable';$('connectionDetails').textContent='Could not check provider settings: '+e.message}
 }
 // Fixed-universe discovery: never present research alignment as guaranteed profit.
@@ -69,8 +69,8 @@ async function discoverMarket(){
 }
 function scheduleDiscovery(){
  const due=()=>{const time=Date.parse(state.discovery?.checked_at);return !Number.isFinite(time)||Date.now()-time>=600000};
- setInterval(()=>{if(!document.hidden&&state.configured&&!state.discoveryLoading&&state.view==='overview'&&due())discoverMarket()},60000);
- document.addEventListener('visibilitychange',()=>{if(!document.hidden&&state.view==='overview'&&state.configured&&due())discoverMarket()});
+ setInterval(()=>{if(!document.hidden&&state.configured&&!state.discoveryLoading&&(state.view==='overview'||state.view==='scanner')&&due())discoverMarket()},60000);
+ document.addEventListener('visibilitychange',()=>{if(!document.hidden&&(state.view==='overview'||state.view==='scanner')&&state.configured&&due())discoverMarket()});
 }
 
 function renderWatch(){let root=$('watchList');root.replaceChildren();for(const symbol of state.watch){const row=create('div','watch-item'),open=create('button',''),rm=create('button','delete-symbol','×');open.type='button';open.append(create('strong','',symbol),create('small','',state.market.has(symbol)?money(state.market.get(symbol).last)+' · '+pct(state.market.get(symbol).change_pct):'Price not requested'));open.addEventListener('click',()=>inspect(symbol));rm.title='Remove '+symbol;rm.setAttribute('aria-label','Remove '+symbol);rm.addEventListener('click',()=>{state.watch=state.watch.filter(x=>x!==symbol);saveWatch();renderWatch()});row.append(open,rm);root.append(row)}}
@@ -135,11 +135,18 @@ function resetAgentRoom(reason){
  grid.append(create('p','subtle-note',reason||'No specialist report loaded.'));
  $('agentRoomVerdict').textContent='Awaiting data';$('agentRoomVerdict').className='signal-tag';
  $('agentRoomSummary').textContent='No verified specialist evidence.';
- $('agentRoomVeto').hidden=true;$('agentRoomVeto').textContent='';
+ $('agentRoomVeto').hidden=true;$('agentRoomVeto').textContent='';headlineSupervisor(null);
+}
+function headlineSupervisor(report){
+ const h=$('supervisorHeadline'),p=$('supervisorOneLine');if(!h||!p)return;
+ const status=report?.verdict||'WAIT';
+ h.textContent=status==='BUY_WATCH'?'SUPERVISOR · BUY WATCH':status==='SELL_WATCH'?'SUPERVISOR · BEARISH WATCH':'SUPERVISOR · WAIT';
+ h.className='supervisor-status '+(status==='BUY_WATCH'?'bull':status==='SELL_WATCH'?'bear':'');
+ p.textContent=report?.next_step||'Missing or stale market evidence. No executable signal.';
 }
 function renderAgentRoom(report){
  if(!report?.agents){resetAgentRoom('Agent report unavailable. No multi-agent confirmation is claimed.');return}
- const result=report.verdict||'WAIT';
+ const result=report.verdict||'WAIT';headlineSupervisor(report);
  $('agentRoomVerdict').textContent=result==='BUY_WATCH'?'BUY WATCH':result==='SELL_WATCH'?'BEARISH WATCH':'WAIT';
  $('agentRoomVerdict').className='signal-tag '+(result==='BUY_WATCH'?'bull':result==='SELL_WATCH'?'bear':'');
  $('agentRoomSummary').textContent=report.specialist_count+' specialist checks · '+report.available_votes+' evidenced votes · '+report.abstentions+' unavailable · '+report.agreement_pct+'% directional agreement · consensus '+(report.score>0?'+':'')+report.score+'. Agreement is not profit probability.';
@@ -266,7 +273,7 @@ function renderNews(data){$('newsChecked').textContent='Checked '+dateString(dat
 data.items.forEach((item,i)=>{if(!/^https:\/\//.test(item.url))return;const row=create('article','news-item'),num=create('span','news-item-num',String(i+1).padStart(2,'0')),content=create('div','news-item-content'),meta=create('div','story-meta'),link=create('a','',item.title),info=create('small','',(item.source||'Publisher')+' · '+ageLabel(item.date));meta.append(create('span','',item.topic||'MARKETS'),create('span','',ageLabel(item.date)),create('span','',item.source||'Public news'));link.href=item.url;link.target='_blank';link.rel='noopener noreferrer';link.className='story-link';link.append(create('span','sr-only',''));const h=create('h3');h.append(link);content.append(meta,h,info);row.append(num,content);row.addEventListener('click',e=>{if(e.target.closest('a'))return;selectArticle(item)});const select=create('button','cell-btn','Details');select.type='button';select.title='View source details';select.onclick=()=>selectArticle(item);row.append(select);root.append(row)})
 }
 function selectArticle(item){$('articleContextTitle').textContent=item.title;$('articleContext').textContent=(item.source||'Source')+' · published '+stamp(item.date)+'. Verify the full article and price reaction before drawing conclusions. The headline is not a trade signal.';const link=$('articleOriginal');link.href=item.url;link.hidden=false}
-function bind(){initTheme();state.watch=readWatch();renderWatch();bindAgentFilters();scheduleDiscovery();localClock();setInterval(localClock,60000);
+function bind(){initTheme();state.watch=readWatch();renderWatch();bindAgentFilters();$('showAgentRoom')?.addEventListener('click',()=>$('agentRoomTitle')?.scrollIntoView({behavior:'smooth',block:'start'}));scheduleDiscovery();localClock();setInterval(localClock,60000);
 $$('[data-page]').forEach(el=>el.addEventListener('click',()=>setPage(el.dataset.page)));
 $('mobileMenu').onclick=()=>{$('sidebar').classList.toggle('open');$('navShade').hidden=!$('sidebar').classList.contains('open')};$('navShade').onclick=closeNav;
 $('themeToggle').onclick=()=>setTheme(document.body.dataset.theme==='dark'?'light':'dark');
