@@ -1,0 +1,19 @@
+name = "rangeform-scheduled-research"
+main = "worker/scheduled-scanner.js"
+compatibility_date = "2026-10-01"
+
+# Separate Worker, intentionally NOT the existing Pages project.
+# Example: every 30 minutes; server code skips weekends/outside US market hours.
+[triggers]
+crons = ["*/30 * * * *"]
+
+# Deploy only after creating a dedicated KV namespace and adding its actual id
+# via Cloudflare dashboard or uncommenting the binding below.
+# [[kv_namespaces]]
+# binding = "SCANNER_SNAPSHOTS"
+# id = "REPLACE_WITH_YOUR_KV_NAMESPACE_ID"
+
+# Set TWELVEDATA_API_KEY as secret (and FINNHUB_API_KEY optional).
+# Set LIVE_DATA_ENABLED=on only after verifying exchange/public display rights.
+# [vars]
+# LIVE_DATA_ENABLED = "on"
