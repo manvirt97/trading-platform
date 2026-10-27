@@ -5,8 +5,8 @@
 <meta name="description" content="Rangeform: evidence-first market research, conditional trade plans and market news.">
 <title>Rangeform — Market intelligence</title>
 <link rel="icon" type="image/png" href="/static/rangeform-official-icon.png">
-<link rel="stylesheet" href="/static/v9.css?v=8"><link rel="stylesheet" href="/static/v11-mobile.css?v=1">
-<script src="/static/v9.js?v=10" defer></script><script src="/static/v9-ai.js?v=4" type="module"></script><script src="/static/v9-paper.js?v=1" defer></script>
+<link rel="stylesheet" href="/static/v9.css?v=8"><link rel="stylesheet" href="/static/v11-mobile.css?v=1"><link rel="stylesheet" href="/static/v12-settings-news.css?v=1">
+<script src="/static/v9.js?v=11" defer></script><script src="/static/v9-ai.js?v=4" type="module"></script><script src="/static/v9-paper.js?v=1" defer></script>
 </head>
 <body data-view="overview" data-theme="light">
 <div class="app">
@@ -24,7 +24,7 @@
   <nav class="side-nav" aria-label="Research tools">
    <button class="nav-link" type="button" data-page="signals" data-focus="riskAccount"><span class="nav-icon">◇</span> Risk planner</button>
    <button class="nav-link" type="button" data-page="signals" data-focus="paperTitle"><span class="nav-icon">▣</span> Paper journal</button>
-   <button class="nav-link" type="button" data-page="signals" data-focus="connectionDetails"><span class="nav-icon">⚙</span> Data status</button>
+   <button class="nav-link" type="button" data-page="settings"><span class="nav-icon">⚙</span> Settings</button>
   </nav>
   <div class="side-footer"><div class="side-status"><span id="sideStatusDot" class="status-dot amber"></span><div><strong id="sideStatus">Checking market data</strong><small id="sideStatusDetail">Verifying provider configuration</small></div></div><a href="/v9.html#scanner">Explore opportunities ↗</a></div>
  </aside>
@@ -145,7 +145,34 @@
    <section class="page" data-section="news">
     <div class="page-heading"><div><div class="eyebrow">DISCOVER / TRUSTED PUBLISHERS</div><h1>News &amp; catalysts<br><em>that matter.</em></h1><p>Company developments, earnings and macro events. Each story links to its source.</p></div></div>
     <div class="news-tools"><div class="news-search"><span>⌕</span><input id="newsQuery" type="search" placeholder="Company, ticker or topic..." aria-label="Search market news"><button id="newsSearchBtn" class="primary-btn" type="button">Search ↗</button></div><div id="newsCategories" class="news-cats"><button class="selected" data-category="all">All markets</button><button data-category="earnings">Earnings</button><button data-category="rates">Fed &amp; rates</button><button data-category="energy">Energy</button><button data-category="canada">Canada</button><button data-category="technology">Technology</button></div></div>
-    <div class="news-layout"><section class="card news-card"><div class="card-head"><div><div class="eyebrow">SOURCE-LINKED HEADLINES</div><h2 id="newsHeading">Latest market stories</h2></div><small id="newsChecked">Not checked</small></div><div class="news-items" id="newsItems"><p class="empty-inline">Opening latest financial headlines…</p></div></section><aside class="right-flow"><div class="card"><div class="eyebrow">WHY THIS MATTERS</div><h2>Read the story. Then the reaction.</h2><p>News is not a trading signal. Examine what changed, which companies are affected, whether markets have already priced it in, and how fresh the source is.</p><div class="filter-row"><span>✓</span><div><strong>Original publisher</strong><small>Open the source to check details</small></div></div><div class="filter-row"><span>✓</span><div><strong>Category-specific results</strong><small>Changing a filter requests new headlines</small></div></div></div><div class="card"><div class="eyebrow">SELECTED ARTICLE</div><h2 id="articleContextTitle">Choose a story</h2><p id="articleContext">Selecting a headline displays its publisher and publication time. News summaries are not generated without a grounded AI source.</p><a id="articleOriginal" href="https://news.google.com/" target="_blank" rel="noopener noreferrer" class="button-link subtle-btn" hidden>Read publisher ↗</a></div></aside></div>
+    <div class="news-layout"><section class="card news-card"><div class="card-head"><div><div class="eyebrow">SOURCE-LINKED HEADLINES</div><h2 id="newsHeading">Latest market stories</h2></div><small id="newsChecked">Not checked</small></div><div class="news-items" id="newsItems"><p class="empty-inline">Opening latest financial headlines…</p></div></section><aside class="right-flow"><div class="card"><div class="eyebrow">WHY THIS MATTERS</div><h2>Read the story. Then the reaction.</h2><p>News is not a trading signal. Examine what changed, which companies are affected, whether markets have already priced it in, and how fresh the source is.</p><div class="filter-row"><span>✓</span><div><strong>Original publisher</strong><small>Open the source to check details</small></div></div><div class="filter-row"><span>✓</span><div><strong>Category-specific results</strong><small>Changing a filter requests new headlines</small></div></div></div><div class="card article-context-card"><div class="eyebrow">ARTICLE CONTEXT</div><h2 id="articleContextTitle">Choose a story</h2><p id="articleContext">Tap “Source & timing” below a headline to see when it was published and open its original source. Headlines do not establish a trading signal.</p><a id="articleOriginal" href="https://news.google.com/" target="_blank" rel="noopener noreferrer" class="button-link subtle-btn" hidden>Open original story ↗</a></div></aside></div>
+   </section>
+
+   <section class="page settings-page" data-section="settings" aria-label="Settings">
+    <div class="page-heading"><div><div class="eyebrow">YOUR WORKSPACE / PREFERENCES</div><h1>Settings</h1><p>Make Rangeform yours. Appearance and news preferences are saved on this device; private service credentials stay on the server.</p></div></div>
+    <div class="settings-grid-v12">
+     <section class="card settings-panel" aria-labelledby="settingsAppearanceTitle">
+      <div class="card-head"><div><div class="eyebrow">APPEARANCE</div><h2 id="settingsAppearanceTitle">Display preferences</h2><p>Changes apply immediately across your workspace.</p></div></div>
+      <label class="setting-field" for="settingsTheme"><span><strong>Appearance</strong><small>Choose a consistent light or dark interface</small></span><select id="settingsTheme"><option value="light">Light</option><option value="dark">Dark</option></select></label>
+      <label class="setting-field" for="settingsNewsDensity"><span><strong>News layout</strong><small>Compact headlines or comfortable spacing</small></span><select id="settingsNewsDensity"><option value="comfortable">Comfortable</option><option value="compact">Compact</option></select></label>
+     </section>
+     <section class="card settings-panel" aria-labelledby="settingsNewsTitle">
+      <div class="card-head"><div><div class="eyebrow">PERSONALIZATION</div><h2 id="settingsNewsTitle">News &amp; discovery</h2><p>Choose which headlines Rangeform shows first.</p></div></div>
+      <label class="setting-field" for="settingsNewsCategory"><span><strong>Default news category</strong><small>Applied when you open the app next time</small></span><select id="settingsNewsCategory"><option value="all">All markets</option><option value="earnings">Earnings</option><option value="rates">Fed &amp; rates</option><option value="energy">Energy</option><option value="canada">Canada</option><option value="technology">Technology</option></select></label>
+      <p class="settings-footnote">Preferences are stored in this browser only. They are not synced to your account.</p>
+     </section>
+     <section class="card settings-panel" aria-labelledby="settingsFeedTitle">
+      <div class="card-head"><div><div class="eyebrow">MARKET DATA</div><h2 id="settingsFeedTitle">Provider connection</h2><p>Check feed configuration and understand the difference between connected and real-time.</p></div></div>
+      <div class="settings-provider"><span id="settingsProviderDot" class="status-dot amber"></span><div><strong id="settingsProviderState">Checking data connection…</strong><small id="settingsProviderDescription">Connecting to Rangeform's server-side data-status endpoint.</small></div></div>
+      <div class="settings-actions"><button id="settingsCheckProvider" class="subtle-btn" type="button">Check connection ↻</button><a class="subtle-btn button-link" href="https://github.com/manvirt97/trading-platform/blob/main/V9_IMPLEMENTATION.md" target="_blank" rel="noopener noreferrer">Data setup guide ↗</a></div>
+      <p class="settings-footnote">Connection status does not verify streaming quotes, exchange licences, bid/ask spreads or brokerage access. Never enter secret market-data keys into this page.</p>
+     </section>
+     <section class="card settings-panel" aria-labelledby="settingsAccountTitle">
+      <div class="card-head"><div><div class="eyebrow">ACCOUNT &amp; SECURITY</div><h2 id="settingsAccountTitle">Your account</h2><p>Manage sign-in and account options separately from local preferences.</p></div></div>
+      <div class="settings-actions"><a class="subtle-btn button-link" href="/account.html">Open account &amp; privacy settings ↗</a></div>
+      <p class="settings-footnote">Rangeform is a research application. Buy and sell watches never place broker orders.</p>
+     </section>
+    </div>
    </section>
   </main>
   <footer class="site-footer"><span>RANGEFORM · MARKET RESEARCH</span><span>No automatic orders · Delayed or historical data may not reflect tradable prices</span></footer>
