@@ -455,10 +455,10 @@ function renderNews(data){
   info.append(originalInline);
   details.onclick=()=>{
    const open=details.getAttribute('aria-expanded')==='true';
-   $('.story-context-toggle[aria-expanded="true"]').forEach(b=>{
+   document.querySelectorAll('.story-context-toggle[aria-expanded="true"]').forEach(b=>{
     b.setAttribute('aria-expanded','false');b.textContent='Source & timing';
    });
-   $('.story-context-panel').forEach(p=>p.hidden=true);
+   document.querySelectorAll('.story-context-panel').forEach(p=>p.hidden=true);
    info.hidden=open;
    details.setAttribute('aria-expanded',String(!open));
    details.textContent=open?'Source & timing':'Hide source info';
