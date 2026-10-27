@@ -8,7 +8,7 @@ test('Ten pictured research disciplines are accessible from the main Rangeform s
  assert.match(html,/data-section="studio"/);
  for(const name of ['Stock screener','DCF valuation','Portfolio risk','Earnings','Portfolio blueprint','Chart breakdown','Dividends','Competitive edge','Historical patterns','Macro impact'])assert.match(html,new RegExp(name));
  assert.match(code,/studio:'Research Studio'/);
- assert.match(code,/\['overview','signals','scanner','news','settings','studio'\]/);
+ assert.match(code,/\['overview','daydesk','signals','scanner','news','settings','studio'\]/);
  assert.match(html,/research-studio\.js\?v=1/);
 });
 test('Premium design is last-loaded, respects small screens, and uses restrained graphite and stone colours',()=>{
