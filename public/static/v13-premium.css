@@ -108,6 +108,11 @@ h2{font-size:18px;font-family:var(--v13-font);font-weight:800;letter-spacing:-.0
 .studio-table td{color:#50616d}
 .result-note{font-size:12px;color:#6f808b;line-height:1.7;margin:10px 0}
 .result-note.error{border:1px solid #eed2cf;background:#fcf4f3;color:#934d4a;padding:12px 14px;border-radius:9px;font-weight:650}
+.studio-result-actions{display:flex;align-items:center;flex-wrap:wrap;gap:9px;margin:17px 0 9px}
+.studio-result-actions button{min-height:39px;white-space:normal;font-size:11px}
+.studio-result-actions button:first-child{background:#e9f0ee;border-color:#c7d9d3;color:#345948}
+body[data-theme=dark] .studio-result-actions button:first-child{background:#2d453e;border-color:#4e7263;color:#c7dfd3}
+@media(max-width:640px){.studio-result-actions{flex-direction:column;align-items:stretch}.studio-result-actions button{width:100%}}
 .studio-source{display:flex;align-items:center;gap:8px;border-top:1px solid var(--line);padding-top:15px;color:#748991;font-size:11px;margin-top:15px}
 .studio-source span{font-size:17px}
 .studio-legal{font-size:11px;color:#819198;line-height:1.7;margin:15px 0 2px}
