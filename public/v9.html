@@ -1,30 +1,30 @@
 <!doctype html>
 <html lang="en"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#f6f8fb">
+<meta name="theme-color" content="#f6f8fb"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Rangeform"><meta name="apple-mobile-web-app-status-bar-style" content="default"><link rel="manifest" href="/manifest.webmanifest?v=11"><link rel="apple-touch-icon" href="/static/rangeform-official-icon.png?v=1">
 <meta name="description" content="Rangeform: evidence-first market research, conditional trade plans and market news.">
 <title>Rangeform — Market intelligence</title>
 <link rel="icon" type="image/png" href="/static/rangeform-official-icon.png">
-<link rel="stylesheet" href="/static/v9.css?v=7">
-<script src="/static/v9.js?v=7" defer></script><script src="/static/v9-ai.js?v=3" type="module"></script><script src="/static/v9-paper.js?v=1" defer></script>
+<link rel="stylesheet" href="/static/v9.css?v=8">
+<script src="/static/v9.js?v=8" defer></script><script src="/static/v9-ai.js?v=4" type="module"></script><script src="/static/v9-paper.js?v=1" defer></script>
 </head>
 <body data-view="overview" data-theme="light">
 <div class="app">
  <aside class="sidebar" id="sidebar">
-  <a class="brand" href="/v9.html" aria-label="Rangeform home"><img src="/static/rangeform-official-icon.png" alt="" width="37" height="37"><span><strong>Rangeform</strong><small>MARKET INTELLIGENCE</small></span></a>
+  <a class="brand" href="/v9.html#overview" aria-label="Rangeform home"><img src="/static/rangeform-official-icon.png" alt="" width="37" height="37"><span><strong>Rangeform</strong><small>V10.2 · MARKET INTELLIGENCE</small></span></a>
   <div class="nav-label">WORKSPACE</div>
   <nav class="side-nav" aria-label="Main navigation">
    <button class="nav-link active" data-page="overview"><span class="nav-icon">◫</span> Overview</button>
    <button class="nav-link" data-page="signals"><span class="nav-icon">↗</span> Trade signals</button>
    <button class="nav-link" data-page="scanner"><span class="nav-icon">◎</span> Opportunity scanner</button>
    <button class="nav-link" data-page="news"><span class="nav-icon">▤</span> News &amp; catalysts</button>
-   <a class="nav-link" href="/research.html?classic=1#copilot"><span class="nav-icon">✳</span> Research AI <small class="nav-hint">Existing</small></a>
+   <button class="nav-link" type="button" data-page="overview" data-focus="assistantTitle"><span class="nav-icon">✳</span> Research AI</button>
   </nav>
   <div class="nav-label border-label">YOUR TOOLS</div>
   <nav class="side-nav" aria-label="Research tools">
-   <a class="nav-link" href="/research.html?classic=1#risk"><span class="nav-icon">◇</span> Risk planner</a>
-   <a class="nav-link" href="/research.html?classic=1#journal"><span class="nav-icon">▣</span> Journal</a>
-   <a class="nav-link" href="/research.html?classic=1#settings"><span class="nav-icon">⚙</span> Data &amp; settings</a>
+   <button class="nav-link" type="button" data-page="signals" data-focus="riskAccount"><span class="nav-icon">◇</span> Risk planner</button>
+   <button class="nav-link" type="button" data-page="signals" data-focus="paperTitle"><span class="nav-icon">▣</span> Paper journal</button>
+   <button class="nav-link" type="button" data-page="signals" data-focus="connectionDetails"><span class="nav-icon">⚙</span> Data status</button>
   </nav>
   <div class="side-footer"><div class="side-status"><span id="sideStatusDot" class="status-dot amber"></span><div><strong id="sideStatus">Checking market data</strong><small id="sideStatusDetail">Verifying provider configuration</small></div></div><a href="/research.html?classic=1">Open classic workspace ↗</a></div>
  </aside>
@@ -32,7 +32,7 @@
   <header class="topbar">
    <button id="mobileMenu" class="icon-button mobile-menu" type="button" aria-label="Open navigation">☰</button>
    <div class="top-search"><span aria-hidden="true">⌕</span><input type="search" id="globalSearch" maxlength="12" placeholder="Search a symbol (e.g. NVDA, SHOP)" aria-label="Search stock symbol"><kbd>↵</kbd></div>
-   <div class="top-right"><span class="version-marker" title="Visible deployed interface version">V10 · CLAUDE COUNCIL</span><div class="market-time"><span>CALGARY</span><strong id="localTime">--:--</strong></div><button id="providerBadge" type="button" class="provider-pill"><span id="feedDot" class="status-dot amber"></span><span id="feedLabel">Checking feed</span></button><button id="themeToggle" class="icon-button" type="button" aria-label="Toggle light and dark theme">◐</button><a class="user-circle" href="/account.html" title="My workspace" aria-label="My workspace">↗</a></div>
+   <div class="top-right"><span class="version-marker" title="Visible deployed interface version">V10 · CLAUDE COUNCIL</span><div class="market-time"><span>CALGARY</span><strong id="localTime">--:--</strong></div><button id="providerBadge" type="button" class="provider-pill"><span id="feedDot" class="status-dot amber"></span><span id="feedLabel">Checking feed</span></button><button id="themeToggle" class="icon-button" type="button" aria-label="Toggle light and dark theme">◐</button><a class="user-circle" href="/account.html" title="Account and private settings" aria-label="My workspace">↗</a></div>
   </header>
   <main class="main" id="main">
    <section class="page visible" data-section="overview">
@@ -134,7 +134,7 @@
   <div class="paper-actions"><button id="paperExport" type="button" class="subtle-btn">Export practice CSV</button></div>
   <p class="subtle-note">Up to three open practice positions. Trading pauses after three consecutive losses or a 2% realized daily drawdown. A flat 0.05% cost per side is modeled; gaps, realistic fills, and taxes are not modeled. Records are saved only in this browser.</p>
 </article>
-       <article class="card data-card"><div class="eyebrow">SOURCE TRANSPARENCY</div><h2>Market data connection</h2><div id="connectionDetails"><p>Checking provider settings…</p></div><a class="subtle-btn button-link" href="/research.html?classic=1#settings">Data setup &amp; connection ↗</a></article>
+       <article class="card data-card"><div class="eyebrow">SOURCE TRANSPARENCY</div><h2>Market data connection</h2><div id="connectionDetails"><p>Checking provider settings…</p></div><a class="subtle-btn button-link" href="https://github.com/manvirt97/trading-platform/blob/main/V10_CLAUDE_SUPERVISOR_SETUP.md" target="_blank" rel="noopener noreferrer">Connection setup guide ↗</a></article>
       </div>
     </div>
    </section>

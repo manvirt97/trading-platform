@@ -17,7 +17,42 @@ function saveWatch(){try{localStorage.setItem('rf_v9_watch',JSON.stringify(state
 function setTheme(v){document.body.dataset.theme=v==='dark'?'dark':'light';try{localStorage.setItem('rf_v9_theme',document.body.dataset.theme)}catch{}}
 const create=(tag,className,text)=>{let el=document.createElement(tag);if(className)el.className=className;if(text!=null)el.textContent=String(text);return el};
 async function request(url){const res=await fetch(url,{cache:'no-store',headers:{Accept:'application/json'}});let d;try{d=await res.json()}catch{throw Error('Received an invalid response.')}if(!res.ok||d.error)throw Error(d.error||d.note||'Request unavailable ('+res.status+')');return d}
-function setPage(page){if(!['overview','signals','scanner','news'].includes(page))return;state.view=page;document.body.dataset.view=page;$$('[data-section]').forEach(p=>p.classList.toggle('visible',p.dataset.section===page));$$('.nav-link[data-page]').forEach(el=>{el.classList.toggle('active',el.dataset.page===page);el.setAttribute('aria-current',el.dataset.page===page?'page':'false')});document.title='Rangeform · '+({overview:'Overview',signals:'Trade decision desk',scanner:'Opportunity scanner',news:'News & catalysts'}[page]);history.replaceState(null,'','#'+page);window.scrollTo({top:0,behavior:'instant'});closeNav();const discovery=document.querySelector('.discovery-card');const host=page==='scanner'?$('discoveryScannerHost'):$('discoveryHome');if(discovery&&host)host.after(discovery);if(page==='news'&&!state.newsCache.has(state.newsCategory+'|'+$('newsQuery').value.trim()))loadNews();if(page==='signals'&&state.analysis)renderAnalysis(state.analysis);if((page==='overview'||page==='scanner')&&state.configured&&!state.discovery)discoverMarket()}
+const oldRoutes={
+  copilot:{page:'overview',focus:'assistantTitle'},ai:{page:'overview',focus:'assistantTitle'},
+  radar:{page:'scanner'},market:{page:'overview'},
+  risk:{page:'signals',focus:'riskAccount'},journal:{page:'signals',focus:'paperTitle'},
+  backtest:{page:'signals',focus:'agentRoomTitle'},settings:{page:'signals',focus:'connectionDetails'}
+};
+function setPage(page,focus=null){
+ if(!['overview','signals','scanner','news'].includes(page))return;
+ state.view=page;state.focus=focus;
+ document.body.dataset.view=page;
+ $('[data-section]').forEach(el=>el.classList.toggle('visible',el.dataset.section===page));
+ $('.nav-link[data-page]').forEach(el=>{
+  const active=el.dataset.page===page&&(el.dataset.focus||null)===focus;
+  el.classList.toggle('active',active);
+  if(active)el.setAttribute('aria-current','page');else el.removeAttribute('aria-current');
+ });
+ document.title='Rangeform · '+({overview:'Overview',signals:'Trade decision desk',scanner:'Opportunity scanner',news:'News & catalysts'}[page]);
+ history.replaceState(null,'','#'+page);
+ closeNav();
+ const discovery=document.querySelector('.discovery-card'),host=page==='scanner'?$('discoveryScannerHost'):$('discoveryHome');
+ if(discovery&&host)host.after(discovery);
+ if(page==='news'&&!state.newsCache.has(state.newsCategory+'|'+$('newsQuery').value.trim()))loadNews();
+ if(page==='signals'&&state.analysis)renderAnalysis(state.analysis);
+ if((page==='overview'||page==='scanner')&&state.configured&&!state.discovery)discoverMarket();
+ if(focus){
+  requestAnimationFrame(()=>{
+   const el=$(focus);if(el)el.closest('.card,.assistant-card,.paper-card')?.scrollIntoView({behavior:'smooth',block:'start'});
+  });
+ }else window.scrollTo({top:0,behavior:'instant'});
+}
+function routeFromHash(){
+ const raw=location.hash.slice(1).toLowerCase();
+ const legacy=oldRoutes[raw];
+ if(legacy){setPage(legacy.page,legacy.focus||null);return}
+ setPage(['overview','signals','scanner','news'].includes(raw)?raw:'overview');
+}
 function closeNav(){$('sidebar').classList.remove('open');$('navShade').hidden=true}
 function initTheme(){let theme;try{theme=localStorage.getItem('rf_v9_theme')||localStorage.getItem('rangeform_theme')||'light'}catch{}setTheme(theme)}
 function localClock(){try{$('localTime').textContent=new Intl.DateTimeFormat('en-CA',{timeZone:'America/Edmonton',hour:'numeric',minute:'2-digit'}).format(new Date())}catch{$('localTime').textContent='—'}}
@@ -274,7 +309,7 @@ data.items.forEach((item,i)=>{if(!/^https:\/\//.test(item.url))return;const row=
 }
 function selectArticle(item){$('articleContextTitle').textContent=item.title;$('articleContext').textContent=(item.source||'Source')+' · published '+stamp(item.date)+'. Verify the full article and price reaction before drawing conclusions. The headline is not a trade signal.';const link=$('articleOriginal');link.href=item.url;link.hidden=false}
 function bind(){initTheme();state.watch=readWatch();renderWatch();bindAgentFilters();$('showAgentRoom')?.addEventListener('click',()=>$('agentRoomTitle')?.scrollIntoView({behavior:'smooth',block:'start'}));scheduleDiscovery();localClock();setInterval(localClock,60000);
-$$('[data-page]').forEach(el=>el.addEventListener('click',()=>setPage(el.dataset.page)));
+$('[data-page]').forEach(el=>el.addEventListener('click',()=>setPage(el.dataset.page,el.dataset.focus||null)));
 $('mobileMenu').onclick=()=>{$('sidebar').classList.toggle('open');$('navShade').hidden=!$('sidebar').classList.contains('open')};$('navShade').onclick=closeNav;
 $('themeToggle').onclick=()=>setTheme(document.body.dataset.theme==='dark'?'light':'dark');
 $('providerBadge').onclick=()=>setPage('signals');
@@ -289,7 +324,8 @@ $('riskAccount').addEventListener('input',renderRisk);$('riskPercent').addEventL
 $('newsSearchBtn').onclick=()=>loadNews(true);$('newsQuery').addEventListener('keydown',e=>{if(e.key==='Enter')loadNews(true)});
 $$('[data-category]').forEach(el=>el.onclick=()=>{state.newsCategory=el.dataset.category;$$('[data-category]').forEach(x=>x.classList.toggle('selected',x===el));loadNews()});
 window.addEventListener('resize',()=>{if(state.analysis)drawChart(state.analysis)});
-loadProvider();setPage(['overview','signals','scanner','news'].includes(location.hash.slice(1))?location.hash.slice(1):'overview');
+loadProvider();window.addEventListener('hashchange',routeFromHash);
+routeFromHash();
 }
 document.addEventListener('DOMContentLoaded',bind);
 })();

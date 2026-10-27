@@ -1,0 +1,60 @@
+/* Unified V10 account utility: visual match to current light/dark research workspace.
+   Preserves all existing Firebase + D1 form element IDs and account.js behavior. */
+:root{--bg:#f6f8fb;--panel:#fff;--edge:#e1e8ef;--text:#17263a;--sub:#62748b;--accent:#315e87;--soft:#f0f5f9;--shadow:0 12px 35px rgba(26,53,80,.045)}
+body{background:var(--bg);color:var(--text);font-family:Inter,"DM Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;font-size:14px;line-height:1.6;min-height:100vh;-webkit-font-smoothing:antialiased}
+body.dark{--bg:#101923;--panel:#192635;--edge:#364b5f;--text:#eef4fa;--sub:#b0c0ce;--accent:#a8c6e4;--soft:#243549;--shadow:0 10px 33px rgba(0,0,0,.07)}
+.bar{position:sticky;top:0;z-index:25;min-height:76px;height:auto;padding:12px clamp(14px,2.6vw,38px);display:flex;align-items:center;gap:20px;border-bottom:1px solid var(--edge);background:var(--panel);box-shadow:none}
+.bar .brand{gap:10px;min-width:175px}
+.bar .brand b{font-family:inherit;font-size:22px!important;font-weight:800;letter-spacing:-.06em;text-transform:none;color:var(--text)}
+.bar .brand small{font-size:9px;font-weight:800;letter-spacing:.14em;color:var(--sub)}
+.bar .nav{position:static!important;transform:none!important;top:auto!important;left:auto!important;width:auto!important;min-width:0!important;max-width:none!important;margin-left:auto;display:flex;align-items:center;gap:5px;background:var(--soft);padding:4px;border:1px solid var(--edge);border-radius:12px}
+.bar .nav a{display:flex!important;padding:11px 13px!important;font-size:12px!important;font-weight:720;white-space:nowrap;color:var(--sub);border-radius:9px;border:1px solid transparent;min-height:40px}
+.bar .nav a.active{color:var(--text);background:var(--panel);border-color:var(--edge);box-shadow:var(--shadow)}
+.bar .nav a:hover{color:var(--accent);background:var(--panel)}
+.bar .head-actions{margin-left:0}
+.icon-btn{border:1px solid var(--edge);background:var(--soft);border-radius:10px;color:var(--text);min-height:40px;width:40px}
+.wrap{max-width:1350px;margin:0 auto;padding:32px clamp(14px,2.5vw,38px) 40px}
+.hero{margin:0 0 20px}.hero h1{font-size:clamp(34px,3.8vw,48px);font-weight:810;letter-spacing:-.055em;line-height:1.1;margin:10px 0}
+.hero h1 em{color:var(--accent);font-style:normal;font-weight:760}
+.hero p{color:var(--sub);font-size:14px;line-height:1.65;max-width:660px}
+.overline{font-weight:820;font-size:10px;letter-spacing:.14em;color:var(--accent)}
+.tile{border-radius:16px;box-shadow:var(--shadow);border-color:var(--edge);background:var(--panel)}
+.tile.content{padding:20px 22px}
+.tile.content h3{font-size:20px;letter-spacing:-.04em;font-weight:770;line-height:1.25}
+.tile.content p{color:var(--sub);line-height:1.65}
+.grid.lower{grid-template-columns:repeat(2,minmax(0,1fr));gap:15px}
+.warning{border:1px solid var(--edge);border-left:3px solid var(--accent);border-radius:12px;background:var(--panel);color:var(--sub);padding:14px 16px;font-size:12px}
+.account-form{gap:13px}
+.account-form label{font-size:12px;color:var(--sub);font-weight:710;line-height:1.45}
+.account-form input,.account-form select,.account-form textarea,.ai-form input,.ai-form .account-model-label select{background:var(--soft);color:var(--text);border:1px solid var(--edge);border-radius:10px;padding:11px 13px;font-size:13px;min-height:43px}
+.account-form input:focus-visible,.account-form select:focus-visible,.account-form textarea:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.primary{background:#274f75;border-color:#274f75;color:#fff;padding:11px 16px;min-height:43px;border-radius:10px;font-weight:740;font-size:12px}
+.primary:hover{background:#366b9a}
+.pill{border:1px solid var(--edge);background:var(--soft);color:var(--text);border-radius:10px;padding:11px 15px;font-size:12px;min-height:42px}
+.account-history li,.ai-output{background:var(--soft);border:1px solid var(--edge);border-radius:11px;padding:15px}
+.ai-output{font-size:13px;line-height:1.7}
+.login-row{align-items:center}
+.login-row h3{margin:0}.login-row p{margin:5px 0 0}
+footer{border-top:1px solid var(--edge);padding:20px 0;color:var(--sub);display:flex;gap:12px;justify-content:space-between;align-items:center;font-size:11px}
+footer a{font-weight:760;color:var(--accent)}
+@media(max-width:1010px){
+ .bar{flex-wrap:wrap;gap:8px}
+ .bar .brand{flex:1 1 auto}
+ .bar .nav{order:3;width:100%!important;display:grid;grid-template-columns:repeat(4,minmax(0,1fr))}
+ .bar .nav a{padding:10px 5px!important;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:11px!important}
+ .bar .head-actions{order:2}
+}
+@media(max-width:740px){
+ .bar{padding:calc(8px + env(safe-area-inset-top,0px)) 11px 8px;min-height:0}
+ .bar .brand b{font-size:19px!important}.bar .brand small{font-size:8px}
+ .bar .brand .mark{width:37px;height:37px;flex:0 0 37px}
+ .bar .nav{grid-template-columns:repeat(4,minmax(0,1fr));gap:2px}
+ .bar .nav a{font-size:10px!important;padding:8px 2px!important;min-height:38px}
+ .wrap{padding:23px 12px 35px}
+ .grid.lower{grid-template-columns:minmax(0,1fr)}
+ .tile.content{padding:16px}
+ .ai-form{grid-template-columns:1fr}
+ .login-row>div:first-child{flex-basis:100%}
+ footer{flex-direction:column;align-items:start}
+}
+@media(max-width:370px){.bar .nav a{font-size:9px!important}}

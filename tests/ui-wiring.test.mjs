@@ -3,19 +3,28 @@ import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 const load=path=>readFileSync(new URL('../'+path,import.meta.url),'utf8');
 
-test('all Rangeform screens have identical primary navigation and standalone manifest',()=>{
- for(const path of ['public/research.html','public/market.html','public/account.html']){
-  const html=load(path);
-  assert.match(html,/href="\/market\.html"/);
-  assert.match(html,/href="\/research"/);
-  assert.match(html,/href="\/account\.html"/);
-  assert.match(html,/rel="manifest" href="\/manifest\.webmanifest"/);
-  assert.match(html,/href="\/static\/rangeform-official-icon\.png\?v=1"/);
-  assert.match(html,/rangeform-official-icon\.png/);
- }
+test('V10 navigation is canonical while classic tools and account stay available',()=>{
+ const index=load('public/index.html');
+ const modern=load('public/v9.html');
+ const account=load('public/account.html');
+ const research=load('public/research.html');
+ const market=load('public/market.html');
+ const rules=load('public/_redirects');
  const manifest=JSON.parse(load('public/manifest.webmanifest'));
+ assert.match(index,/location.replace\('\/v9.html'/);
+ assert.match(market,/href="\/market.html"/); // preserved as explicitly optional classic source
+ assert.match(rules,/\/market.html \/v9.html#overview 302/);
+ assert.match(research,/location.replace\('\/v9.html'/);
+ assert.match(account,/href="\/v9.html#overview"/);
+ assert.match(account,/href="\/v9.html#scanner"/);
+ assert.match(account,/href="\/v9.html#signals"/);
+ assert.match(account,/href="\/account.html"/);
+ assert.match(account,/account-v11.css/);
+ assert.match(modern,/href="\/research.html\?classic=1"/); // intentional classic escape only
+ assert.match(modern,/rel="manifest" href="\/manifest.webmanifest\?v=11"/);
  assert.equal(manifest.display,'standalone');
  assert.equal(manifest.scope,'/');
+ assert.equal(manifest.start_url,'/v9.html#overview');
  assert.ok(manifest.icons.some(x=>x.sizes==='96x96'));
  assert.ok(manifest.icons.some(x=>x.type==='image/png'));
 });
