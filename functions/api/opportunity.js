@@ -18,7 +18,11 @@ export async function onRequestGet({request,env}){
   const raw=await getData(request,env,{symbol,interval,source:'twelvedata'});
   technical=analyze(raw.bars,symbol,raw.meta);
  }catch(e){
-  return json({error:'Verified provider history unavailable. '+String(e.message||'').slice(0,180),status:'NO_DATA',provider_ready:false},503);
+  const limited=e?.code==='PROVIDER_RATE_LIMIT';
+  return new Response(JSON.stringify({error:(limited?'Twelve Data credit limit reached. ':'Verified provider history unavailable. ')+String(e.message||'').slice(0,210),
+   code:limited?'PROVIDER_RATE_LIMIT':'PROVIDER_UNAVAILABLE',retry_after_seconds:limited?(e.retryAfterSeconds||65):null,
+   status:'NO_DATA',provider_ready:false}),{status:limited?429:503,
+   headers:{'content-type':'application/json','cache-control':'no-store',...(limited?{'retry-after':String(e.retryAfterSeconds||65)}:{})}});
  }
  let news={state:'not-checked',items:[]};
  if(includeNews){
