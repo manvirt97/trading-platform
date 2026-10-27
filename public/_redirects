@@ -1,0 +1,6 @@
+# Rangeform V10 unified navigation. Use temporary redirects while old links update.
+# Keep /research.html available for explicit ?classic=1 deep links.
+# Cloudflare Pages processes redirects before static pages.
+/market.html /v9.html#overview 302
+/market /v9.html#overview 302
+/market/ /v9.html#overview 302
