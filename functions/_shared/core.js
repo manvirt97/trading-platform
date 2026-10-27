@@ -12,7 +12,25 @@ function atr(b,w=14){if(b.length<w+1||b.some(x=>x.high==null))return null;let tr
 export function analyze(b,symbol,meta={}){
  if(b.length<35)throw Error('Not enough completed bars');let p=b.map(x=>x.close),full=b.every(x=>x.open!==undefined),price=p.at(-1),ma20=sma(p,20),ma50=sma(p,50),r=rsi(p),a=full?atr(b):null,vol=full?b.map(x=>x.volume):[],v20=vol.length>20?mean(vol.slice(-21,-1)):0,vr=v20?round(vol.at(-1)/v20):null,change=pct(price,p.at(-2)),hi=Math.max(...b.slice(-21,-1).map(x=>full?x.high:x.close)),lo=Math.min(...b.slice(-21,-1).map(x=>full?x.low:x.close)),mom=pct(price,p.at(-6));let patterns=[];let add=(name,type,why)=>patterns.push({name,type,why});
  if(price>hi)add('20-bar breakout','bullish','The last close exceeds the previous 20 completed bars.');if(price<lo)add('20-bar breakdown','bearish','The last close is below the previous 20 completed bars.');let prior20=sma(p.slice(0,-1),20);if(price>ma20&&p.at(-2)<=prior20)add('MA20 reclaim','bullish','Price reclaimed its 20-bar average.');if(price<ma20&&p.at(-2)>=prior20)add('MA20 loss','bearish','Price fell below its 20-bar average.');
- if(full){let c=b.at(-1),pr=b.at(-2),body=Math.abs(c.close-c.open),span=Math.max(.00001,c.high-c.low);if(body/span<.12)add('Doji / indecision','neutral','Small body relative to candle range.');else if(Math.min(c.open,c.close)-c.low>2*body&&c.high-Math.max(c.open,c.close)<body)add('Lower-wick rejection','neutral','Strong intrabar rebound; requires confirmation.');if(pr.close<pr.open&&c.close>c.open&&c.open<=pr.close&&c.close>=pr.open)add('Bullish engulfing','bullish','Current bullish body encompasses prior bearish body.');if(pr.close>pr.open&&c.close<c.open&&c.open>=pr.close&&c.close<=pr.open)add('Bearish engulfing','bearish','Current bearish body encompasses prior bullish body.')}
+ if(full){
+  const c=b.at(-1),pr=b.at(-2);
+  const body=Math.abs(c.close-c.open),span=Math.max(.00001,c.high-c.low);
+  const upper=c.high-Math.max(c.open,c.close),lower=Math.min(c.open,c.close)-c.low;
+  const priorBody=Math.abs(pr.close-pr.open);
+  if(body/span<=.12)add('Doji / indecision','neutral','Open and close are close together; neither side is clearly dominant.');
+  if(lower>=Math.max(body*2,span*.45)&&upper<=span*.2)
+   add('Hammer-like lower wick','neutral','A long lower shadow shows price rejection. A confirmed reversal needs a preceding downtrend and later bullish bar.');
+  if(upper>=Math.max(body*2,span*.45)&&lower<=span*.2)
+   add('Shooting-star-like upper wick','neutral','A long upper shadow shows selling pressure. A bearish reversal needs a preceding uptrend and later confirmation.');
+  if(c.high<=pr.high&&c.low>=pr.low)
+   add('Inside bar / compression','neutral','The latest candle range is contained in the previous candle. Direction is unresolved until a valid range break.');
+  if(c.high>pr.high&&c.low<pr.low)
+   add('Outside bar / volatility','neutral','Both sides of the previous bar were exceeded. This is volatility, not a directional entry.');
+  if(pr.close<pr.open&&c.close>c.open&&c.open<=pr.close&&c.close>=pr.open&&body>=priorBody*.9)
+   add('Bullish engulfing','bullish','The latest bullish real body surrounds the preceding bearish body; confirmation is still required.');
+  if(pr.close>pr.open&&c.close<c.open&&c.open>=pr.close&&c.close<=pr.open&&body>=priorBody*.9)
+   add('Bearish engulfing','bearish','The latest bearish real body surrounds the preceding bullish body; confirmation is still required.');
+ }
  if(r<30)add('RSI oversold','neutral','Weak momentum; not necessarily a reversal.');if(r>70)add('RSI overbought','neutral','Strong momentum; not necessarily a sell signal.');
  let components=[{name:'Trend vs MA20',impact:price>ma20?16:-16,reason:'Close '+(price>ma20?'above':'below')+' 20-bar average'}, {name:'Trend vs MA50',impact:ma50?(price>ma50?12:-12):0,reason:ma50?'Longer trend proxy':'MA50 unavailable'}, {name:'5-bar momentum',impact:mom>1?10:mom< -1?-10:0,reason:'Directional momentum, not certainty'}, {name:'RSI regime',impact:r>50&&r<70?5:r<40?-5:0,reason:'Momentum confirmation'}, {name:'Range break',impact:price>hi?15:price<lo?-15:0,reason:'Close vs prior 20-bar range'},{name:'Volume context',impact:vr>1.5&&price>p.at(-2)?5:0,reason:full?'Relative trading activity':'Unavailable for close-only sample'}];
  let score=Math.min(100,Math.max(0,50+components.reduce((a,c)=>a+c.impact,0))),regime=score>=65?'Constructive':score<=35?'Caution':'Mixed';let lr=[];for(let i=Math.max(1,p.length-21);i<p.length;i++)lr.push(Math.log(p[i]/p[i-1]));let sig=std(lr);
