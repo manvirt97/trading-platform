@@ -27,6 +27,19 @@ export function openingRange(bars,interval,now=new Date()){
  const openingLow=Math.min(...morning.map(b=>Number(b.low)));
  return {state:'ready',high:round(openingHigh,4),low:round(openingLow,4),session_day:today,required:expected,observed:distinct.size,window:'09:30–10:00 America/New_York'};
 }
+// Simple candle-volume histogram: volume assigned to each candle's typical price.
+// This is NOT Level II, resting orders, footprint, volume at executed prices, or options flow.
+export function candleVolumeProfile(bars,steps=12){
+ const clean=(bars||[]).slice(-120).filter(b=>[b.high,b.low,b.close,b.volume].every(v=>Number.isFinite(Number(v)))&&Number(b.volume)>=0);
+ if(clean.length<12)return {state:'unavailable',bins:[],method:'Historical candle-volume proxy; NOT order-book depth.'};
+ const values=clean.map(b=>(Number(b.high)+Number(b.low)+Number(b.close))/3);
+ const min=Math.min(...values),max=Math.max(...values),spread=max-min;
+ if(!Number.isFinite(spread)||spread<=0)return {state:'unavailable',bins:[],method:'Historical candle-volume proxy; NOT order-book depth.'};
+ const bins=Array.from({length:steps},(_,i)=>({mid:round(min+(i+.5)*spread/steps,4),volume:0}));
+ for(let i=0;i<clean.length;i++){const b=Math.max(0,Math.min(steps-1,Math.floor((values[i]-min)/spread*steps)));bins[b].volume+=Number(clean[i].volume)}
+ const peak=Math.max(...bins.map(b=>b.volume),1);
+ return {state:'historical-proxy',method:'Completed-candle volume allocated to typical price, not exchange-executed volume-at-price or order-book liquidity.',bins:bins.map(b=>({price:b.mid,relative_intensity:round(100*b.volume/peak,1)}))};
+}
 export function evaluateOpportunity(analysis, news={state:'not-checked',items:[]}, now=new Date()){
  const bars=Array.isArray(analysis?.bar_history)?analysis.bar_history:[];
  const symbol=String(analysis?.symbol||'').slice(0,10);
@@ -84,7 +97,7 @@ export function evaluateOpportunity(analysis, news={state:'not-checked',items:[]
   source:'Twelve Data historical OHLCV (not an executable quote)',source_status:usable?'historical-verified-structure':'unavailable',
   setup_score:Number.isFinite(score)?score:null,opening_range:range,
   observations,news:{state:newsState,stories:newsItems,recent_headlines_24h:recentCount,interpretation:'Headlines are context only; no verified directional sentiment, event impact or real-time price reaction is inferred.'},
-  plan,
+  plan,volume_profile:candleVolumeProfile(bars),
   explanation:status==='NO_DATA'?'No valid authorized completed OHLCV bars.':status==='WAIT_STALE'?'No current confirmation: the market is closed, the daily interval is historical, or the last intraday bar is stale.':status==='BUY_WATCH'?'Conditional bullish opening-range breakout with volume and trend confirmation. Broker execution conditions and news impact remain unverified.':status==='SELL_WATCH'?'Conditional bearish opening-range breakdown with volume and trend confirmation; not a short order or a sell mandate.':'No confirmed opening-range setup. Wait for complete opening bars, volume, direction and a fresh session.',
   cautions:['Research/watch signal ONLY; not advice, a quote, or an order.','Never use indicator alignment as probability of profit.','Opening-range breakout cannot guarantee profitable trades.','No bid/ask spread, slippage, options chain, level-2/order-book depth, or broker position data verified.','Market news can be late, irrelevant or incomplete.']
  };
