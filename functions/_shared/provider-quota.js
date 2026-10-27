@@ -85,6 +85,14 @@ export async function getTwelveData({request,env,symbol,interval,fetcher=fetch})
    err.code=code===403?'PROVIDER_ENTITLEMENT':'PROVIDER_UNAVAILABLE';err.status=code===403?403:503;throw err;
   }
   if(!body||!Array.isArray(body.values))throw Error('Twelve Data returned no verified dated price bars.');
+  // Check prices, timestamps and enough *completed* candles BEFORE marking the
+  // provider healthy or caching a supposed success.
+  const {parseTwelve}=await import('./core.js');
+  try{parseTwelve(body,interval)}
+  catch(e){
+   await saveCache(statusKey,{kind:'invalid-bars',checked_at:new Date().toISOString()},30);
+   throw e;
+  }
   const credits=Number(response.headers.get('api-credits-left'));
   const headersCredits=Number.isFinite(credits)&&response.headers.has('api-credits-left')?credits:null;
   const fetched_at=new Date().toISOString();
