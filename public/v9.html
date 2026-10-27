@@ -5,8 +5,8 @@
 <meta name="description" content="Rangeform: evidence-first market research, conditional trade plans and market news.">
 <title>Rangeform — Market intelligence</title>
 <link rel="icon" type="image/png" href="/static/rangeform-official-icon.png">
-<link rel="stylesheet" href="/static/v9.css?v=4">
-<script src="/static/v9.js?v=4" defer></script><script src="/static/v9-ai.js?v=1" type="module"></script>
+<link rel="stylesheet" href="/static/v9.css?v=5">
+<script src="/static/v9.js?v=5" defer></script><script src="/static/v9-ai.js?v=1" type="module"></script><script src="/static/v9-paper.js?v=1" defer></script>
 </head>
 <body data-view="overview" data-theme="light">
 <div class="app">
@@ -107,6 +107,16 @@
       <div class="right-flow">
        <article class="card conditions-card"><div class="eyebrow">THREE POSSIBLE OUTCOMES</div><h2>What would change the outlook?</h2><div class="condition buy"><span class="condition-icon">↗</span><div><strong>Possible long</strong><p id="longCondition">Wait for validated resistance and volume confirmation.</p></div></div><div class="condition sell"><span class="condition-icon">↘</span><div><strong>Possible exit / bearish watch</strong><p id="shortCondition">Wait for validated support and downside confirmation.</p></div></div><div class="condition wait"><span class="condition-icon">—</span><div><strong>Wait</strong><p id="waitCondition">No data, conflicting evidence or stale bars mean no actionable signal.</p></div></div></article>
        <article class="card risk-card"><div class="card-head"><div><div class="eyebrow">HYPOTHETICAL TRADE PLAN</div><h2>Plan your risk</h2></div></div><div class="risk-fields"><label>ACCOUNT VALUE ($)<input id="riskAccount" type="number" min="1" step="100" value="10000"></label><label>RISK PER TRADE (%)<input id="riskPercent" type="number" min=".1" max="1" step=".1" value=".5"></label></div><div class="risk-details" id="riskResults"><p>Entry, stop and position size require validated chart levels.</p></div><p class="subtle-note">Educational position sizing only. Stops can slip; actual losses can exceed estimates.</p></article>
+       <article class="card paper-card" aria-labelledby="paperTitle">
+  <div class="card-head"><div><div class="eyebrow">PAPER PRACTICE · NO BROKER ORDERS</div><h2 id="paperTitle">Practice the trade</h2><p>Hypothetical entries and exits using completed-bar reference prices, not actual fills.</p></div></div>
+  <div class="paper-action-row"><button id="paperOpen" type="button" class="primary-btn" disabled>Record paper long</button><button id="paperClose" type="button" class="subtle-btn" disabled>Close at latest bar</button></div>
+  <div class="paper-kill"><label><input id="paperKill" type="checkbox"> Pause new paper trades</label><small>Local practice kill switch — does not control any brokerage account.</small></div>
+  <p class="subtle-note" id="paperStatus" role="status">Only fresh server-confirmed bullish watches are eligible for a new simulated position.</p>
+  <div id="paperStats" class="paper-stats">No closed practice positions.</div>
+  <div class="table-scroller"><table class="scanner-table paper-table"><thead><tr><th>SYMBOL</th><th>STATUS</th><th>QUANTITY</th><th>ENTRY / EXIT</th><th>NET P/L</th></tr></thead><tbody id="paperJournal"></tbody></table></div>
+  <div class="paper-actions"><button id="paperExport" type="button" class="subtle-btn">Export practice CSV</button></div>
+  <p class="subtle-note">Up to three open practice positions. Trading pauses after three consecutive losses or a 2% realized daily drawdown. A flat 0.05% cost per side is modeled; gaps, realistic fills, and taxes are not modeled. Records are saved only in this browser.</p>
+</article>
        <article class="card data-card"><div class="eyebrow">SOURCE TRANSPARENCY</div><h2>Market data connection</h2><div id="connectionDetails"><p>Checking provider settings…</p></div><a class="subtle-btn button-link" href="/research.html?classic=1#settings">Data setup &amp; connection ↗</a></article>
       </div>
     </div>
