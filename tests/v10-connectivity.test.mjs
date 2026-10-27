@@ -87,3 +87,12 @@ test('V10 visible scanner, 11-Claude console, supervisor and verified provider s
  assert.match(auth,/\/api\/tv-alerts/);
  assert.match(html,/Paper|paper/i);
 });
+
+
+test('Claude 5.5 request omits banned sampling parameters and uses model-correct thinking mode',()=>{
+ const code=read('functions/api/claude-desk.js');
+ assert.doesNotMatch(code,/temperature\s*:/);
+ assert.doesNotMatch(code,/top_p\s*:/);
+ assert.doesNotMatch(code,/top_k\s*:/);
+ assert.match(code,/thinking:\{type:model==='claude-sonnet-5-5'\?'between_tools':'disabled'\}/);
+});
