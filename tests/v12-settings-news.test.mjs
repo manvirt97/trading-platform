@@ -9,7 +9,7 @@ test('Settings is a first-class sidebar page, not a link to the signal data pane
  assert.match(html,/data-page="settings"[^>]*>\s*<span class="nav-icon">⚙<\/span> Settings/);
  assert.match(html,/<section class="page settings-page" data-section="settings"/);
  for(const id of ['settingsTheme','settingsNewsDensity','settingsNewsCategory','settingsProviderState','settingsProviderDescription','settingsCheckProvider'])assert.match(html,new RegExp('id="'+id+'"'));
- assert.match(js,/\['overview','signals','scanner','news','settings'\]/);
+ assert.match(js,/\['overview','signals','scanner','news','settings','studio'\]/);
  assert.match(js,/settings:'Settings'/);
  assert.match(js,/page==='settings'/);
  assert.doesNotMatch(js,/settings:\{page:'signals',focus:'connectionDetails'\}/);
@@ -42,7 +42,7 @@ test('Local visual and news preferences are actually bound, persisted and restor
  assert.match(js,/\$\('settingsNewsCategory'\)\.onchange/);
  assert.match(js,/initTheme\(\);initWorkspacePrefs\(\)/);
  assert.match(html,/v12-settings-news\.css\?v=1/);
- assert.match(html,/v9\.js\?v=11/);
+ assert.match(html,/v9\.js\?v=12/);
 });
 test('Settings never asks users to paste market data API keys into browser storage',()=>{
  const html=read('public/v9.html'),js=read('public/static/v9.js');
