@@ -3,6 +3,7 @@
 import {getData,json} from '../_shared/http.js';
 import {analyze,validateSymbol} from '../_shared/core.js';
 import {evaluateOpportunity} from '../_shared/opportunity.js';
+import {runAgentRoom} from '../_shared/agent-room.js';
 import {onRequestGet as getNews} from './news.js';
 
 export async function onRequestGet({request,env}){
@@ -30,5 +31,6 @@ export async function onRequestGet({request,env}){
   }catch{news={state:'unverified',items:[]}}
  }
  const signal=evaluateOpportunity(technical,news);
- return json({opportunity:signal,analysis:technical,news_checked:includeNews});
+ const agent_room=runAgentRoom(technical,signal);
+ return json({opportunity:signal,agent_room,analysis:technical,news_checked:includeNews});
 }
