@@ -114,8 +114,29 @@ async function runClaudeCouncil(){
    const summary=document.createElement('p');summary.textContent=agent.assessment;
    block.append(name,summary);container.append(block);
   }
- }catch(e){badge.textContent='Claude request unavailable';$('claudeSupervisor').textContent=e.message+'. No AI trading conclusion was generated.'}
+ }catch(e){
+  const configError=/^CLAUDE_(INVALID_REQUEST|THINKING_CONFIG|MODEL_CONFIG|TOKEN_CONFIG|ACCESS|BILLING)/.test(String(e.code||''));
+  badge.textContent=configError?'Claude configuration needs attention':'Claude investigation unavailable';
+  const top=$('claudeSupervisor');top.replaceChildren();
+  const title=document.createElement('strong');title.textContent=configError?'Claude API rejected its request':'Claude AI investigation could not complete';
+  const message=document.createElement('p');message.textContent=e.message||'Unknown service error';
+  const note=document.createElement('p');note.textContent='The separate Twelve Data historical feed can still work. No AI trading conclusion was generated; review the reason above and verify your Anthropic Console / Cloudflare secret before rerunning.';
+  top.append(title,message,note);
+ }
  finally{btn.disabled=false;btn.textContent='Investigate with 11 Claude agents'}
+}
+async function checkClaudeHealth(){
+ const button=$('checkClaudeHealth'),status=$('claudeHealthState');if(!button||!status)return;
+ if(!state.user){status.textContent='Sign in with Google from Research AI before checking private model access. This test does not run a billed generation.';return}
+ button.disabled=true;button.textContent='Checking model access…';status.textContent='Contacting the Anthropic Models API without a paid research generation…';
+ try{
+  const token=await state.user.getIdToken();
+  const r=await fetch('/api/claude-health',{cache:'no-store',headers:{Authorization:'Bearer '+token,'Accept':'application/json'}});
+  const data=await r.json();
+  const lines=(data.models||[]).map(m=>m.role+': '+m.model+' — '+m.status+(m.reason?' ('+m.reason+')':''));
+  status.textContent=[data.overall==='models-accessible'?'Both requested models are accessible. This does not verify paid generation.':'Connection needs attention.',...lines,data.note||data.error||''].filter(Boolean).join(' | ');
+ }catch(e){status.textContent='Model check unavailable: '+String(e.message).slice(0,180)}
+ finally{button.disabled=false;button.textContent='Test Claude model access'}
 }
 async function inspectConnection(kind){
  const target=$('integrationResults'),button=$(kind==='tv'?'tvRefresh':'cronRefresh');
@@ -142,7 +163,31 @@ function bind(){
  $('runClaudeCouncil')?.addEventListener('click',runClaudeCouncil);
  $('tvRefresh')?.addEventListener('click',()=>inspectConnection('tv'));
  $('cronRefresh')?.addEventListener('click',()=>inspectConnection('cron'));
- fetch('/api/status',{cache:'no-store'}).then(r=>r.json()).then(x=>{const el=$('tvState');if(el)el.textContent=x.tradingview_bridge_configured?'Receiver configured · verify webhook test delivery':'Not configured. Set dedicated token and TV_EVENTS KV.'}).catch(()=>{$('tvState').textContent='Status unavailable'});
+ $('checkClaudeHealth')?.addEventListener('click',checkClaudeHealth);
+ // Status reflects configuration only, not verified delivery. Never allow
+ // an unavailable optional service to masquerade as a working button.
+ fetch('/api/status',{cache:'no-store'}).then(async response=>{
+  if(!response.ok)throw Error('Service status unavailable');
+  return response.json();
+ }).then(x=>{
+  const tv=Boolean(x.tradingview_bridge_configured);
+  const scanner=Boolean(x.scheduled_scanner_storage_bound);
+  const p=x.tradingview_components||{};
+  const missing=[
+   !p.receiver_token?'encrypted webhook token':null,
+   !p.event_store?'TV_EVENTS KV binding':null,
+   !p.private_owner?'private owner ID':null
+  ].filter(Boolean);
+  $('tvState').textContent=tv?'Configured · delivery unverified':'Not connected · missing '+missing.join(', ');
+  $('cronState').textContent=scanner?'Storage connected · Worker deployment and successful runs unverified':'Not connected · bind SCANNER_SNAPSHOTS and deploy the separate Worker';
+  $('tvRefresh').disabled=!tv;
+  $('cronRefresh').disabled=!scanner;
+  $('integrationResults').textContent=tv||scanner?'Check any connected integration here after sign-in. Presence of a binding alone does not verify a successful event.':'These optional integrations are not active. Use the setup steps below to connect them.';
+ }).catch(()=>{
+  $('tvState').textContent='Could not check TradingView status.';
+  $('cronState').textContent='Could not check scheduled scanner status.';
+  $('tvRefresh').disabled=true;$('cronRefresh').disabled=true;
+ });
  window.addEventListener('rangeform:discovery',event=>{state.discovery=event.detail;const data=state.discovery;
   if(data?.items?.length)answer('SCAN UPDATED · '+time(data.checked_at)+'\n\n'+groundedReply());
   else answer('MARKET DATA NOT READY\n\n'+(data?.reason||'No verified scan available.'));

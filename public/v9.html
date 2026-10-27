@@ -5,13 +5,13 @@
 <meta name="description" content="Rangeform: evidence-first market research, conditional trade plans and market news.">
 <title>Rangeform — Market intelligence</title>
 <link rel="icon" type="image/png" href="/static/rangeform-official-icon.png">
-<link rel="stylesheet" href="/static/v9.css?v=8"><link rel="stylesheet" href="/static/v11-mobile.css?v=1"><link rel="stylesheet" href="/static/v12-settings-news.css?v=1"><link rel="stylesheet" href="/static/v13-premium.css?v=1">
-<script src="/static/v9.js?v=12" defer></script><script type="module" src="/static/research-studio.js?v=1"></script><script src="/static/v9-ai.js?v=4" type="module"></script><script src="/static/v9-paper.js?v=1" defer></script>
+<link rel="stylesheet" href="/static/v9.css?v=8"><link rel="stylesheet" href="/static/v11-mobile.css?v=1"><link rel="stylesheet" href="/static/v12-settings-news.css?v=1"><link rel="stylesheet" href="/static/v13-premium.css?v=1"><link rel="stylesheet" href="/static/v14-unified.css?v=1">
+<script src="/static/v9.js?v=13" defer></script><script type="module" src="/static/research-studio.js?v=1"></script><script src="/static/v9-ai.js?v=5" type="module"></script><script src="/static/v9-paper.js?v=1" defer></script>
 </head>
 <body data-view="overview" data-theme="light">
 <div class="app">
  <aside class="sidebar" id="sidebar">
-  <a class="brand" href="/v9.html#overview" aria-label="Rangeform home"><img src="/static/rangeform-official-icon.png" alt="" width="37" height="37"><span><strong>Rangeform</strong><small>V13 · RESEARCH &amp; DECISIONS</small></span></a>
+  <a class="brand" href="/v9.html#overview" aria-label="Rangeform home"><img src="/static/rangeform-official-icon.png" alt="" width="37" height="37"><span><strong>Rangeform</strong><small>RESEARCH &amp; DECISIONS</small></span></a>
   <div class="nav-label">WORKSPACE</div>
   <nav class="side-nav" aria-label="Main navigation">
    <button class="nav-link active" data-page="overview"><span class="nav-icon">◫</span> Overview</button>
@@ -34,7 +34,7 @@
    <button id="mobileMenu" class="icon-button mobile-menu" type="button" aria-label="Open navigation">☰</button>
    <a class="mobile-header-brand" href="/v9.html#overview" aria-label="Rangeform overview"><img src="/static/rangeform-official-icon.png" width="25" height="25" alt=""><strong>Rangeform</strong></a>
    <div class="top-search"><span aria-hidden="true">⌕</span><input type="search" id="globalSearch" maxlength="12" placeholder="Search a symbol (e.g. NVDA, SHOP)" aria-label="Search stock symbol"><kbd>↵</kbd></div>
-   <div class="top-right"><span class="version-marker" title="Rangeform unified research release">V13 · RESEARCH STUDIO</span><div class="market-time"><span>CALGARY</span><strong id="localTime">--:--</strong></div><button id="providerBadge" type="button" class="provider-pill" title="Market data status. Tap for details."><span id="feedDot" class="status-dot amber"></span><span id="feedLabel">Checking feed</span></button><button id="themeToggle" class="icon-button" type="button" aria-label="Toggle light and dark theme">◐</button><a class="user-circle" href="/account.html" title="Account and private settings" aria-label="My workspace">↗</a></div>
+   <div class="top-right"><span class="version-marker" title="Rangeform unified research release">RANGEFORM · STUDIO</span><div class="market-time"><span>CALGARY</span><strong id="localTime">--:--</strong></div><button id="providerBadge" type="button" class="provider-pill" title="Market data status. Tap for details."><span id="feedDot" class="status-dot amber"></span><span id="feedLabel">Checking feed</span></button><button id="themeToggle" class="icon-button" type="button" aria-label="Toggle light and dark theme">◐</button><a class="user-circle" href="/account.html" title="Account and private settings" aria-label="My workspace">↗</a></div>
   </header>
   <main class="main" id="main">
    <section class="page visible" data-section="overview">
@@ -90,15 +90,7 @@
  <div class="claude-supervisor" id="claudeSupervisor"><strong>Supervisor verdict</strong><p>No Claude investigation has been run. Technical safety controls remain independent.</p></div>
  <div id="claudeAgentResults" class="claude-agent-list"><p class="subtle-note">Individual Claude specialist reports appear here, including abstentions and failed calls.</p></div>
  </article>
- <article class="card integrations-card" aria-labelledby="integrationsTitle">
- <div class="eyebrow">REAL-TIME INPUTS · OPTIONAL CONNECTIONS</div><h2 id="integrationsTitle">TradingView & scheduled scans</h2>
- <p>TradingView sends Pine Script alerts into a secured webhook. Market-data quotes must still come from an entitled licensed provider. External alerts never place orders.</p>
- <div class="integration-state"><strong>TradingView webhook</strong><span id="tvState">Checking configuration…</span></div>
- <div class="integration-state"><strong>Scheduled scanner</strong><span id="cronState">Requires separate Cloudflare Worker and shared KV binding</span></div>
- <div class="integration-actions"><button id="tvRefresh" class="subtle-btn" type="button">View my TradingView alerts</button><button id="cronRefresh" class="subtle-btn" type="button">View latest scheduled scan</button></div>
- <div id="integrationResults" class="integration-results" aria-live="polite">Sign in with Google, configure the bridge and click a button to view events.</div>
- <p class="subtle-note">The webhook uses a dedicated 32+ character integration token and sender verification. Never put a broker credential or Anthropic API key in a TradingView alert.</p>
- </article>
+ <div class="card integrations-shortcut"><strong>Optional integrations</strong><p>TradingView alerts and scheduled scans are managed in Settings, separately from the market-data feed.</p><button class="subtle-btn" type="button" data-page="settings">Manage integrations ↗</button></div>
  <article class="card agent-room-card" aria-labelledby="agentRoomTitle">
         <div class="card-head">
          <div><div class="eyebrow">MULTI-SPECIALIST RESEARCH · 22 CHECKS</div>
@@ -193,6 +185,21 @@
       <div class="settings-actions"><button id="settingsCheckProvider" class="subtle-btn" type="button">Check connection ↻</button><a class="subtle-btn button-link" href="https://github.com/manvirt97/trading-platform/blob/main/V9_IMPLEMENTATION.md" target="_blank" rel="noopener noreferrer">Data setup guide ↗</a></div>
       <p class="settings-footnote">Connection status does not verify streaming quotes, exchange licences, bid/ask spreads or brokerage access. Never enter secret market-data keys into this page.</p>
      </section>
+     <section class="card settings-panel" aria-labelledby="settingsAiTitle">
+      <div class="card-head"><div><div class="eyebrow">AI SERVICE HEALTH</div><h2 id="settingsAiTitle">Claude model diagnostics</h2><p>Check model access without running the eleven-agent investigation or spending generation tokens.</p></div></div>
+      <p id="claudeHealthState" class="settings-footnote" role="status">Sign in with Google to check configured Anthropic model access. An enabled key does not guarantee successful requests.</p>
+      <div class="settings-actions"><button type="button" id="checkClaudeHealth" class="subtle-btn">Test Claude model access</button><a class="subtle-btn button-link" href="https://console.anthropic.com/" target="_blank" rel="noopener noreferrer">Anthropic Console ↗</a></div>
+     </section>
+ <article class="card integrations-card" aria-labelledby="integrationsTitle">
+ <div class="eyebrow">INTEGRATIONS · CONFIGURATION</div><h2 id="integrationsTitle">Optional market integrations</h2>
+ <p>These services require separate Cloudflare resources. A green market-data indicator does not mean these optional services are connected.</p>
+ <div class="integration-state"><strong>TradingView webhook</strong><span id="tvState">Checking configuration…</span></div>
+ <div class="integration-state"><strong>Scheduled scanner</strong><span id="cronState">Requires separate Cloudflare Worker and shared KV binding</span></div>
+ <div class="integration-actions"><button id="tvRefresh" class="subtle-btn" type="button" disabled title="Configure TradingView first">View my TradingView alerts</button><button id="cronRefresh" class="subtle-btn" type="button" disabled title="Deploy scanner first">View latest scheduled scan</button></div>
+ <div id="integrationResults" class="integration-results" aria-live="polite">Sign in with Google, configure the bridge and click a button to view events.</div>
+ <details class="integration-guide"><summary>Set up TradingView securely</summary><ol><li>Create a Cloudflare KV namespace and bind it to this Pages project as <code>TV_EVENTS</code>.</li><li>Create an encrypted <code>TRADINGVIEW_WEBHOOK_TOKEN</code> secret (32+ random characters) and set private <code>TV_OWNER_UID</code> for the account allowed to view alerts.</li><li>Redeploy Cloudflare Pages, then configure an HTTPS TradingView alert using <code>/api/tv-alert</code> and TradingView's supported JSON schema. Enable TradingView two-factor authentication.</li><li>Send a harmless test alert and confirm receipt here. Never put broker passwords or Anthropic keys in webhook messages.</li></ol><a href="https://www.tradingview.com/support/solutions/43000529348-how-to-configure-webhook-alerts/" target="_blank" rel="noopener noreferrer">TradingView webhook documentation ↗</a></details>
+ <details class="integration-guide"><summary>Set up scheduled market scans</summary><ol><li>Create a KV namespace and bind it as <code>SCANNER_SNAPSHOTS</code> to both your Pages project and the separate scanner Worker.</li><li>Set authorized market-data secrets on the Worker and enable the licensed feed.</li><li>Deploy <code>wrangler.scanner.toml</code> with the real KV namespace ID, and confirm scheduled executions in Cloudflare logs.</li><li>After a market-hours run, check that a validated snapshot exists before opening it here.</li></ol></details><p class="subtle-note">These are optional research alerts, never brokerage execution. A connected resource is not proof that an alert or scheduled scan has successfully run.</p>
+ </article>
      <section class="card settings-panel" aria-labelledby="settingsAccountTitle">
       <div class="card-head"><div><div class="eyebrow">ACCOUNT &amp; SECURITY</div><h2 id="settingsAccountTitle">Your account</h2><p>Manage sign-in and account options separately from local preferences.</p></div></div>
       <div class="settings-actions"><a class="subtle-btn button-link" href="/account.html">Open account &amp; privacy settings ↗</a></div>

@@ -35,6 +35,6 @@ test('fallback redirects and old-page scripts cannot expose classic Research',()
  assert.doesNotMatch(read('public/v9.html'),/Open classic workspace|href="\/research\.html\?classic=1"/);
 });
 test('built version makes stale Cloudflare projects easily identifiable',()=>{
- assert.match(read('functions/api/status.js'),/app_version:'V13'/);
- assert.match(read('public/v9.html'),/V13 · RESEARCH &amp; DECISIONS/);
+ assert.match(read('functions/api/status.js'),/app_version:'V14'/);
+ assert.match(read('public/v9.html'),/RESEARCH &amp; DECISIONS/);
 });

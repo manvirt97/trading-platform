@@ -1,0 +1,156 @@
+/*
+ * RANGEFORM V14 · ONE SYSTEM / TWO FINISHES
+ * Light = uniformly porcelain / limestone (including sidebar).
+ * Dark = uniformly midnight graphite (including main, cards and sidebar).
+ * No permanently inverted sidebar, no neon, no blurred 20-layer overlays.
+ * Loaded AFTER V13. The shared tokens keep theme changes stable.
+ */
+body[data-theme="light"] {
+ color-scheme:light;
+ --bg:#f2f4f2;--card:#fbfcfb;--muted-card:#edf1f0;
+ --sidebar:#f5f7f6;--ink:#1d2c34;--secondary:#5c707b;--line:#d9e2df;
+ --blue:#365e6c;--blue-soft:#e6eeed;--green:#226f55;--green-soft:#e5f1e9;
+ --red:#a45355;--red-soft:#f8eeee;--amber:#8a6647;--amber-soft:#f5ece1;
+ --shadow:0 9px 25px rgba(29,45,51,.035);
+}
+body[data-theme="dark"] {
+ color-scheme:dark;
+ --bg:#101a22;--card:#17242e;--muted-card:#20303b;
+ --sidebar:#15212b;--ink:#e8efee;--secondary:#b3c5cc;--line:#324551;
+ --blue:#a4c1cb;--blue-soft:#243b46;--green:#85bca0;--green-soft:#223d34;
+ --red:#e1a8a8;--red-soft:#3f3136;--amber:#d3b28c;--amber-soft:#443b31;
+ --shadow:0 10px 27px rgba(3,9,15,.09);
+}
+body .app,body .content-shell{background:var(--bg)}
+body .sidebar {
+ background:var(--sidebar);border-right:1px solid var(--line);
+ box-shadow:none;
+}
+body .sidebar .brand{color:var(--ink)}
+body .sidebar .brand strong{color:var(--ink)}
+body .sidebar .brand small,body .sidebar .nav-label{color:var(--secondary)}
+body .sidebar .border-label{border-color:var(--line)}
+body .sidebar .nav-link,body .sidebar .side-nav .nav-link {
+ color:var(--secondary);border-color:transparent;
+}
+body .sidebar .nav-icon{color:var(--secondary)}
+body .sidebar .nav-link:hover,body .sidebar .side-nav .nav-link:hover {
+ background:var(--muted-card);color:var(--ink);border-color:var(--line);
+}
+body .sidebar .nav-link.active,body .sidebar .side-nav .nav-link.active {
+ background:var(--blue-soft);color:var(--ink);
+ border-color:var(--line);box-shadow:inset 3px 0 #b19b80;
+}
+body .sidebar .nav-link.active .nav-icon{color:var(--blue)}
+body .sidebar .nav-hint {
+ background:var(--muted-card);border-color:var(--line);color:var(--secondary);
+}
+body .sidebar .side-status{
+ background:var(--card);border-color:var(--line);
+}
+body .sidebar .side-status strong{color:var(--ink)}
+body .sidebar .side-status small,
+body .sidebar .side-footer>a{color:var(--secondary)}
+body .topbar {
+ background:var(--card);
+ border-color:var(--line);
+ color:var(--ink);
+ box-shadow:0 5px 15px rgba(13,26,36,.018);
+}
+body .top-search{
+ background:var(--muted-card);border-color:var(--line);
+}
+body .top-search input,body .top-search>span{color:var(--ink)}
+body .top-search input::placeholder{color:var(--secondary);opacity:.86}
+body .provider-pill,body .icon-button,body .user-circle{
+ background:var(--card);color:var(--ink);border-color:var(--line);
+}
+body .icon-button:hover,body .user-circle:hover{background:var(--muted-card)}
+body .version-marker{background:var(--muted-card);border-color:var(--line);color:var(--secondary)}
+body .card,body .studio-work,body .studio-nav{
+ background:var(--card);border-color:var(--line);box-shadow:var(--shadow);
+}
+body .studio-intro {
+ background:linear-gradient(115deg,var(--muted-card),var(--card) 82%);
+ border-color:var(--line);
+}
+body .studio-pill,body .studio-metric,body .research-footnote,body .research-field>input,
+body .research-field>select,body .research-field>textarea,
+body .studio-file-field,body .studio-evidence-label {
+ background:var(--muted-card);border-color:var(--line);color:var(--ink);
+}
+body .studio-pill{color:var(--secondary)}
+body .research-field>span,body .studio-metric>span{color:var(--secondary)}
+body .studio-tab{color:var(--secondary)}
+body .studio-tab:hover,body .studio-tab.active{background:var(--muted-card);color:var(--ink);border-color:var(--line)}
+body .studio-table th,body .studio-table td{color:var(--ink);border-color:var(--line)}
+body .primary-btn {background:#365e6c;border-color:#365e6c;box-shadow:none;color:#fff}
+body .primary-btn:hover{background:#284b58;border-color:#284b58}
+body .subtle-btn,body .button-link,body .cell-btn{
+ background:var(--card);border-color:var(--line);color:var(--blue);
+ box-shadow:none;
+}
+body .subtle-btn:hover,body .button-link:hover,body .cell-btn:hover {background:var(--muted-card)}
+body .scanner-table th{background:var(--muted-card);color:var(--secondary)}
+body .page-heading p,body .card-head p{color:var(--secondary)}
+body .news-card .story-link{color:var(--ink)}
+body .news-card .story-context-panel,body .integration-results{
+ background:var(--muted-card);border-color:var(--line);color:var(--secondary);
+}
+body .claude-supervisor,body .claude-agent-entry,
+body .agent-summary,body .agent-grid article,
+body .paper-kill,body .settings-provider,
+body .risk-summary-grid>div {
+ background:var(--muted-card);border-color:var(--line);
+}
+body .setting-field select,body .settings-page .setting-field select {
+ background:var(--muted-card);border-color:var(--line);color:var(--ink);
+}
+body .studio-source,body .integration-state{border-color:var(--line)}
+body .eyebrow{color:var(--secondary)}
+body[data-theme="dark"] .studio-intro h1 em,
+body[data-theme="light"] .studio-intro h1 em{color:var(--amber)}
+body[data-theme="dark"] .studio-result-actions button:first-child{
+ background:var(--blue-soft);border-color:var(--line);color:var(--ink);
+}
+body[data-theme="dark"] .story-meta,body[data-theme="dark"] .claude-agent-entry p,
+body[data-theme="dark"] .integrations-card p{color:var(--secondary)}
+/* Optional integrations are not trading signals. Accessible without page clutter. */
+.integrations-shortcut{
+ display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;
+ padding:14px 19px!important;
+}
+.integrations-shortcut strong{font-size:13px}
+.integrations-shortcut p{font-size:12px;margin:0;color:var(--secondary);flex:1 1 320px}
+.integrations-shortcut .subtle-btn{font-size:11px}
+.integration-guide{margin:9px 0;border:1px solid var(--line);border-radius:10px;background:var(--muted-card);padding:9px 13px;font-size:12px}
+.integration-guide summary{font-weight:770;cursor:pointer;color:var(--ink);line-height:1.7}
+.integration-guide ol{margin:10px 0 8px;padding-left:21px;color:var(--secondary);line-height:1.85}
+.integration-guide code{color:var(--ink);overflow-wrap:anywhere}
+.integration-guide a{color:var(--blue);text-decoration:underline;text-underline-offset:2px}
+.integrations-card .integration-state{align-items:flex-start}
+.integrations-card .integration-state>span{overflow-wrap:anywhere;max-width:65%}
+.integrations-card .integration-actions button:disabled{
+ opacity:.53;cursor:not-allowed;
+}
+/* More readable agent errors. No oversized "unavailable" grid covering the entire screen. */
+body .claude-supervisor p{overflow-wrap:anywhere}
+body .claude-agent-list{max-height:360px}
+body .claude-agent-entry{padding:11px;border-radius:10px}
+/* A single theme for iOS header, the settings and deep research pages. */
+@media(max-width:940px){
+ body .topbar{background:var(--card)}
+ body .sidebar{background:var(--sidebar)}
+ body .mobile-header-brand{color:var(--ink)}
+ body .nav-shade{background:rgba(10,21,28,.42)}
+}
+@media(max-width:640px){
+ .integrations-shortcut{padding:13px 14px!important}
+ .integrations-shortcut p{flex-basis:100%}
+ .integrations-shortcut .subtle-btn{min-height:40px;width:100%}
+ .integrations-card .integration-state{flex-direction:column;gap:3px}
+ .integrations-card .integration-state>span{text-align:left;max-width:100%}
+ .integrations-card .integration-actions{flex-direction:column}
+ .integrations-card .integration-actions>button{width:100%}
+ .integrations-card .integration-guide{font-size:11.5px}
+}

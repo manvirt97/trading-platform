@@ -78,7 +78,7 @@ test('V10 visible scanner, 11-Claude console, supervisor and verified provider s
  const html=read('public/v9.html'),js=read('public/static/v9.js'),auth=read('public/static/v9-ai.js');
  for(const id of ['discoveryScannerHost','discoveryHome','supervisorHeadline','claudeDeskStatus','claudeDeskTitle','claudeAgentResults','claudeSupervisor','runClaudeCouncil','tvRefresh','cronRefresh'])
   assert.match(html,new RegExp('id="'+id+'"'));
- assert.match(html,/V13 · RESEARCH STUDIO/);
+ assert.match(html,/RANGEFORM · STUDIO/);
  assert.match(html,/Opportunity scanner/);
  assert.match(js,/host\.after\(discovery\)/);
  assert.match(js,/headlineSupervisor/);
@@ -89,10 +89,11 @@ test('V10 visible scanner, 11-Claude console, supervisor and verified provider s
 });
 
 
-test('Claude 5.5 request omits banned sampling parameters and uses model-correct thinking mode',()=>{
+test('Claude request uses a minimal Messages payload and no unsupported thinking flags',()=>{
  const code=read('functions/api/claude-desk.js');
  assert.doesNotMatch(code,/temperature\s*:/);
  assert.doesNotMatch(code,/top_p\s*:/);
  assert.doesNotMatch(code,/top_k\s*:/);
- assert.match(code,/thinking:\{type:model==='claude-sonnet-5-5'\?'between_tools':'disabled'\}/);
+ assert.match(code,/JSON.stringify\(\{model,max_tokens:maxTokens,system,messages:/);
+ assert.doesNotMatch(code,/thinking:\{type:model===/);
 });
