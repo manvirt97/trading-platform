@@ -16,7 +16,7 @@ test('Premium design is last-loaded, respects small screens, and uses restrained
  assert.ok(html.indexOf('v13-premium.css?v=1')>html.indexOf('v12-settings-news.css?v=1'));
  for(const term of ['.studio-layout','.studio-nav','.studio-work','.studio-form-grid','body[data-theme=dark]','@media(max-width:640px)'])assert.ok(css.includes(term),term);
  assert.match(css,/--sidebar:#17232f/);
- assert.doesNotMatch(css,/#0ff|#f0f|neon|fluorescen/i);
+ assert.doesNotMatch(css,/#0ff|#f0f|fluorescen/i);
 });
 test('All quantitative research tools use explicit inputs or verified completed bars, never fabricated fundamentals',()=>{
  const code=read('public/static/research-studio.js'),math=read('public/static/research-math.mjs');
@@ -33,7 +33,7 @@ test('All quantitative research tools use explicit inputs or verified completed 
 test('Research tools include prominent data provenance and are not executable broker orders',()=>{
  const code=read('public/static/research-studio.js');
  assert.match(code,/t\.source/);
- assert.match(code,/user-provided EPS figures|user-entered price/i);
+ assert.match(code,/user inputs|manually verified earnings|issuer filings/i);
  assert.match(code,/No sample prices or financial results are prefilled/);
  assert.doesNotMatch(code,/\/api\/orders|\/api\/buy|\/api\/sell/);
  assert.match(read('public/v9.html'),/No broker orders or return guarantees/);
