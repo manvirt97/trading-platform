@@ -42,7 +42,7 @@ export async function getData(request,env,force){
   return {bars:validateBars(force.bars),meta:{source:'user-csv',freshness:'USER IMPORT — VERIFY TIMESTAMPS',source_detail:'User-supplied bars; not independently verified',currency:force.currency==='CAD'?'CAD':'USD',interval,data_quality:'complete-ohlcv'}};
  }
  if(source!=='twelvedata')throw Error('Unsupported data source');
- if(env.LIVE_DATA_ENABLED!=='on')throw Error('Price-data gate is off. Authorize your provider, protect public endpoints, then set LIVE_DATA_ENABLED=on.');
+ if(env.LIVE_DATA_ENABLED!=='on')throw Error(env.TWELVEDATA_API_KEY||env.FINNHUB_API_KEY?'Live data is locked. Protect your site and verify authorized display entitlements before setting LIVE_DATA_ENABLED=on.':'Live data not connected: configure TWELVEDATA_API_KEY or an authorized licensed backup feed.');
  let primaryError='';
  if(env.TWELVEDATA_API_KEY){
   try{
