@@ -1,0 +1,248 @@
+/*
+  Rangeform Classic · Header layout repair (v10)
+  Last-loaded CSS: deliberately overrides the older absolute-positioned
+  three-tab navigation in experience.css. Do not reintroduce absolute
+  centering: it covered search at normal laptop widths.
+*/
+.topbar {
+  box-sizing: border-box;
+  min-width: 0;
+  overflow: visible;
+}
+.topbar > .top-left,
+.topbar > .global-nav,
+.topbar > .top-actions {
+  min-width: 0;
+  margin: 0;
+}
+.topbar > .global-nav {
+  position: static !important;
+  top: auto !important;
+  left: auto !important;
+  right: auto !important;
+  transform: none !important;
+  margin: 0 !important;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-items: stretch;
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: none !important;
+  padding: 4px;
+  gap: 5px;
+  border: 1px solid var(--border);
+  border-radius: 13px;
+  background: var(--surface);
+}
+.topbar > .global-nav > a {
+  min-width: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  line-height: 1.25;
+  padding: 10px 8px;
+  font-size: 12px !important;
+}
+.topbar > .top-left {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  overflow: hidden;
+}
+.topbar > .top-left .crumb {
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
+  white-space: nowrap;
+}
+.topbar > .top-left .crumb b {
+  display: inline-block;
+  max-width: 130px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.topbar > .top-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  width: 100%;
+  min-width: 0;
+  margin-left: 0 !important;
+}
+.topbar > .top-actions > .command-trigger {
+  display: flex;
+  flex: 1 1 auto;
+  min-width: 170px;
+  max-width: 420px;
+  width: auto;
+  overflow: hidden;
+  white-space: nowrap;
+}
+.topbar > .top-actions > .command-trigger > span:nth-child(2) {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.topbar > .top-actions > .command-trigger kbd { flex: 0 0 auto; }
+.topbar > .top-actions > .time-cluster,
+.topbar > .top-actions > .demo-pill,
+.topbar > .top-actions > .icon-btn {
+  flex-shrink: 0;
+}
+.topbar > .top-actions > .icon-btn { width: 36px; height: 36px; }
+
+/* Big desktop: three separate tracks. Tabs never float over search. */
+@media (min-width: 1641px) {
+  .topbar {
+    display: grid;
+    grid-template-columns: minmax(130px, .55fr) minmax(365px, 450px) minmax(420px, 1.6fr);
+    align-items: center;
+    column-gap: clamp(13px, 1.45vw, 24px);
+    height: 76px;
+    padding: 0 clamp(20px, 2vw, 34px);
+  }
+  .topbar > .top-left { grid-column: 1; }
+  .topbar > .global-nav { grid-column: 2; }
+  .topbar > .top-actions { grid-column: 3; }
+}
+
+/* Normal laptops (including the 1536px screenshot): two deliberate rows.
+   The top row reserves the full center lane for tabs. Row two gives search
+   first priority and keeps tools to the right without any collision. */
+@media (min-width: 701px) and (max-width: 1640px) {
+  .topbar {
+    display: grid;
+    grid-template-columns: minmax(100px, 1fr) minmax(345px, 470px) minmax(100px, 1fr);
+    grid-template-rows: 45px 45px;
+    align-items: center;
+    column-gap: 12px;
+    row-gap: 7px;
+    height: auto;
+    min-height: 109px;
+    padding: 8px clamp(14px, 1.5vw, 28px) 9px;
+  }
+  .topbar > .top-left {
+    grid-column: 1;
+    grid-row: 1;
+  }
+  .topbar > .global-nav {
+    grid-column: 2;
+    grid-row: 1;
+    justify-self: stretch;
+  }
+  .topbar > .top-actions {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+  }
+  .topbar > .top-actions > .command-trigger {
+    flex: 1 1 240px;
+    width: 100%;
+    max-width: 570px;
+    min-width: 160px;
+    height: 40px;
+    margin-right: auto;
+  }
+  .topbar > .top-actions > .command-trigger > span:nth-child(2) { display: inline; }
+  .topbar > .top-actions > .command-trigger kbd { display: inline-block; }
+  .topbar > .top-actions > .time-cluster { display: flex; }
+  .topbar > .top-actions .local-clock,
+  .topbar > .top-actions .et-clock { display: block; }
+  .topbar > .top-actions > .demo-pill {
+    white-space: nowrap;
+    max-width: 208px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 10px;
+  }
+}
+@media (min-width: 701px) and (max-width: 1150px) {
+  .topbar > .top-actions > .time-cluster { display: none; }
+  .topbar > .top-actions > .command-trigger { max-width: none; }
+  .topbar > .global-nav > a { padding: 10px 6px; font-size: 11px !important; }
+}
+@media (min-width: 701px) and (max-width: 850px) {
+  .topbar {
+    grid-template-columns: minmax(50px, 1fr) minmax(290px, 420px) minmax(0, 1fr);
+  }
+  .topbar > .top-left .crumb > span:first-child,
+  .topbar > .top-left .crumb > .slash { display: none; }
+  .topbar > .top-actions > .demo-pill { max-width: 155px; }
+}
+
+/* Phones: page title + essentials first, three large nav targets below. */
+@media (max-width: 700px) {
+  .topbar {
+    display: grid;
+    grid-template-columns: minmax(92px, 1fr) auto;
+    grid-template-rows: 44px 42px;
+    height: 98px;
+    min-height: 98px;
+    gap: 3px 7px;
+    padding: 5px 11px 4px;
+  }
+  .topbar > .top-left {
+    grid-column: 1;
+    grid-row: 1;
+    min-width: 0;
+  }
+  .topbar > .top-left .crumb > span:first-child,
+  .topbar > .top-left .crumb > .slash { display: none; }
+  .topbar > .top-left .crumb b { max-width: 90px; font-size: 11px; }
+  .topbar > .global-nav {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    width: 100% !important;
+    gap: 3px;
+    padding: 3px;
+  }
+  .topbar > .global-nav > a {
+    font-size: 10.5px !important;
+    padding: 9px 3px;
+    white-space: nowrap;
+  }
+  .topbar > .top-actions {
+    grid-column: 2;
+    grid-row: 1;
+    width: auto;
+    min-width: 0;
+    gap: 6px;
+  }
+  .topbar > .top-actions > .time-cluster,
+  .topbar > .top-actions > .demo-pill { display: none; }
+  .topbar > .top-actions > .command-trigger {
+    width: 37px;
+    height: 36px;
+    min-width: 37px;
+    max-width: 37px;
+    flex: 0 0 37px;
+    justify-content: center;
+    padding: 0 6px;
+  }
+  .topbar > .top-actions > .command-trigger > span:nth-child(2),
+  .topbar > .top-actions > .command-trigger kbd { display: none; }
+  .topbar > .top-actions > .icon-btn {
+    flex: 0 0 34px;
+    width: 34px;
+    height: 34px;
+  }
+  body.standalone .topbar {
+    height: calc(98px + env(safe-area-inset-top, 0px));
+    min-height: calc(98px + env(safe-area-inset-top, 0px));
+    padding-top: calc(5px + env(safe-area-inset-top, 0px));
+  }
+}
+@media (max-width: 365px) {
+  .topbar { padding-left: 7px; padding-right: 7px; column-gap: 3px; }
+  .topbar > .global-nav > a { font-size: 10px !important; }
+  .topbar > .top-actions { gap: 4px; }
+  .topbar > .top-actions > .icon-btn { width: 31px; height: 31px; flex-basis: 31px; }
+}
