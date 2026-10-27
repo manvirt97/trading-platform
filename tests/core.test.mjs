@@ -20,3 +20,16 @@ test('provider credentials are optional, not exposed in status',async()=>{let re
 test('Twelve Data requires timestamp/valid bars, does not fabricate OHLC',()=>{assert.throws(()=>parseTwelve({values:[{datetime:'2026-10-25 10:00:00',open:2,high:1,low:2,close:2}]} ,'5min'))});
 
 test('production endpoints do not return invented prices',async()=>{const response=await analysisGet({request:r('/api/analyze?symbol=AAPL&source=demo'),env:{}});assert.notEqual(response.status,200);const body=await response.text();assert.match(body,/Synthetic example prices are disabled/)});
+
+test('candlestick analysis labels wick rejections and inside bars as conditional, not forecasts',()=>{
+ const base=demo('TSLA','5min').bars.map(x=>({...x}));
+ const prev=base.at(-2),last=base.at(-1);
+ prev.open=100;prev.close=101;prev.high=102;prev.low=99;prev.volume=15000;
+ last.open=100.4;last.close=100.5;last.high=101;last.low=98;last.volume=16500;
+ const a=analyze(base,'TSLA',{source:'user-csv',interval:'5min'});
+ assert.ok(a.patterns.some(x=>x.name==='Hammer-like lower wick'));
+ assert.ok(a.patterns.every(x=>!/guarantee|certain profit/i.test(x.why)));
+ last.open=100.1;last.close=100.3;last.high=101.5;last.low=99.5;
+ const b=analyze(base,'TSLA',{source:'user-csv',interval:'5min'});
+ assert.ok(b.patterns.some(x=>x.name==='Inside bar / compression'));
+});
