@@ -276,3 +276,19 @@ body[data-theme=dark] .verdict-card.bear{background:linear-gradient(100deg,#402b
 .agent-tile small{font-size:10px;color:var(--secondary)}
 .agent-block{display:block;color:var(--red);font-size:11px;line-height:1.5;margin-top:7px}
 @media(max-width:710px){.agent-grid{grid-template-columns:1fr;max-height:680px}.agent-room-card .card-head{flex-wrap:wrap}}
+
+
+/* Browser-local paper practice: always separate from broker orders. */
+.paper-card .card-head{margin-bottom:12px}
+.paper-action-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.paper-action-row>*{flex:1 1 auto;white-space:normal}
+.paper-kill{display:flex;flex-direction:column;gap:4px;background:var(--muted-card);padding:11px 12px;border:1px solid var(--line);border-radius:10px}
+.paper-kill label{font-size:13px;font-weight:750;display:flex;align-items:center;gap:9px}
+.paper-kill input{accent-color:var(--red);height:17px;width:17px}
+.paper-kill small{font-size:11px;line-height:1.5;color:var(--secondary)}
+.paper-card #paperStatus{margin:12px 0;line-height:1.6}
+.paper-stats{background:var(--muted-card);border:1px solid var(--line);padding:11px 12px;border-radius:9px;font-size:12px;font-weight:710;line-height:1.6;margin:12px 0}
+.paper-table{min-width:460px}
+.paper-table th{font-size:9px;padding:9px}
+.paper-table td{font-size:11px;padding:10px}
+.paper-actions{display:flex;align-items:center;justify-content:flex-end;margin-top:12px}
