@@ -40,7 +40,7 @@ test('Confirmed bullish opening range becomes only a conditional watch, NEVER an
  assert.match(x.quote_status,/No live bid\/ask/);
 });
 test('Bearish opening-range setup remains research-only',()=>{
- const a=market();a.bar_history.at(-1)=candle('2026-10-26T14:10:00Z',98.5,97,98.7,96.5,2500);a.last=97;
+ const a=market();a.bar_history[a.bar_history.length-1]=candle('2026-10-26T14:10:00Z',98.5,97,98.7,96.5,2500);a.last=97;
  const r=evaluateDayDesk(a,NOW);
  assert.equal(r.status,'CONDITIONAL_WATCH');
  assert.equal(r.setup,'OPENING_RANGE_BREAKDOWN');
@@ -66,7 +66,7 @@ test('VWAP reclaim research requires crossing and confirmed current-session volu
  const a=market();
  a.bar_history.splice(45+2,1); // incomplete opening range, but enough valid session volume
  a.bar_history.at(-2).close=99.1;
- a.bar_history.at(-1)=candle('2026-10-26T14:10:00Z',99.4,101.3,102,99.2,2500);a.last=101.3;
+ a.bar_history[a.bar_history.length-1]=candle('2026-10-26T14:10:00Z',99.4,101.3,102,99.2,2500);a.last=101.3;
  const r=evaluateDayDesk(a,NOW);
  assert.equal(r.range.state,'incomplete');
  assert.equal(r.status,'CONDITIONAL_WATCH');
