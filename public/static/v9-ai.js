@@ -117,9 +117,32 @@ async function runClaudeCouncil(){
  }catch(e){badge.textContent='Claude request unavailable';$('claudeSupervisor').textContent=e.message+'. No AI trading conclusion was generated.'}
  finally{btn.disabled=false;btn.textContent='Investigate with 11 Claude agents'}
 }
+async function inspectConnection(kind){
+ const target=$('integrationResults'),button=$(kind==='tv'?'tvRefresh':'cronRefresh');
+ if(!state.user){target.textContent='Google sign-in is required to view private alert and scheduled-scan records. Sign in from Overview → Evidence Assistant.';return}
+ button.disabled=true;target.textContent='Checking authenticated '+(kind==='tv'?'TradingView alerts':'scheduled scanner')+'…';
+ try{
+  const token=await state.user.getIdToken();
+  const result=await getJSON(kind==='tv'?'/api/tv-alerts':'/api/scheduled-opportunities',{headers:{Authorization:'Bearer '+token}});
+  target.replaceChildren();
+  const items=kind==='tv'?(result.items||[]):(result.items||[]);
+  if(!items.length){target.textContent='No recorded '+(kind==='tv'?'TradingView webhook events':'scheduled scan candidates')+'. This is not evidence of a market opportunity.';return}
+  for(const item of items.slice(0,10)){
+   const row=document.createElement('div');row.className='integration-event';
+   const headline=document.createElement('strong'),detail=document.createElement('span');
+   headline.textContent=kind==='tv'?item.symbol+' · '+item.action:item.symbol+' · '+item.status;
+   detail.textContent=kind==='tv'?time(item.received_at)+' · Unverified chart alert':time(item.bar_time)+' · Completed bar / '+(item.quality_score??'unknown')+'/100 alignment';
+   row.append(headline,detail);target.append(row);
+  }
+ }catch(e){target.textContent='Connection unavailable: '+e.message}
+ finally{button.disabled=false}
+}
 function bind(){
  window.addEventListener('rangeform:agent-report',event=>{state.selectedSymbol=event.detail?.analysis?.symbol||null});
  $('runClaudeCouncil')?.addEventListener('click',runClaudeCouncil);
+ $('tvRefresh')?.addEventListener('click',()=>inspectConnection('tv'));
+ $('cronRefresh')?.addEventListener('click',()=>inspectConnection('cron'));
+ fetch('/api/status',{cache:'no-store'}).then(r=>r.json()).then(x=>{const el=$('tvState');if(el)el.textContent=x.tradingview_bridge_configured?'Receiver configured · verify webhook test delivery':'Not configured. Set dedicated token and TV_EVENTS KV.'}).catch(()=>{$('tvState').textContent='Status unavailable'});
  window.addEventListener('rangeform:discovery',event=>{state.discovery=event.detail;const data=state.discovery;
   if(data?.items?.length)answer('SCAN UPDATED · '+time(data.checked_at)+'\n\n'+groundedReply());
   else answer('MARKET DATA NOT READY\n\n'+(data?.reason||'No verified scan available.'));
