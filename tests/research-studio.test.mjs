@@ -38,3 +38,20 @@ test('Research tools include prominent data provenance and are not executable br
  assert.doesNotMatch(code,/\/api\/orders|\/api\/buy|\/api\/sell/);
  assert.match(read('public/v9.html'),/No broker orders or return guarantees/);
 });
+
+test('Research briefs require user action before copying or drafting for the existing assistant',()=>{
+ const code=read('public/static/research-studio.js');
+ assert.match(code,/Copy research brief/);
+ assert.match(code,/Draft question for Research AI/);
+ assert.match(code,/navigator\.clipboard\?\.writeText/);
+ assert.match(code,/assistant\.value=prompt/);
+ assert.match(code,/Nothing is submitted to an AI model automatically/);
+});
+test('Pattern Finder accepts a locally read CSV without uploading it and moat score begins unselected',()=>{
+ const code=read('public/static/research-studio.js');
+ assert.match(code,/id="rs-priceFile"/);
+ assert.match(code,/file\.text\(\)/);
+ assert.match(code,/500000/);
+ assert.match(code,/Choose an evidence rating/);
+ assert.doesNotMatch(code,/fetch\(.*priceFile/);
+});
