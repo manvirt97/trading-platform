@@ -114,7 +114,15 @@ async function runClaudeCouncil(){
    const summary=document.createElement('p');summary.textContent=agent.assessment;
    block.append(name,summary);container.append(block);
   }
- }catch(e){badge.textContent='Claude request unavailable';$('claudeSupervisor').textContent=e.message+'. No AI trading conclusion was generated.'}
+ }catch(e){
+  const configError=/^CLAUDE_(INVALID_REQUEST|THINKING_CONFIG|MODEL_CONFIG|TOKEN_CONFIG|ACCESS|BILLING)/.test(String(e.code||''));
+  badge.textContent=configError?'Claude configuration needs attention':'Claude investigation unavailable';
+  const top=$('claudeSupervisor');top.replaceChildren();
+  const title=document.createElement('strong');title.textContent=configError?'Claude API rejected its request':'Claude AI investigation could not complete';
+  const message=document.createElement('p');message.textContent=e.message||'Unknown service error';
+  const note=document.createElement('p');note.textContent='The separate Twelve Data historical feed can still work. No AI trading conclusion was generated; review the reason above and verify your Anthropic Console / Cloudflare secret before rerunning.';
+  top.append(title,message,note);
+ }
  finally{btn.disabled=false;btn.textContent='Investigate with 11 Claude agents'}
 }
 async function inspectConnection(kind){
