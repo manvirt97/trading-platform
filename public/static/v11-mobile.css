@@ -274,7 +274,15 @@
     border-collapse:separate;
   }
   .discovery-card .scanner-table thead,
-  .page[data-section="scanner"] .scanner-table thead { display:none; }
+  .page[data-section="scanner"] .scanner-table thead {
+    position:absolute;
+    width:1px;
+    height:1px;
+    overflow:hidden;
+    clip:rect(0 0 0 0);
+    clip-path:inset(50%);
+    white-space:nowrap;
+  }
   .discovery-card .scanner-table tr,
   .page[data-section="scanner"] .scanner-table tr {
     display:grid;
@@ -382,6 +390,9 @@
     line-height:1.5;
     margin-bottom:12px;
   }
+  /* Anchor/focus navigation lands below the sticky two-row header. */
+  #assistantTitle,#paperTitle,#riskAccount,#connectionDetails,
+  .page .card[id] { scroll-margin-top:135px; }
   .site-footer { gap:5px; }
   .toast {
     bottom:calc(12px + env(safe-area-inset-bottom,0px));
