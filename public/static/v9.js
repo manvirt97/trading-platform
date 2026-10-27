@@ -10,6 +10,7 @@ const ageLabel=v=>{let t=Date.parse(v);if(!Number.isFinite(t))return 'Unknown';l
 const symbolOK=s=>/^[A-Z][A-Z0-9.-]{0,9}$/.test(s);
 const state={view:'overview',symbol:'NVDA',watch:[],configured:false,newsCategory:'all',newsCache:new Map(),market:new Map(),analysis:null,opportunity:null,agentRoom:null,agentFilter:'all',discovery:null,discoveryLoading:false,discoveryUniverse:'leaders',scanning:false,newsLoading:false,provider:'Not configured'};
 let toastTimeout=0;
+let newsController=null,discoveryQueued=false;
 const monitor={enabled:false,timer:null,lastAlertKey:'',busy:false};
 const toast=(message)=>{const el=$('toast');el.textContent=String(message).slice(0,250);el.hidden=false;clearTimeout(toastTimeout);toastTimeout=setTimeout(()=>{el.hidden=true},4800)};
 function readWatch(){let a;try{a=JSON.parse(localStorage.getItem('rf_v9_watch')||'null')}catch{}const clean=Array.isArray(a)?a.filter(x=>typeof x==='string').map(x=>x.toUpperCase()).filter(symbolOK):[];return [...new Set(clean.length?clean:['NVDA','TSLA','SHOP','AAPL','SPY'])].slice(0,6)}
@@ -92,7 +93,7 @@ function discoveryRender(result){
  window.dispatchEvent(new CustomEvent('rangeform:discovery',{detail:result}));
 }
 async function discoverMarket(){
- if(state.discoveryLoading)return;
+ if(state.discoveryLoading){discoveryQueued=true;return;}
  if(!state.configured){discoveryReset('No authorized price-data provider. Automatic discovery is unavailable.');return}
  const target=state.discoveryUniverse;state.discoveryLoading=true;$('discoveryRefresh').disabled=true;$('discoveryRefresh').textContent='Checking sample…';
  try{
@@ -100,7 +101,7 @@ async function discoverMarket(){
   if(target!==state.discoveryUniverse)return;
   discoveryRender(result);
  }catch(e){if(target===state.discoveryUniverse)discoveryReset('Automatic scan unavailable: '+e.message)}
- finally{state.discoveryLoading=false;$('discoveryRefresh').disabled=false;$('discoveryRefresh').textContent='Scan sample ↻'}
+ finally{state.discoveryLoading=false;$('discoveryRefresh').disabled=false;$('discoveryRefresh').textContent='Scan sample ↻';if(discoveryQueued){discoveryQueued=false;discoverMarket()}}
 }
 function scheduleDiscovery(){
  const due=()=>{const time=Date.parse(state.discovery?.checked_at);return !Number.isFinite(time)||Date.now()-time>=600000};
@@ -300,10 +301,25 @@ ctx.fillStyle=colors.label;ctx.font='11px DM Sans';ctx.fillText('COMPLETED CANDL
 const css=name=>getComputedStyle(document.body).getPropertyValue(name).trim();
 function dateString(t){try{return new Date(t).toLocaleDateString('en-CA',{month:'short',day:'numeric'})}catch{return 'Unknown date'}}
 async function loadNews(force=false){
- if(state.newsLoading)return;const category=state.newsCategory,q=$('newsQuery').value.trim(),key=category+'|'+q;if(!force&&state.newsCache.has(key)){renderNews(state.newsCache.get(key));return}state.newsLoading=true;
- $('newsItems').replaceChildren();$('newsItems').append(create('p','empty-inline','Checking public publisher feeds…'));$('newsHeading').textContent=(category==='all'?'All markets':category.charAt(0).toUpperCase()+category.slice(1))+' headlines';
- try{let data=await request('/api/news?'+new URLSearchParams({category,q,region:'CA'}));state.newsCache.set(key,data);if(state.newsCategory===category&&$('newsQuery').value.trim()===q)renderNews(data)}catch(e){$('newsItems').replaceChildren();$('newsItems').append(create('p','empty-inline','News unavailable: '+e.message+' Try another filter or search.'));$('newsChecked').textContent='Source unavailable'}
- finally{state.newsLoading=false}}
+ const category=state.newsCategory,q=$('newsQuery').value.trim(),key=category+'|'+q;
+ // Cancel stale requests immediately when the user selects another category.
+ if(newsController){newsController.abort();newsController=null}
+ if(!force&&state.newsCache.has(key)){renderNews(state.newsCache.get(key));return}
+ const controller=new AbortController();newsController=controller;state.newsLoading=true;
+ $('newsItems').replaceChildren();$('newsItems').append(create('p','empty-inline','Checking '+category+' publisher feeds…'));
+ $('newsHeading').textContent=(category==='all'?'All markets':category.charAt(0).toUpperCase()+category.slice(1))+' headlines';
+ try{
+  const response=await fetch('/api/news?'+new URLSearchParams({category,q,region:'CA'}),{signal:controller.signal,cache:'no-store',headers:{Accept:'application/json'}});
+  let data;try{data=await response.json()}catch{throw Error('Invalid publisher-feed response.')}
+  if(!response.ok||data.error)throw Error(data.error||'Publisher feeds unavailable');
+  state.newsCache.set(key,data);
+  if(newsController===controller&&state.newsCategory===category&&$('newsQuery').value.trim()===q)renderNews(data);
+ }catch(e){
+  if(e.name==='AbortError'||newsController!==controller)return;
+  $('newsItems').replaceChildren();$('newsItems').append(create('p','empty-inline','News unavailable: '+e.message+' Try another filter or search.'));
+  $('newsChecked').textContent='Source unavailable';
+ }finally{if(newsController===controller){newsController=null;state.newsLoading=false}}
+}
 function renderNews(data){$('newsChecked').textContent='Checked '+dateString(data.as_of)+' · '+(data.sources_ok||0)+'/'+(data.sources_total||0)+' feeds';const root=$('newsItems');root.replaceChildren();if(!data.items?.length){root.append(create('p','empty-inline',data.note||'No recent articles matched this search.'));return}
 data.items.forEach((item,i)=>{if(!/^https:\/\//.test(item.url))return;const row=create('article','news-item'),num=create('span','news-item-num',String(i+1).padStart(2,'0')),content=create('div','news-item-content'),meta=create('div','story-meta'),link=create('a','',item.title),info=create('small','',(item.source||'Publisher')+' · '+ageLabel(item.date));meta.append(create('span','',item.topic||'MARKETS'),create('span','',ageLabel(item.date)),create('span','',item.source||'Public news'));link.href=item.url;link.target='_blank';link.rel='noopener noreferrer';link.className='story-link';link.append(create('span','sr-only',''));const h=create('h3');h.append(link);content.append(meta,h,info);row.append(num,content);row.addEventListener('click',e=>{if(e.target.closest('a'))return;selectArticle(item)});const select=create('button','cell-btn','Details');select.type='button';select.title='View source details';select.onclick=()=>selectArticle(item);row.append(select);root.append(row)})
 }
