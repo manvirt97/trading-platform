@@ -253,3 +253,26 @@ body[data-theme=dark] .verdict-card.bear{background:linear-gradient(100deg,#402b
 .assistant-access .text-action[hidden]{display:none}
 @media(max-width:840px){.assistant-query{flex-wrap:wrap}.assistant-query input{flex-basis:100%}.assistant-query button{flex:1 1 43%}}
 @media(max-width:600px){.discovery-card .card-head{align-items:stretch;flex-direction:column}.discovery-actions{align-items:stretch}.discovery-actions>*{flex:1 1 auto}.assistant-heading{align-items:stretch;flex-direction:column}.assistant-answer{font-size:13px}.assistant-presets button{flex:1 1 100%}}
+
+
+/* Explainable specialist desk */
+.agent-room-card{border-color:var(--line)}
+.agent-room-card .card-head{align-items:start}
+.agent-summary{font-size:13px;font-weight:680;line-height:1.55;background:var(--muted-card);border:1px solid var(--line);border-radius:11px;padding:13px 15px;margin:12px 0}
+.agent-veto{padding:10px 14px;border:1px solid #dbb1aa;background:var(--red-soft);color:var(--red);border-radius:10px;font-size:12px;line-height:1.6}
+.agent-veto[hidden]{display:none}
+.agent-veto p{margin:5px 0}
+.agent-filters{display:flex;flex-wrap:wrap;gap:7px;margin:16px 0 14px}
+.agent-filters button{border:1px solid var(--line);border-radius:9px;padding:9px 12px;background:var(--card);color:var(--secondary);font-size:12px;font-weight:720}
+.agent-filters button.selected{background:var(--blue-soft);color:var(--blue);border-color:var(--blue)}
+.agent-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;max-height:560px;overflow:auto;scrollbar-width:thin}
+.agent-tile{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:13px 14px;min-width:0}
+.agent-tile-head{display:flex;align-items:start;justify-content:space-between;gap:8px}
+.agent-tile-head strong{font-size:13px;letter-spacing:-.015em}
+.agent-pill{font-size:10px;font-weight:800;letter-spacing:.045em;border-radius:7px;background:var(--muted-card);color:var(--secondary);padding:5px 7px;white-space:nowrap}
+.agent-pill.pass,.agent-pill.bullish{background:var(--green-soft);color:var(--green)}
+.agent-pill.blocked,.agent-pill.bearish{background:var(--red-soft);color:var(--red)}
+.agent-tile p{font-size:12px;color:var(--secondary);line-height:1.65;margin:8px 0}
+.agent-tile small{font-size:10px;color:var(--secondary)}
+.agent-block{display:block;color:var(--red);font-size:11px;line-height:1.5;margin-top:7px}
+@media(max-width:710px){.agent-grid{grid-template-columns:1fr;max-height:680px}.agent-room-card .card-head{flex-wrap:wrap}}
