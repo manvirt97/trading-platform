@@ -5,8 +5,8 @@
 <meta name="description" content="Rangeform: evidence-first market research, conditional trade plans and market news.">
 <title>Rangeform — Market intelligence</title>
 <link rel="icon" type="image/png" href="/static/rangeform-official-icon.png">
-<link rel="stylesheet" href="/static/v9.css?v=2">
-<script src="/static/v9.js?v=2" defer></script>
+<link rel="stylesheet" href="/static/v9.css?v=3">
+<script src="/static/v9.js?v=3" defer></script><script src="/static/v9-ai.js?v=1" type="module"></script>
 </head>
 <body data-view="overview" data-theme="light">
 <div class="app">
@@ -43,6 +43,20 @@
      <div class="strip-cell"><span>TSLA · EV</span><strong data-quote="TSLA">—</strong><small data-change="TSLA">Provider required</small></div>
      <div class="strip-cell"><span>SHOP · CANADIAN TECH</span><strong data-quote="SHOP">—</strong><small data-change="SHOP">Provider required</small></div>
     </div>
+    <section class="card discovery-card" aria-labelledby="discoveryTitle">
+  <div class="card-head"><div><div class="eyebrow">AUTOMATIC DISCOVERY · SERVER-VERIFIED SAMPLE</div><h2 id="discoveryTitle">Market opportunities — no ticker search needed</h2><p id="discoveryStatus">Checking connection before scanning a small, fixed universe. No real-time market-wide claims.</p></div>
+    <div class="discovery-actions"><select id="discoveryUniverse" aria-label="Choose sample market universe"><option value="leaders">US large-cap leaders</option><option value="diversified">Diversified US sample</option></select><button id="discoveryRefresh" class="subtle-btn" type="button">Scan sample ↻</button></div></div>
+  <div class="table-scroller"><table class="scanner-table"><thead><tr><th>SYMBOL</th><th>RESEARCH STATUS</th><th>INDICATOR SCORE</th><th>LAST BAR</th><th>WHY IT'S WATCHED</th><th></th></tr></thead><tbody id="discoveryResults"><tr><td colspan="6" class="empty-inline">Automatic discovery requires an authorized OHLCV data connection.</td></tr></tbody></table></div>
+  <div class="discovery-footer"><span id="discoveryTimestamp">Not scanned</span><span>Fixed six-stock sample · refreshed on page view and up to every 10 minutes while visible · no orders</span></div>
+</section>
+<section class="card assistant-card" aria-labelledby="assistantTitle">
+ <div class="assistant-heading"><div><div class="eyebrow">EVIDENCE ASSISTANT</div><h2 id="assistantTitle">Ask what the charts actually show</h2><p>Rule-based explanations always identify their data source. Optional Cloudflare AI requires Google sign-in.</p></div><span class="signal-tag" id="assistantService">Checking AI service</span></div>
+ <div class="assistant-presets"><button type="button" data-preset="best">Explain the strongest setup</button><button type="button" data-preset="risks">What could go wrong?</button><button type="button" data-preset="patterns">Analyze candle patterns</button></div>
+ <div id="assistantAnswer" role="status" aria-live="polite" class="assistant-answer">Connect market data to enable an evidence-grounded assessment. AI does not invent prices or news.</div>
+ <div class="assistant-query"><input id="assistantQuestion" maxlength="450" placeholder="Ask about this scan or a candle pattern…" aria-label="Question for market research assistant"><button type="button" id="assistantExplain" class="primary-btn">Explain evidence</button><button type="button" id="assistantUseAI" class="subtle-btn">Ask AI model</button></div>
+ <div class="assistant-access"><span id="assistantAuthState">Checking sign-in…</span><button type="button" id="assistantSignIn" class="text-action" hidden>Sign in with Google</button><button type="button" id="assistantSignOut" class="text-action" hidden>Sign out</button></div>
+</section>
+
     <div class="overview-grid">
      <section class="card opportunity-card"><div class="card-head"><div><div class="eyebrow">WATCHLIST SCANNER</div><h2>Strongest available setups</h2><p>Ranks only symbols you scan with your authorized feed. No fabricated scores.</p></div><button class="subtle-btn" data-page="scanner">Open scanner ↗</button></div>
        <div class="table-scroller"><table class="scanner-table"><thead><tr><th>SYMBOL</th><th>DIRECTION</th><th>SETUP QUALITY</th><th>DATA AGE</th><th>RESEARCH</th></tr></thead><tbody id="overviewResults"><tr><td colspan="5"><div class="empty-inline">Run a watchlist scan to see verified historical setups. There is no live scan yet.</div></td></tr></tbody></table></div>
