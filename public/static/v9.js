@@ -27,8 +27,8 @@ function setPage(page,focus=null){
  if(!['overview','signals','scanner','news'].includes(page))return;
  state.view=page;state.focus=focus;
  document.body.dataset.view=page;
- $('[data-section]').forEach(el=>el.classList.toggle('visible',el.dataset.section===page));
- $('.nav-link[data-page]').forEach(el=>{
+ $$('[data-section]').forEach(el=>el.classList.toggle('visible',el.dataset.section===page));
+ $$('.nav-link[data-page]').forEach(el=>{
   const active=el.dataset.page===page&&(el.dataset.focus||null)===focus;
   el.classList.toggle('active',active);
   if(active)el.setAttribute('aria-current','page');else el.removeAttribute('aria-current');
@@ -309,7 +309,7 @@ data.items.forEach((item,i)=>{if(!/^https:\/\//.test(item.url))return;const row=
 }
 function selectArticle(item){$('articleContextTitle').textContent=item.title;$('articleContext').textContent=(item.source||'Source')+' · published '+stamp(item.date)+'. Verify the full article and price reaction before drawing conclusions. The headline is not a trade signal.';const link=$('articleOriginal');link.href=item.url;link.hidden=false}
 function bind(){initTheme();state.watch=readWatch();renderWatch();bindAgentFilters();$('showAgentRoom')?.addEventListener('click',()=>$('agentRoomTitle')?.scrollIntoView({behavior:'smooth',block:'start'}));scheduleDiscovery();localClock();setInterval(localClock,60000);
-$('[data-page]').forEach(el=>el.addEventListener('click',()=>setPage(el.dataset.page,el.dataset.focus||null)));
+$$('[data-page]').forEach(el=>el.addEventListener('click',()=>setPage(el.dataset.page,el.dataset.focus||null)));
 $('mobileMenu').onclick=()=>{$('sidebar').classList.toggle('open');$('navShade').hidden=!$('sidebar').classList.contains('open')};$('navShade').onclick=closeNav;
 $('themeToggle').onclick=()=>setTheme(document.body.dataset.theme==='dark'?'light':'dark');
 $('providerBadge').onclick=()=>setPage('signals');
