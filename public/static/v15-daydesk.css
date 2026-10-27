@@ -1,0 +1,122 @@
+/* Rangeform V15 | Trading workspace: premium, restrained, responsive.
+   Reuses the unified light/dark CSS token system; no neon and no fake quotes. */
+.daydesk-page{--dd-positive:#2a8566;--dd-negative:#b66b6a;--dd-vwap:#a78a67;--dd-or:#648caf;min-width:0}
+body[data-theme=dark] .daydesk-page{--dd-positive:#79c3a3;--dd-negative:#dd9b98;--dd-vwap:#d3b28c;--dd-or:#8fb6d1}
+.daydesk-heading{display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:15px;margin:0 0 18px}
+.daydesk-heading h1{font-size:clamp(30px,3vw,44px);letter-spacing:-.065em;font-weight:850;line-height:1.15;margin:5px 0 7px}
+.daydesk-heading p{max-width:750px;line-height:1.65;color:var(--secondary);font-size:12.5px;margin:0}
+.daydesk-session{color:var(--secondary);background:var(--card);padding:9px 12px;border:1px solid var(--line);border-radius:10px;font-size:11px;font-weight:750}
+.daydesk-toolbar{display:grid;grid-template-columns:minmax(165px,1.5fr) minmax(130px,.7fr) auto minmax(160px,1fr);gap:10px;align-items:end;margin-bottom:11px;border:1px solid var(--line);border-radius:14px;background:var(--card);padding:15px}
+.daydesk-toolbar label{display:flex;flex-direction:column;gap:7px;min-width:0}
+.daydesk-toolbar label>span{font-weight:800;font-size:10px;letter-spacing:.09em;color:var(--secondary)}
+.daydesk-toolbar input,.daydesk-toolbar select{width:100%;min-width:0;height:44px;border:1px solid var(--line);background:var(--muted-card);border-radius:9px;color:var(--ink);padding:0 12px;font-weight:750;font-size:15px}
+.daydesk-toolbar .primary-btn{height:44px;margin:0;white-space:nowrap;padding:0 16px}
+.daydesk-feed{color:var(--secondary);font-size:11px;font-weight:720;line-height:1.45;padding:10px 0 7px;overflow-wrap:anywhere}
+.daydesk-symbols{display:flex;align-items:center;flex-wrap:wrap;gap:7px 8px;margin-bottom:15px}
+.daydesk-symbols>span{font-size:10px;font-weight:800;color:var(--secondary);letter-spacing:.07em;margin-right:4px}
+.daydesk-symbols button{font-size:11px;font-weight:780;color:var(--secondary);background:var(--card);border:1px solid var(--line);padding:7px 11px;border-radius:8px;min-height:34px;cursor:pointer}
+.daydesk-symbols button:hover{background:var(--muted-card);color:var(--ink)}
+.daydesk-status{display:flex;align-items:center;justify-content:space-between;gap:15px;margin-bottom:13px;border-left:3px solid var(--line)!important;padding:17px 20px!important}
+.daydesk-status[data-day-status=candidate]{border-left-color:var(--dd-positive)!important}
+.daydesk-status[data-day-status=stale],.daydesk-status[data-day-status=limited]{border-left-color:var(--dd-vwap)!important}
+.daydesk-status strong{display:block;font-size:19px;letter-spacing:-.045em;line-height:1.25;margin-top:6px}
+.daydesk-status[data-day-status=candidate] strong{color:var(--dd-positive)}
+.daydesk-status p{margin:6px 0 0;font-size:12px;color:var(--secondary);max-width:720px;line-height:1.6}
+.daydesk-status-side{display:flex;flex-direction:column;gap:7px;text-align:right;flex:0 0 230px;color:var(--secondary);font-size:10px;line-height:1.5}
+.daydesk-main-grid{display:grid;grid-template-columns:minmax(0,1.85fr) minmax(290px,1fr);gap:13px;align-items:start}
+.daydesk-main-col,.daydesk-side-col{display:flex;flex-direction:column;gap:13px;min-width:0}
+.daydesk-page .card{border-radius:14px;padding:19px}
+.daydesk-panel-head{display:flex;justify-content:space-between;align-items:start;flex-wrap:wrap;gap:12px;border-bottom:1px solid var(--line);margin-bottom:13px;padding-bottom:12px}
+.daydesk-panel-head h2,.daydesk-plan-card h2{font-size:19px;letter-spacing:-.04em;margin:4px 0}
+.daydesk-panel-head p{font-size:11px;color:var(--secondary);margin:3px 0 0}
+.daydesk-panel-head>span{color:var(--secondary);font-size:11px;font-weight:750}
+.daydesk-chart{width:100%;min-height:290px;aspect-ratio:900/370;background:var(--muted-card);border:1px solid var(--line);border-radius:11px;overflow:hidden;display:flex;align-items:center;justify-content:center}
+.daydesk-chart svg{display:block;width:100%;height:100%;max-height:395px}
+.daydesk-empty{text-align:center;display:flex;flex-direction:column;gap:6px;padding:35px;color:var(--secondary);font-size:12px}
+.daydesk-empty strong{font-size:16px;color:var(--ink)}
+.daydesk-svg-grid line{stroke:var(--line);stroke-width:1;stroke-dasharray:3 5}
+.daydesk-svg-grid text,.daydesk-svg-labels text{fill:var(--secondary);font-size:10px;font-weight:650}
+.daydesk-svg-bars .up{stroke:var(--dd-positive);fill:var(--dd-positive);stroke-width:1.6}
+.daydesk-svg-bars .down{stroke:var(--dd-negative);fill:var(--dd-negative);stroke-width:1.6}
+.daydesk-svg-levels line{stroke-width:1.7;stroke-dasharray:6 5}
+.daydesk-svg-levels line.vwap{stroke:var(--dd-vwap)}
+.daydesk-svg-levels line.range{stroke:var(--dd-or)}
+.daydesk-svg-levels text{font-size:10px;font-weight:800;paint-order:stroke;stroke:var(--muted-card);stroke-width:3px}
+.daydesk-svg-levels text.vwap{fill:var(--dd-vwap)}
+.daydesk-svg-levels text.range{fill:var(--dd-or)}
+.daydesk-chart-legend{display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px;color:var(--secondary);font-size:10px;font-weight:720;padding:12px 0 2px}
+.daydesk-chart-legend span{display:inline-flex;gap:5px;align-items:center}
+.daydesk-swatch{display:inline-block;width:14px;height:2px;border-radius:4px}
+.daydesk-swatch-green{background:var(--dd-positive)}
+.daydesk-swatch-red{background:var(--dd-negative)}
+.daydesk-swatch-vwap{background:var(--dd-vwap)}
+.daydesk-swatch-or{background:var(--dd-or)}
+.daydesk-disclaimer,.daydesk-muted{font-size:11px;color:var(--secondary);line-height:1.7;margin:10px 0 0}
+.daydesk-checks{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+.daydesk-check{display:flex;align-items:start;gap:10px;background:var(--muted-card);border:1px solid var(--line);border-radius:11px;padding:12px;min-width:0}
+.daydesk-check-dot{display:grid;place-items:center;flex:0 0 26px;height:26px;background:var(--card);border:1px solid var(--line);border-radius:9px;color:var(--secondary);font-size:13px;font-weight:850}
+.daydesk-check.pass .daydesk-check-dot{color:var(--dd-positive)}
+.daydesk-check strong{display:block;font-size:12px;line-height:1.5;color:var(--ink)}
+.daydesk-check small{display:block;color:var(--secondary);font-size:11px;line-height:1.55;margin-top:4px}
+.daydesk-gate{font-size:11px;margin:13px 0 0;color:var(--secondary);line-height:1.65;border-top:1px solid var(--line);padding-top:12px}
+.daydesk-gate strong{color:var(--ink)}
+.daydesk-large{display:block;font-size:clamp(32px,3vw,45px);font-weight:850;letter-spacing:-.07em;line-height:1.2;margin:7px 0}
+.daydesk-key-card>p{font-size:11px;margin:3px 0 15px;color:var(--secondary)}
+.daydesk-levels{display:flex;flex-direction:column;gap:0;border-top:1px solid var(--line);margin-top:12px}
+.daydesk-levels>div{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:11px 0;border-bottom:1px solid var(--line)}
+.daydesk-levels span{font-size:11px;color:var(--secondary);line-height:1.5}
+.daydesk-levels strong{font-size:12px;font-variant-numeric:tabular-nums;font-weight:800;text-align:right;white-space:nowrap;color:var(--ink)}
+.daydesk-plan-card>p{color:var(--secondary);font-size:12px;line-height:1.6}
+.daydesk-plan-card #day-use-levels{display:block;margin-top:13px;width:100%;min-height:40px;font-size:11px}
+.daydesk-plan-card #day-use-levels:disabled{opacity:.53;cursor:not-allowed}
+.daydesk-risk-card{margin-top:13px}
+.daydesk-risk-fields{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px 15px}
+.daydesk-risk-fields label{display:flex;flex-direction:column;gap:6px;font-size:11px;font-weight:760;color:var(--ink)}
+.daydesk-risk-fields label span{color:var(--secondary);font-weight:600}
+.daydesk-risk-fields input{display:block;width:100%;height:42px;min-width:0;padding:10px 11px;border:1px solid var(--line);border-radius:9px;background:var(--muted-card);color:var(--ink);font-size:14px;font-variant-numeric:tabular-nums}
+.daydesk-risk-actions{display:flex;gap:13px;align-items:center;flex-wrap:wrap;margin:17px 0}
+.daydesk-risk-actions>span{font-size:11px;color:var(--secondary);max-width:520px;line-height:1.5}
+.daydesk-risk-results{background:var(--muted-card);padding:16px;border-radius:11px;border:1px solid var(--line);font-size:12px;color:var(--secondary);line-height:1.6}
+.daydesk-risk-results>strong{display:block;font-size:17px;font-weight:820;color:var(--ink);letter-spacing:-.03em;margin-bottom:13px}
+.daydesk-size-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}
+.daydesk-size-grid>div{border:1px solid var(--line);padding:12px;background:var(--card);border-radius:10px}
+.daydesk-size-grid span{display:block;font-size:10px;color:var(--secondary)}
+.daydesk-size-grid strong{display:block;font-size:16px;line-height:1.3;font-variant-numeric:tabular-nums;color:var(--ink);margin-top:4px}
+.daydesk-risk-error{color:var(--red);font-weight:700}
+.daydesk-footnote{margin:15px 0 6px;font-size:11px;color:var(--secondary);line-height:1.7}
+@media(max-width:1240px){
+ .daydesk-toolbar{grid-template-columns:minmax(160px,1.2fr) minmax(130px,.7fr) auto}
+ .daydesk-feed{grid-column:1/-1;padding:0}
+ .daydesk-main-grid{grid-template-columns:minmax(0,1.4fr) minmax(270px,1fr)}
+}
+@media(max-width:990px){
+ .daydesk-main-grid{grid-template-columns:minmax(0,1fr)}
+ .daydesk-side-col{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));align-items:start}
+ .daydesk-risk-fields{grid-template-columns:repeat(3,minmax(0,1fr))}
+}
+@media(max-width:700px){
+ .daydesk-heading{align-items:start}
+ .daydesk-heading h1{font-size:31px}
+ .daydesk-session{padding:7px 10px}
+ .daydesk-toolbar{grid-template-columns:1fr 1fr;gap:10px;padding:12px}
+ .daydesk-toolbar .daydesk-symbol{grid-column:1/-1}
+ .daydesk-toolbar .primary-btn{grid-column:1/-1;width:100%}
+ .daydesk-feed{grid-column:1/-1}
+ .daydesk-status{flex-direction:column;align-items:flex-start;padding:15px!important}
+ .daydesk-status-side{flex:0 1 auto;text-align:left}
+ .daydesk-chart{min-height:215px}
+ .daydesk-side-col{display:flex}
+ .daydesk-checks{grid-template-columns:1fr}
+ .daydesk-risk-fields{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+ .daydesk-size-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .daydesk-risk-fields input,.daydesk-toolbar input,.daydesk-toolbar select{font-size:16px}
+}
+@media(max-width:400px){
+ .daydesk-risk-fields,.daydesk-size-grid{grid-template-columns:1fr}
+ .daydesk-toolbar{grid-template-columns:1fr}
+ .daydesk-toolbar .daydesk-interval,.daydesk-toolbar .daydesk-symbol{grid-column:1}
+ .daydesk-chart{min-height:170px}
+}
+@media(prefers-reduced-motion:reduce){
+ .daydesk-page *{scroll-behavior:auto!important;transition:none!important}
+}
