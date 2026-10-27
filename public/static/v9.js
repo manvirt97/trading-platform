@@ -56,7 +56,7 @@ const oldRoutes={
   backtest:{page:'signals',focus:'agentRoomTitle'}
 };
 function setPage(page,focus=null){
- if(!['overview','signals','scanner','news','settings','studio'].includes(page))return;
+ if(!['overview','daydesk','signals','scanner','news','settings','studio'].includes(page))return;
  state.view=page;state.focus=focus;
  document.body.dataset.view=page;
  $$('[data-section]').forEach(el=>el.classList.toggle('visible',el.dataset.section===page));
@@ -65,7 +65,7 @@ function setPage(page,focus=null){
   el.classList.toggle('active',active);
   if(active)el.setAttribute('aria-current','page');else el.removeAttribute('aria-current');
  });
- document.title='Rangeform · '+({overview:'Overview',signals:'Trade decision desk',scanner:'Opportunity scanner',news:'News & catalysts',settings:'Settings',studio:'Research Studio'}[page]);
+ document.title='Rangeform · '+({overview:'Overview',signals:'Trade decision desk',scanner:'Opportunity scanner',news:'News & catalysts',settings:'Settings',studio:'Research Studio',daydesk:'Day Trading Desk'}[page]);
  history.replaceState(null,'','#'+page);
  closeNav();
  const discovery=document.querySelector('.discovery-card'),host=page==='scanner'?$('discoveryScannerHost'):$('discoveryHome');
@@ -84,7 +84,7 @@ function routeFromHash(){
  const raw=location.hash.slice(1).toLowerCase();
  const legacy=oldRoutes[raw];
  if(legacy){setPage(legacy.page,legacy.focus||null);return}
- setPage(['overview','signals','scanner','news','settings','studio'].includes(raw)?raw:'overview');
+ setPage(['overview','daydesk','signals','scanner','news','settings','studio'].includes(raw)?raw:'overview');
 }
 function closeNav(){$('sidebar').classList.remove('open');$('navShade').hidden=true}
 function initTheme(){let theme;try{theme=localStorage.getItem('rf_v9_theme')||localStorage.getItem('rangeform_theme')||'light'}catch{}setTheme(theme)}
@@ -455,10 +455,10 @@ function renderNews(data){
   info.append(originalInline);
   details.onclick=()=>{
    const open=details.getAttribute('aria-expanded')==='true';
-   $$$('.story-context-toggle[aria-expanded="true"]').forEach(b=>{
+   $('.story-context-toggle[aria-expanded="true"]').forEach(b=>{
     b.setAttribute('aria-expanded','false');b.textContent='Source & timing';
    });
-   $$$('.story-context-panel').forEach(p=>p.hidden=true);
+   $('.story-context-panel').forEach(p=>p.hidden=true);
    info.hidden=open;
    details.setAttribute('aria-expanded',String(!open));
    details.textContent=open?'Source & timing':'Hide source info';
