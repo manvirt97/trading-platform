@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 const load=path=>readFileSync(new URL('../'+path,import.meta.url),'utf8');
 
-test('V10 navigation is canonical while classic tools and account stay available',()=>{
+test('V10 is canonical and legacy browser entry routes cannot display classic layouts',()=>{
  const index=load('public/index.html');
  const modern=load('public/v9.html');
  const account=load('public/account.html');
@@ -13,14 +13,14 @@ test('V10 navigation is canonical while classic tools and account stay available
  const manifest=JSON.parse(load('public/manifest.webmanifest'));
  assert.match(index,/location.replace\('\/v9.html'/);
  assert.match(market,/href="\/market.html"/); // preserved as explicitly optional classic source
- assert.match(rules,/\/market.html \/v9.html#overview 302/);
+ assert.match(rules,/\/market.html \/v9.html 302/);
  assert.match(research,/location.replace\('\/v9.html'/);
  assert.match(account,/href="\/v9.html#overview"/);
  assert.match(account,/href="\/v9.html#scanner"/);
  assert.match(account,/href="\/v9.html#signals"/);
  assert.match(account,/href="\/account.html"/);
  assert.match(account,/account-v11.css/);
- assert.match(modern,/href="\/research.html\?classic=1"/); // intentional classic escape only
+ assert.doesNotMatch(modern,/href="\/research.html\?classic=1"/); // legacy escape retired
  assert.match(modern,/rel="manifest" href="\/manifest.webmanifest\?v=11"/);
  assert.equal(manifest.display,'standalone');
  assert.equal(manifest.scope,'/');
