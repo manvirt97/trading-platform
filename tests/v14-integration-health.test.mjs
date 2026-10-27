@@ -52,7 +52,7 @@ test('Unauthenticated and unconfigured Claude endpoints fail closed',async()=>{
  const check=await onRequestGet({request:new Request('https://example.com/api/claude-health'),env:{}});
  assert.equal(check.status,503);
 });
-test('TradingView needs a token, KV namespace and private owner; scanner binding is distinct',()=>{
+test('TradingView needs a token, KV namespace and private owner; scanner binding is distinct',async()=>{
  const k={get:async()=>null};
  const partial=(await status({env:{TRADINGVIEW_WEBHOOK_TOKEN:'secure',TV_EVENTS:k}}));
  const payload=await partial.json();
