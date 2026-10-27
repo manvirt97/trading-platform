@@ -7,7 +7,7 @@
  const cap=200,costPerSide=.0005;
  const money=n=>Number.isFinite(n)?(n<0?'−':'')+'$'+Math.abs(n).toLocaleString('en-CA',{minimumFractionDigits:2,maximumFractionDigits:2}):'—';
  const create=(tag,cls,txt)=>{const e=document.createElement(tag);if(cls)e.className=cls;if(txt!=null)e.textContent=String(txt);return e};
- const valid=t=>t&&typeof t.symbol==='string'&&/^[A-Z][A-Z0-9.-]{0,9}$/.test(t.symbol)&&Number.isFinite(t.entry)&&Number.isFinite(t.stop)&&Number.isFinite(t.qty)&&t.qty>0&&t.entry>0&&t.stop>0&&t.stop<t.entry&&['open','closed'].includes(t.status);
+ const valid=t=>t&&typeof t.symbol==='string'&&/^[A-Z][A-Z0-9.-]{0,9}$/.test(t.symbol)&&Number.isFinite(t.entry)&&Number.isFinite(t.stop)&&Number.isFinite(t.qty)&&t.qty>0&&t.entry>0&&t.stop>0&&t.stop<t.entry&&['open','closed'].includes(t.status)&&(t.status==='open'||Number.isFinite(t.exit)&&t.exit>0&&typeof t.closedAt==='string'&&Number.isFinite(Date.parse(t.closedAt)));
  const load=()=>{try{const arr=JSON.parse(localStorage.getItem(KEY)||'[]');return Array.isArray(arr)?arr.filter(valid).slice(0,cap):[]}catch{return []}};
  const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(state.trades.slice(0,cap)))}catch{$('paperStatus').textContent='Unable to save practice journal in this browser. Check private-browsing storage settings.'}};
  const state={trades:load(),paused:false,last:null};
@@ -85,7 +85,7 @@
     t.status==='closed'?pnl(t).toFixed(2):'',t.status==='closed'?rMultiple(t)?.toFixed(3):''].map(q).join(','));
   const blob=new Blob([[headers.join(','),...rows].join('\r\n')],{type:'text/csv;charset=utf-8'});
   const uri=URL.createObjectURL(blob),a=document.createElement('a');a.href=uri;a.download='rangeform-paper-practice.csv';
-  document.body.append(a);a.click();a.remove();URL.revokeObjectURL(uri);
+  document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(uri),1000);
  }
  function bind(){
   $('paperOpen').addEventListener('click',open);
