@@ -63,7 +63,7 @@ test('TradingView needs a token, KV namespace and private owner; scanner binding
  const data=await ready.json();
  assert.equal(data.tradingview_bridge_configured,true);
  assert.equal(data.scheduled_scanner_storage_bound,true);
- assert.equal(data.app_version,'V14');
+ assert.equal(data.app_version,'V16');
  assert.doesNotMatch(JSON.stringify(data),/secure|private-uid/);
 });
 test('Unified palette uses one theme across sidebar, workspace, news and studio',()=>{
