@@ -31,7 +31,7 @@ export function runAgentRoom(analysis,opportunity,now=new Date()){
  const history=bars.length>=55;
  const agents=[];
  // 10 risk/context specialists.
- let a=agent('integrity','Data Integrity','Safety',0);agents.push(gate(a,analysis?.source==='twelvedata'&&analysis?.data_quality==='complete-ohlcv'&&bars.length>=36&&numeric(close),'Only real, validated OHLCV bars may enter the supervisor.',true));
+ let a=agent('integrity','Data Integrity','Safety',0);agents.push(gate(a,['twelvedata','finnhub-backup'].includes(analysis?.source)&&analysis?.data_quality==='complete-ohlcv'&&bars.length>=36&&numeric(close),'Only real, validated OHLCV bars may enter the supervisor.',true));
  a=agent('freshness','Completed Bar Freshness','Safety',0);
  const age=last?Math.round((+now-Date.parse(last.time))/1000):Infinity,validAge=numeric(duration)&&age>=duration&&age<=duration*3+180;
  agents.push(gate(a,validAge&&opportunity?.status!=='WAIT_STALE'&&opportunity?.status!=='NO_DATA','Latest completed bar age '+(Number.isFinite(age)?Math.round(age/60)+' minutes':'unknown')+'; current entry blocked if stale.',true));

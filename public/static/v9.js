@@ -17,19 +17,19 @@ function saveWatch(){try{localStorage.setItem('rf_v9_watch',JSON.stringify(state
 function setTheme(v){document.body.dataset.theme=v==='dark'?'dark':'light';try{localStorage.setItem('rf_v9_theme',document.body.dataset.theme)}catch{}}
 const create=(tag,className,text)=>{let el=document.createElement(tag);if(className)el.className=className;if(text!=null)el.textContent=String(text);return el};
 async function request(url){const res=await fetch(url,{cache:'no-store',headers:{Accept:'application/json'}});let d;try{d=await res.json()}catch{throw Error('Received an invalid response.')}if(!res.ok||d.error)throw Error(d.error||d.note||'Request unavailable ('+res.status+')');return d}
-function setPage(page){if(!['overview','signals','scanner','news'].includes(page))return;state.view=page;document.body.dataset.view=page;$$('[data-section]').forEach(p=>p.classList.toggle('visible',p.dataset.section===page));$$('.nav-link[data-page]').forEach(el=>{el.classList.toggle('active',el.dataset.page===page);el.setAttribute('aria-current',el.dataset.page===page?'page':'false')});document.title='Rangeform · '+({overview:'Overview',signals:'Trade decision desk',scanner:'Market scanner',news:'News & catalysts'}[page]);history.replaceState(null,'','#'+page);window.scrollTo({top:0,behavior:'instant'});closeNav();if(page==='news'&&!state.newsCache.has(state.newsCategory+'|'+$('newsQuery').value.trim()))loadNews();if(page==='signals'&&state.analysis)renderAnalysis(state.analysis);if(page==='overview'&&state.configured&&!state.discovery)discoverMarket()}
+function setPage(page){if(!['overview','signals','scanner','news'].includes(page))return;state.view=page;document.body.dataset.view=page;$$('[data-section]').forEach(p=>p.classList.toggle('visible',p.dataset.section===page));$$('.nav-link[data-page]').forEach(el=>{el.classList.toggle('active',el.dataset.page===page);el.setAttribute('aria-current',el.dataset.page===page?'page':'false')});document.title='Rangeform · '+({overview:'Overview',signals:'Trade decision desk',scanner:'Opportunity scanner',news:'News & catalysts'}[page]);history.replaceState(null,'','#'+page);window.scrollTo({top:0,behavior:'instant'});closeNav();const discovery=document.querySelector('.discovery-card');const host=page==='scanner'?$('discoveryScannerHost'):$('discoveryHome');if(discovery&&host)host.after(discovery);if(page==='news'&&!state.newsCache.has(state.newsCategory+'|'+$('newsQuery').value.trim()))loadNews();if(page==='signals'&&state.analysis)renderAnalysis(state.analysis);if((page==='overview'||page==='scanner')&&state.configured&&!state.discovery)discoverMarket()}
 function closeNav(){$('sidebar').classList.remove('open');$('navShade').hidden=true}
 function initTheme(){let theme;try{theme=localStorage.getItem('rf_v9_theme')||localStorage.getItem('rangeform_theme')||'light'}catch{}setTheme(theme)}
 function localClock(){try{$('localTime').textContent=new Intl.DateTimeFormat('en-CA',{timeZone:'America/Edmonton',hour:'numeric',minute:'2-digit'}).format(new Date())}catch{$('localTime').textContent='—'}}
 async function loadProvider(){
- try{const p=await request('/api/status');state.configured=Boolean(p.twelvedata_enabled);state.provider=state.configured?'Twelve Data enabled':'No authorized bars';
+ try{const p=await request('/api/status');state.configured=Boolean(p.twelvedata_enabled||p.finnhub_fallback_enabled);state.provider=p.twelvedata_enabled?'Twelve Data enabled':p.finnhub_fallback_enabled?'Finnhub authorized backup enabled':'No authorized bars';
   $('feedDot').className='status-dot '+(state.configured?'green':'amber');$('sideStatusDot').className='status-dot '+(state.configured?'green':'amber');
   $('feedLabel').textContent=state.configured?'Provider enabled':'Market feed not connected';$('sideStatus').textContent=state.configured?'History feed configured':'Market data not connected';
   $('sideStatusDetail').textContent=state.configured?'Bars may be delayed. Check timestamps.':'Connect a private provider in settings.';
   const detail=$('connectionDetails');detail.replaceChildren();
-  detail.append(create('p','',state.configured?'Twelve Data is enabled in Cloudflare. Historical bars are retrieved on demand, subject to your plan and exchange permissions. This is not a verified live trading quote.':'Twelve Data is not enabled for chart analysis. You can still read public financial news. To unlock technical signals, connect an authorized API in Data & settings.'));
+  detail.append(create('p','',state.configured?state.provider+' in Cloudflare. Completed historical bars are fetched on demand. Exchange permissions, delay and broker execution must be independently checked.':'Twelve Data is not enabled for chart analysis. You can still read public financial news. To unlock technical signals, connect an authorized API in Data & settings.'));
   $('signalFeedNotice').lastElementChild.textContent=state.configured?'Provider configured. Always check the completed bar timestamp, market status and execution spread.':'No verified market-data feed. Historical analysis and trades are unavailable until connected.';
-  if(state.configured&&state.view==='overview')discoverMarket();else if(!state.configured)discoveryReset('No authorized price-data feed. Connect Twelve Data to enable automatic discovery.');
+  if(state.configured&&['overview','scanner'].includes(state.view))discoverMarket();else if(!state.configured)discoveryReset('No authorized price-data feed. Connect Twelve Data to enable automatic discovery.');
  }catch(e){discoveryReset('Could not verify market-data configuration: '+e.message);$('feedLabel').textContent='Data status unavailable';$('sideStatus').textContent='Status unavailable';$('connectionDetails').textContent='Could not check provider settings: '+e.message}
 }
 // Fixed-universe discovery: never present research alignment as guaranteed profit.
@@ -69,8 +69,8 @@ async function discoverMarket(){
 }
 function scheduleDiscovery(){
  const due=()=>{const time=Date.parse(state.discovery?.checked_at);return !Number.isFinite(time)||Date.now()-time>=600000};
- setInterval(()=>{if(!document.hidden&&state.configured&&!state.discoveryLoading&&state.view==='overview'&&due())discoverMarket()},60000);
- document.addEventListener('visibilitychange',()=>{if(!document.hidden&&state.view==='overview'&&state.configured&&due())discoverMarket()});
+ setInterval(()=>{if(!document.hidden&&state.configured&&!state.discoveryLoading&&(state.view==='overview'||state.view==='scanner')&&due())discoverMarket()},60000);
+ document.addEventListener('visibilitychange',()=>{if(!document.hidden&&(state.view==='overview'||state.view==='scanner')&&state.configured&&due())discoverMarket()});
 }
 
 function renderWatch(){let root=$('watchList');root.replaceChildren();for(const symbol of state.watch){const row=create('div','watch-item'),open=create('button',''),rm=create('button','delete-symbol','×');open.type='button';open.append(create('strong','',symbol),create('small','',state.market.has(symbol)?money(state.market.get(symbol).last)+' · '+pct(state.market.get(symbol).change_pct):'Price not requested'));open.addEventListener('click',()=>inspect(symbol));rm.title='Remove '+symbol;rm.setAttribute('aria-label','Remove '+symbol);rm.addEventListener('click',()=>{state.watch=state.watch.filter(x=>x!==symbol);saveWatch();renderWatch()});row.append(open,rm);root.append(row)}}
@@ -79,14 +79,14 @@ function assessment(x){const daily=x.interval==='1day',ms=Date.now()-Date.parse(
 let kind=!complete||!fresh?'wait':score>=65?'bull':score<=35?'bear':'wait';
 return {kind,score:Number.isFinite(score)?score:null,fresh,complete,reason:!complete?'Validated OHLCV candles are missing.':!fresh?'Last completed bar is too old for a current setup.':kind==='bull'?'Bullish technical factors outweigh bearish factors.':kind==='bear'?'Bearish conditions dominate.':'Technical indicators disagree or lack strong alignment.'}}
 function cacheKey(symbol,interval){return symbol+'|'+interval}
-async function analyzeSymbol(symbol,interval='1day',force=false){if(!state.configured)throw Error('Private market-data provider is not enabled. Open Data & settings to connect it.');if(!symbolOK(symbol))throw Error('Please use a valid ticker symbol.');const key=cacheKey(symbol,interval);if(!force&&state.market.has(key))return state.market.get(key);const data=await request('/api/analyze?'+new URLSearchParams({symbol,source:'twelvedata',interval}));if(data.symbol!==symbol||data.source!=='twelvedata'||!Array.isArray(data.bar_history)||!Number.isFinite(Number(data.last))||!Number.isFinite(Date.parse(data.last_bar_utc)))throw Error('Provider analysis was incomplete or unverified.');state.market.set(key,data);if(interval==='1day')state.market.set(symbol,data);return data}
+async function analyzeSymbol(symbol,interval='1day',force=false){if(!state.configured)throw Error('Private market-data provider is not enabled. Open Data & settings to connect it.');if(!symbolOK(symbol))throw Error('Please use a valid ticker symbol.');const key=cacheKey(symbol,interval);if(!force&&state.market.has(key))return state.market.get(key);const data=await request('/api/analyze?'+new URLSearchParams({symbol,source:'twelvedata',interval}));if(data.symbol!==symbol||!['twelvedata','finnhub-backup'].includes(data.source)||!Array.isArray(data.bar_history)||!Number.isFinite(Number(data.last))||!Number.isFinite(Date.parse(data.last_bar_utc)))throw Error('Provider analysis was incomplete or unverified.');state.market.set(key,data);if(interval==='1day')state.market.set(symbol,data);return data}
 function setRow(root,symbol,x){const tr=create('tr');const result=x&&!x.error?assessment(x):null;const label=!x?'Not scanned':x.error?'Unavailable':result.kind==='bull'?'Bullish watch':result.kind==='bear'?'Bearish watch':result.fresh?'Wait':'Historical only';const td=(value,tag='td')=>{const el=create(tag,'',value);tr.append(el);return el};let asset=td(symbol);asset.append(create('small','',x?.error||'Completed bars'));if(root.id==='overviewResults'){const dir=td('');dir.append(create('span','signal-tag '+(result?.kind||''),label));td(result?.score!=null?result.score+'/100':'—');td(x?.last_bar_utc?ageLabel(x.last_bar_utc):'—');const last=td('');const b=create('button','cell-btn','Inspect ↗');b.onclick=()=>inspect(symbol);b.disabled=!x||Boolean(x.error);last.append(b)}else{td(x&&!x.error?money(x.last):'—');const dir=td('');dir.append(create('span','signal-tag '+(result?.kind||''),label));td(result?.score!=null?result.score+'/100':'—');td(x?.last_bar_utc?stamp(x.last_bar_utc):'—');const last=td('');const b=create('button','cell-btn','View chart ↗');b.onclick=()=>inspect(symbol);b.disabled=!x||Boolean(x.error);last.append(b)}root.append(tr)}
 function renderScan(rows){for(const id of ['scannerResults','overviewResults']){let el=$(id);el.replaceChildren();if(!rows.length){let row=create('tr'),cell=create('td','empty-inline','No real provider results available.');cell.colSpan=id==='scannerResults'?6:5;row.append(cell);el.append(row)}else for(const [sym,x] of rows)setRow(el,sym,x)}renderWatch();let loaded=rows.filter(([,x])=>x&&!x.error).length;$('scanSummary').textContent=loaded+' of '+rows.length+' symbols returned dated historical evidence. Technical scores are NOT win probabilities.'}
 async function scan(){if(state.scanning)return;if(!state.configured){toast('Connect a permitted Twelve Data feed before scanning.');setPage('signals');return}state.scanning=true;for(const id of ['scanButton','overviewScan']){$(id).disabled=true;$(id).textContent='Analyzing verified bars…'}
 const results=[];for(const sym of state.watch){try{const x=await analyzeSymbol(sym,'1day');results.push([sym,x])}catch(e){results.push([sym,{error:e.message}])}renderScan(results)}
 results.sort((a,b)=>{const sa=a[1]?.score, sb=b[1]?.score;return (Number.isFinite(sb)?sb:-1)-(Number.isFinite(sa)?sa:-1)});renderScan(results);
 for(const sym of ['SPY','NVDA','TSLA','SHOP']){const x=state.market.get(sym);const q=document.querySelector('[data-quote="'+sym+'"]'),delta=document.querySelector('[data-change="'+sym+'"]');if(x){q.textContent=money(x.last);delta.textContent=pct(x.change_pct)+' · '+ageLabel(x.last_bar_utc);delta.className=Number(x.change_pct)>=0?'positive':'negative'}}
-state.scanning=false;for(const id of ['scanButton','overviewScan']){$(id).disabled=false;$(id).innerHTML=id==='scanButton'?'Run watchlist scan ↗':'Scan my watchlist <span>↗</span>'}
+state.scanning=false;for(const id of ['scanButton','overviewScan']){$(id).disabled=false;$(id).innerHTML=id==='scanButton'?'Run watchlist scan ↗':'Explore opportunities <span>↗</span>'}
 toast(results.filter(x=>!x[1]?.error).length+' of '+results.length+' symbols analyzed. Review data age before acting.')}
 async function inspect(sym){setMonitor(false);state.symbol=sym;$('symbolInput').value=sym;setPage('signals');await runAnalysis()}
 function clearAnalysis(message){state.analysis=null;state.opportunity=null;state.agentRoom=null;resetAgentRoom(message);resetOpportunity(message);
@@ -99,7 +99,7 @@ async function runAnalysis(options={}){if(monitor.busy)return;const silent=optio
  $('analyzeBtn').disabled=true;$('analyzeBtn').textContent='Checking evidence…';
  try{
   const payload=await request('/api/opportunity?'+new URLSearchParams({symbol,interval,news:'1'}));
-  if(payload.analysis?.symbol!==symbol||payload.analysis?.source!=='twelvedata'||!payload.opportunity)
+  if(payload.analysis?.symbol!==symbol||!['twelvedata','finnhub-backup'].includes(payload.analysis?.source)||!payload.opportunity)
    throw Error('Provider response missing verified market evidence.');
   // Ignore late results after a symbol or interval change.
   if($('symbolInput').value.trim().toUpperCase()!==symbol||$('barInterval').value!==interval)return;
@@ -135,11 +135,18 @@ function resetAgentRoom(reason){
  grid.append(create('p','subtle-note',reason||'No specialist report loaded.'));
  $('agentRoomVerdict').textContent='Awaiting data';$('agentRoomVerdict').className='signal-tag';
  $('agentRoomSummary').textContent='No verified specialist evidence.';
- $('agentRoomVeto').hidden=true;$('agentRoomVeto').textContent='';
+ $('agentRoomVeto').hidden=true;$('agentRoomVeto').textContent='';headlineSupervisor(null);
+}
+function headlineSupervisor(report){
+ const h=$('supervisorHeadline'),p=$('supervisorOneLine');if(!h||!p)return;
+ const status=report?.verdict||'WAIT';
+ h.textContent=status==='BUY_WATCH'?'SUPERVISOR · BUY WATCH':status==='SELL_WATCH'?'SUPERVISOR · BEARISH WATCH':'SUPERVISOR · WAIT';
+ h.className='supervisor-status '+(status==='BUY_WATCH'?'bull':status==='SELL_WATCH'?'bear':'');
+ p.textContent=report?.next_step||'Missing or stale market evidence. No executable signal.';
 }
 function renderAgentRoom(report){
  if(!report?.agents){resetAgentRoom('Agent report unavailable. No multi-agent confirmation is claimed.');return}
- const result=report.verdict||'WAIT';
+ const result=report.verdict||'WAIT';headlineSupervisor(report);
  $('agentRoomVerdict').textContent=result==='BUY_WATCH'?'BUY WATCH':result==='SELL_WATCH'?'BEARISH WATCH':'WAIT';
  $('agentRoomVerdict').className='signal-tag '+(result==='BUY_WATCH'?'bull':result==='SELL_WATCH'?'bear':'');
  $('agentRoomSummary').textContent=report.specialist_count+' specialist checks · '+report.available_votes+' evidenced votes · '+report.abstentions+' unavailable · '+report.agreement_pct+'% directional agreement · consensus '+(report.score>0?'+':'')+report.score+'. Agreement is not profit probability.';
@@ -266,7 +273,7 @@ function renderNews(data){$('newsChecked').textContent='Checked '+dateString(dat
 data.items.forEach((item,i)=>{if(!/^https:\/\//.test(item.url))return;const row=create('article','news-item'),num=create('span','news-item-num',String(i+1).padStart(2,'0')),content=create('div','news-item-content'),meta=create('div','story-meta'),link=create('a','',item.title),info=create('small','',(item.source||'Publisher')+' · '+ageLabel(item.date));meta.append(create('span','',item.topic||'MARKETS'),create('span','',ageLabel(item.date)),create('span','',item.source||'Public news'));link.href=item.url;link.target='_blank';link.rel='noopener noreferrer';link.className='story-link';link.append(create('span','sr-only',''));const h=create('h3');h.append(link);content.append(meta,h,info);row.append(num,content);row.addEventListener('click',e=>{if(e.target.closest('a'))return;selectArticle(item)});const select=create('button','cell-btn','Details');select.type='button';select.title='View source details';select.onclick=()=>selectArticle(item);row.append(select);root.append(row)})
 }
 function selectArticle(item){$('articleContextTitle').textContent=item.title;$('articleContext').textContent=(item.source||'Source')+' · published '+stamp(item.date)+'. Verify the full article and price reaction before drawing conclusions. The headline is not a trade signal.';const link=$('articleOriginal');link.href=item.url;link.hidden=false}
-function bind(){initTheme();state.watch=readWatch();renderWatch();bindAgentFilters();scheduleDiscovery();localClock();setInterval(localClock,60000);
+function bind(){initTheme();state.watch=readWatch();renderWatch();bindAgentFilters();$('showAgentRoom')?.addEventListener('click',()=>$('agentRoomTitle')?.scrollIntoView({behavior:'smooth',block:'start'}));scheduleDiscovery();localClock();setInterval(localClock,60000);
 $$('[data-page]').forEach(el=>el.addEventListener('click',()=>setPage(el.dataset.page)));
 $('mobileMenu').onclick=()=>{$('sidebar').classList.toggle('open');$('navShade').hidden=!$('sidebar').classList.contains('open')};$('navShade').onclick=closeNav;
 $('themeToggle').onclick=()=>setTheme(document.body.dataset.theme==='dark'?'light':'dark');
@@ -276,7 +283,7 @@ $('symbolInput').addEventListener('keydown',e=>{if(e.key==='Enter')runAnalysis()
 $('analyzeBtn').onclick=runAnalysis;$('monitorRefresh').onclick=()=>runAnalysis();
  $('monitorToggle').onclick=()=>setMonitor(!monitor.enabled);
 $('barInterval').onchange=()=>{setMonitor(false);clearAnalysis('Interval changed. Analyze again to load valid bars.')};
-$('overviewScan').onclick=scan;$('scanButton').onclick=scan;$('watchAdd').onclick=addWatch;
+$('overviewScan').onclick=()=>setPage('scanner');$('scanButton').onclick=scan;$('watchAdd').onclick=addWatch;
 $('discoveryRefresh').onclick=discoverMarket;$('discoveryUniverse').onchange=()=>{state.discoveryUniverse=$('discoveryUniverse').value;state.discovery=null;discoverMarket()};
 $('riskAccount').addEventListener('input',renderRisk);$('riskPercent').addEventListener('input',renderRisk);
 $('newsSearchBtn').onclick=()=>loadNews(true);$('newsQuery').addEventListener('keydown',e=>{if(e.key==='Enter')loadNews(true)});

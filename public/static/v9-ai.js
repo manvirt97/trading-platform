@@ -1,7 +1,7 @@
 /* Integrated Rangeform research assistant. Rule-based evidence first; optional
    signed-in Cloudflare Workers AI when the provider actually exists. */
 const $=id=>document.getElementById(id);
-const state={discovery:null,user:null,aiReady:false,authReady:false,auth:null,signIn:null,signOut:null};
+const state={discovery:null,user:null,aiReady:false,authReady:false,auth:null,signIn:null,signOut:null,selectedSymbol:null,claudeEnabled:false};
 const answer=(txt)=>{$('assistantAnswer').textContent=txt;};
 const service=(txt)=>{$('assistantService').textContent=txt;};
 const authStatus=(txt)=>{$('assistantAuthState').textContent=txt;};
@@ -30,7 +30,9 @@ async function getJSON(path,opts={}){
 async function initAuth(){
  try{
   const cfg=await getJSON('/api/profile-config');
-  if(!cfg.ai_enabled){
+  state.claudeEnabled=Boolean(cfg.claude_enabled);
+  $('claudeDeskStatus').textContent=state.claudeEnabled?'Claude configured · login required':'Claude key not configured';
+  if(!cfg.ai_enabled&&!cfg.claude_enabled){
    service('AI model unavailable');
    authStatus(!cfg.enabled?'Google account/D1 configuration unavailable. Evidence explanations remain usable.':'Cloudflare AI binding or AI_ENABLED is missing. Evidence explanations remain usable.');
    return;
@@ -48,13 +50,14 @@ async function initAuth(){
    await signInWithPopup(state.auth,provider);
   };
   state.signOut=async()=>signOut(state.auth);
-  state.aiReady=true;state.authReady=true;
+  state.aiReady=Boolean(cfg.ai_enabled);state.authReady=true;
   $('assistantSignIn').hidden=false;
   onAuthStateChanged(state.auth,user=>{
    state.user=user;
    $('assistantSignIn').hidden=!!user;
    $('assistantSignOut').hidden=!user;
-   service(user?'AI model connected':'AI model ready · sign in');
+   service(user?'AI sign-in connected':'Sign in for Cloudflare AI or Claude');
+   $('claudeDeskStatus').textContent=state.claudeEnabled?(user?'Claude ready · 11 agents':'Claude configured · sign in'):'Claude API not enabled';
    authStatus(user?'Signed in as '+(user.email||'Google user')+' · authenticated requests only':'Sign in with Google to use Cloudflare AI. Evidence explanations require no sign-in.');
   });
  }catch(e){
@@ -84,7 +87,62 @@ async function useModel(){
   answer('AI REQUEST COULD NOT COMPLETE\n\n'+message+'\n\nThe app can still explain the most recent validated scan without AI:\n'+groundedReply());
  }finally{button.disabled=false;button.textContent='Ask AI model'}
 }
+async function runClaudeCouncil(){
+ const badge=$('claudeDeskStatus'),btn=$('runClaudeCouncil');
+ const symbol=state.selectedSymbol||document.getElementById('symbolInput')?.value?.trim().toUpperCase();
+ const interval=document.getElementById('barInterval')?.value||'5min';
+ if(!state.claudeEnabled){badge.textContent='Claude not configured';$('claudeDeskIntro').textContent='Cloudflare needs ANTHROPIC_API_KEY, CLAUDE_AGENTS_ENABLED=on, Firebase and D1.';return}
+ if(!state.user){badge.textContent='Google sign-in required';$('claudeDeskIntro').textContent='Open Overview → Evidence Assistant → Sign in with Google, then return to Trade signals.';return}
+ if(!/^[A-Z][A-Z0-9.-]{0,9}$/.test(symbol||'')){badge.textContent='Analyze a valid ticker first';return}
+ btn.disabled=true;btn.textContent='Running 10 specialists + supervisor…';
+ badge.textContent='Investigating '+symbol;
+ const container=$('claudeAgentResults');container.replaceChildren();
+ $('claudeSupervisor').replaceChildren();$('claudeSupervisor').append(document.createTextNode('Collecting market evidence and independent Claude specialist reports…'));
+ try{
+  const token=await state.user.getIdToken();
+  const data=await getJSON('/api/claude-desk',{method:'POST',headers:{Authorization:'Bearer '+token,'Content-Type':'application/json'},body:JSON.stringify({symbol,interval})});
+  badge.textContent='Claude completed · '+data.agents_count+' specialist/supervisor reports';
+  $('claudeDeskIntro').textContent='Source: '+data.source+'. Last completed bar: '+time(data.bar_time)+'. Risk vetoes remain authoritative.';
+  const top=$('claudeSupervisor');top.replaceChildren();
+  const h=document.createElement('strong');h.textContent='FINAL DECISION: '+data.decision+' · '+data.claude_supervisor.state;
+  const p=document.createElement('p');p.textContent=data.claude_supervisor.assessment;
+  top.append(h,p);
+  if(data.hard_vetoes?.length){const v=document.createElement('p');v.className='claude-veto';v.textContent='Hard veto: '+data.hard_vetoes.map(x=>x.agent+': '+x.reason).join(' | ');top.append(v)}
+  for(const agent of data.claude_agents||[]){
+   const block=document.createElement('article');block.className='claude-agent-entry';
+   const name=document.createElement('strong');name.textContent=agent.name+' · '+agent.state;
+   const summary=document.createElement('p');summary.textContent=agent.assessment;
+   block.append(name,summary);container.append(block);
+  }
+ }catch(e){badge.textContent='Claude request unavailable';$('claudeSupervisor').textContent=e.message+'. No AI trading conclusion was generated.'}
+ finally{btn.disabled=false;btn.textContent='Investigate with 11 Claude agents'}
+}
+async function inspectConnection(kind){
+ const target=$('integrationResults'),button=$(kind==='tv'?'tvRefresh':'cronRefresh');
+ if(!state.user){target.textContent='Google sign-in is required to view private alert and scheduled-scan records. Sign in from Overview → Evidence Assistant.';return}
+ button.disabled=true;target.textContent='Checking authenticated '+(kind==='tv'?'TradingView alerts':'scheduled scanner')+'…';
+ try{
+  const token=await state.user.getIdToken();
+  const result=await getJSON(kind==='tv'?'/api/tv-alerts':'/api/scheduled-opportunities',{headers:{Authorization:'Bearer '+token}});
+  target.replaceChildren();
+  const items=kind==='tv'?(result.items||[]):(result.items||[]);
+  if(!items.length){target.textContent='No recorded '+(kind==='tv'?'TradingView webhook events':'scheduled scan candidates')+'. This is not evidence of a market opportunity.';return}
+  for(const item of items.slice(0,10)){
+   const row=document.createElement('div');row.className='integration-event';
+   const headline=document.createElement('strong'),detail=document.createElement('span');
+   headline.textContent=kind==='tv'?item.symbol+' · '+item.action:item.symbol+' · '+item.status;
+   detail.textContent=kind==='tv'?time(item.received_at)+' · Unverified chart alert':time(item.bar_time)+' · Completed bar / '+(item.quality_score??'unknown')+'/100 alignment';
+   row.append(headline,detail);target.append(row);
+  }
+ }catch(e){target.textContent='Connection unavailable: '+e.message}
+ finally{button.disabled=false}
+}
 function bind(){
+ window.addEventListener('rangeform:agent-report',event=>{state.selectedSymbol=event.detail?.analysis?.symbol||null});
+ $('runClaudeCouncil')?.addEventListener('click',runClaudeCouncil);
+ $('tvRefresh')?.addEventListener('click',()=>inspectConnection('tv'));
+ $('cronRefresh')?.addEventListener('click',()=>inspectConnection('cron'));
+ fetch('/api/status',{cache:'no-store'}).then(r=>r.json()).then(x=>{const el=$('tvState');if(el)el.textContent=x.tradingview_bridge_configured?'Receiver configured · verify webhook test delivery':'Not configured. Set dedicated token and TV_EVENTS KV.'}).catch(()=>{$('tvState').textContent='Status unavailable'});
  window.addEventListener('rangeform:discovery',event=>{state.discovery=event.detail;const data=state.discovery;
   if(data?.items?.length)answer('SCAN UPDATED · '+time(data.checked_at)+'\n\n'+groundedReply());
   else answer('MARKET DATA NOT READY\n\n'+(data?.reason||'No verified scan available.'));

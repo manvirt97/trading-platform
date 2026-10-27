@@ -292,3 +292,37 @@ body[data-theme=dark] .verdict-card.bear{background:linear-gradient(100deg,#402b
 .paper-table th{font-size:9px;padding:9px}
 .paper-table td{font-size:11px;padding:10px}
 .paper-actions{display:flex;align-items:center;justify-content:flex-end;margin-top:12px}
+
+
+/* V10: a decision-first research supervisor, separate from execution. */
+.supervisor-bar{display:flex;align-items:center;gap:12px;padding:12px 16px;border:1px solid var(--line);border-radius:13px;background:var(--card);margin-bottom:13px}
+.supervisor-status{font-size:13px;font-weight:800;letter-spacing:.02em;border-radius:8px;padding:7px 11px;background:var(--muted-card);white-space:nowrap}
+.supervisor-status.bull{color:var(--green);background:var(--green-soft)}
+.supervisor-status.bear{color:var(--red);background:var(--red-soft)}
+.supervisor-bar>span:nth-child(2){flex:1;color:var(--secondary);font-size:12px;line-height:1.5}
+.supervisor-bar button{flex:none}
+.claude-desk-card .card-head{align-items:flex-start}
+.claude-actions{display:flex;align-items:center;flex-wrap:wrap;gap:12px;padding:11px 0 14px}
+.claude-actions small{font-size:11px;line-height:1.5;color:var(--secondary)}
+.claude-supervisor{border:1px solid var(--line);background:var(--blue-soft);border-radius:12px;padding:15px;margin-bottom:12px}
+.claude-supervisor strong{font-size:15px}
+.claude-supervisor p{font-size:13px;line-height:1.65;margin:8px 0 0}
+.claude-supervisor .claude-veto{color:var(--red);font-weight:720}
+.claude-agent-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;max-height:490px;overflow-y:auto;scrollbar-width:thin}
+.claude-agent-entry{padding:13px;border:1px solid var(--line);border-radius:11px;background:var(--card)}
+.claude-agent-entry strong{font-size:12.5px;display:block}
+.claude-agent-entry p{margin:6px 0 0;font-size:12px;color:var(--secondary);line-height:1.6}
+.integrations-card p{color:var(--secondary);font-size:12px;line-height:1.65}
+.integration-state{display:flex;justify-content:space-between;align-items:center;gap:12px;border-top:1px solid var(--line);padding:10px 0;font-size:12px}
+.integration-state strong{font-weight:730}
+.integration-state span{color:var(--secondary);text-align:right}
+.integration-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:11px 0}
+.integration-actions button{flex:1}
+.integration-results{background:var(--muted-card);border:1px solid var(--line);border-radius:10px;padding:12px;font-size:12px;color:var(--secondary);line-height:1.5;min-height:44px}
+.integration-event{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:9px 0;border-bottom:1px solid var(--line)}
+.integration-event:last-child{border:0}
+.integration-event span{font-size:11px}
+@media(max-width:740px){.supervisor-bar{flex-wrap:wrap}.supervisor-bar>span:nth-child(2){flex:1 1 100%;order:3}.supervisor-bar button{margin-left:auto}.claude-agent-list{grid-template-columns:1fr}.integration-state{align-items:flex-start;flex-direction:column}.integration-state span{text-align:left}}
+
+.version-marker{font-weight:800;font-size:10px;letter-spacing:.05em;color:var(--blue);border:1px solid var(--line);background:var(--blue-soft);padding:7px 9px;border-radius:8px;white-space:nowrap}
+@media(max-width:1180px){.version-marker{display:none}}

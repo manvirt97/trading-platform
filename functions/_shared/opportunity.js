@@ -48,7 +48,7 @@ export function evaluateOpportunity(analysis, news={state:'not-checked',items:[]
  const lastBar=new Date(analysis?.last_bar_utc||'');
  const age=+now-+lastBar;
  const size={'1min':1,'5min':5,'15min':15,'1day':1440}[interval];
- const usable=analysis?.source==='twelvedata'&&analysis?.data_quality==='complete-ohlcv'&&bars.length>=36&&last>0&&Number.isFinite(last)&&Number.isFinite(age)&&age>=0&&Boolean(size);
+ const usable=['twelvedata','finnhub-backup'].includes(analysis?.source)&&analysis?.data_quality==='complete-ohlcv'&&bars.length>=36&&last>0&&Number.isFinite(last)&&Number.isFinite(age)&&age>=0&&Boolean(size);
  const ny=nyParts(now),lastNY=nyParts(lastBar);
  const inSession=Boolean(ny&&!['Sat','Sun'].includes(ny.weekday)&&ny.minute>=570&&ny.minute<960);
  const intraday=interval!=='1day';
@@ -94,7 +94,7 @@ export function evaluateOpportunity(analysis, news={state:'not-checked',items:[]
   last_completed_bar_utc:Number.isFinite(+lastBar)?lastBar.toISOString():null,
   bar_age_minutes:Number.isFinite(age)?round(age/60_000,1):null,
   market_session:inSession?'regular-us-equity-session':'outside-regular-us-equity-session',
-  source:'Twelve Data historical OHLCV (not an executable quote)',source_status:usable?'historical-verified-structure':'unavailable',
+  source:(analysis?.source==='finnhub-backup'?'Finnhub fallback':'Twelve Data')+' historical OHLCV (not an executable quote)',source_status:usable?'historical-verified-structure':'unavailable',
   setup_score:Number.isFinite(score)?score:null,opening_range:range,
   observations,news:{state:newsState,stories:newsItems,recent_headlines_24h:recentCount,interpretation:'Headlines are context only; no verified directional sentiment, event impact or real-time price reaction is inferred.'},
   plan,volume_profile:candleVolumeProfile(bars),

@@ -5,8 +5,8 @@
 <meta name="description" content="Rangeform: evidence-first market research, conditional trade plans and market news.">
 <title>Rangeform — Market intelligence</title>
 <link rel="icon" type="image/png" href="/static/rangeform-official-icon.png">
-<link rel="stylesheet" href="/static/v9.css?v=5">
-<script src="/static/v9.js?v=5" defer></script><script src="/static/v9-ai.js?v=1" type="module"></script><script src="/static/v9-paper.js?v=1" defer></script>
+<link rel="stylesheet" href="/static/v9.css?v=7">
+<script src="/static/v9.js?v=7" defer></script><script src="/static/v9-ai.js?v=3" type="module"></script><script src="/static/v9-paper.js?v=1" defer></script>
 </head>
 <body data-view="overview" data-theme="light">
 <div class="app">
@@ -16,7 +16,7 @@
   <nav class="side-nav" aria-label="Main navigation">
    <button class="nav-link active" data-page="overview"><span class="nav-icon">◫</span> Overview</button>
    <button class="nav-link" data-page="signals"><span class="nav-icon">↗</span> Trade signals</button>
-   <button class="nav-link" data-page="scanner"><span class="nav-icon">◎</span> Market scanner</button>
+   <button class="nav-link" data-page="scanner"><span class="nav-icon">◎</span> Opportunity scanner</button>
    <button class="nav-link" data-page="news"><span class="nav-icon">▤</span> News &amp; catalysts</button>
    <a class="nav-link" href="/research.html?classic=1#copilot"><span class="nav-icon">✳</span> Research AI <small class="nav-hint">Existing</small></a>
   </nav>
@@ -32,19 +32,19 @@
   <header class="topbar">
    <button id="mobileMenu" class="icon-button mobile-menu" type="button" aria-label="Open navigation">☰</button>
    <div class="top-search"><span aria-hidden="true">⌕</span><input type="search" id="globalSearch" maxlength="12" placeholder="Search a symbol (e.g. NVDA, SHOP)" aria-label="Search stock symbol"><kbd>↵</kbd></div>
-   <div class="top-right"><div class="market-time"><span>CALGARY</span><strong id="localTime">--:--</strong></div><button id="providerBadge" type="button" class="provider-pill"><span id="feedDot" class="status-dot amber"></span><span id="feedLabel">Checking feed</span></button><button id="themeToggle" class="icon-button" type="button" aria-label="Toggle light and dark theme">◐</button><a class="user-circle" href="/account.html" title="My workspace" aria-label="My workspace">↗</a></div>
+   <div class="top-right"><span class="version-marker" title="Visible deployed interface version">V10 · CLAUDE COUNCIL</span><div class="market-time"><span>CALGARY</span><strong id="localTime">--:--</strong></div><button id="providerBadge" type="button" class="provider-pill"><span id="feedDot" class="status-dot amber"></span><span id="feedLabel">Checking feed</span></button><button id="themeToggle" class="icon-button" type="button" aria-label="Toggle light and dark theme">◐</button><a class="user-circle" href="/account.html" title="My workspace" aria-label="My workspace">↗</a></div>
   </header>
   <main class="main" id="main">
    <section class="page visible" data-section="overview">
-    <div class="page-heading"><div><div class="eyebrow">OVERVIEW / MARKET INTELLIGENCE</div><h1>Find promising setups.<br><em>Know exactly why.</em></h1><p>Scan your watchlist, compare technical evidence, and understand the risks—without the noise.</p></div><button type="button" class="primary-btn" id="overviewScan">Scan my watchlist <span>↗</span></button></div>
+    <div class="page-heading"><div><div class="eyebrow">OVERVIEW / MARKET INTELLIGENCE</div><h1>Find promising setups.<br><em>Know exactly why.</em></h1><p>Scan your watchlist, compare technical evidence, and understand the risks—without the noise.</p></div><button type="button" class="primary-btn" id="overviewScan">Explore opportunities <span>↗</span></button></div>
     <div class="market-strip" id="marketStrip" aria-label="Market snapshot">
      <div class="strip-cell"><span>SPY · US LARGE CAP</span><strong data-quote="SPY">—</strong><small data-change="SPY">Provider required</small></div>
      <div class="strip-cell"><span>NVDA · SEMICONDUCTORS</span><strong data-quote="NVDA">—</strong><small data-change="NVDA">Provider required</small></div>
      <div class="strip-cell"><span>TSLA · EV</span><strong data-quote="TSLA">—</strong><small data-change="TSLA">Provider required</small></div>
      <div class="strip-cell"><span>SHOP · CANADIAN TECH</span><strong data-quote="SHOP">—</strong><small data-change="SHOP">Provider required</small></div>
     </div>
-    <section class="card discovery-card" aria-labelledby="discoveryTitle">
-  <div class="card-head"><div><div class="eyebrow">AUTOMATIC DISCOVERY · SERVER-VERIFIED SAMPLE</div><h2 id="discoveryTitle">Market opportunities — no ticker search needed</h2><p id="discoveryStatus">Checking connection before scanning a small, fixed universe. No real-time market-wide claims.</p></div>
+    <div id="discoveryHome"></div><section class="card discovery-card" aria-labelledby="discoveryTitle">
+  <div class="card-head"><div><div class="eyebrow">AUTOMATIC DISCOVERY · SERVER-VERIFIED SAMPLE</div><h2 id="discoveryTitle">Automatic opportunity scanner</h2><p id="discoveryStatus">Checking connection before scanning a small, fixed universe. No real-time market-wide claims.</p></div>
     <div class="discovery-actions"><select id="discoveryUniverse" aria-label="Choose sample market universe"><option value="leaders">US large-cap leaders</option><option value="diversified">Diversified US sample</option></select><button id="discoveryRefresh" class="subtle-btn" type="button">Scan sample ↻</button></div></div>
   <div class="table-scroller"><table class="scanner-table"><thead><tr><th>SYMBOL</th><th>RESEARCH STATUS</th><th>INDICATOR SCORE</th><th>LAST BAR</th><th>WHY IT'S WATCHED</th><th></th></tr></thead><tbody id="discoveryResults"><tr><td colspan="6" class="empty-inline">Automatic discovery requires an authorized OHLCV data connection.</td></tr></tbody></table></div>
   <div class="discovery-footer"><span id="discoveryTimestamp">Not scanned</span><span>Fixed six-stock sample · refreshed on page view and up to every 10 minutes while visible · no orders</span></div>
@@ -72,6 +72,7 @@
       <div class="monitor-copy"><div class="eyebrow">OPPORTUNITY MONITOR / CONFIRMATIONS</div><strong>Pattern + volume + news</strong><p id="monitorStatus">Connect authorized data to check trading conditions. This is not a streaming feed.</p></div>
       <div class="monitor-actions"><span id="monitorChecked" class="monitor-checked">Not checked</span><button type="button" id="monitorRefresh" class="subtle-btn">Check now ↻</button><button type="button" id="monitorToggle" class="subtle-btn" aria-pressed="false">Auto-check: off</button></div>
     </div>
+    <div class="supervisor-bar" id="supervisorBar" role="status"><span class="supervisor-status" id="supervisorHeadline">SUPERVISOR · AWAITING VERIFIED DATA</span><span id="supervisorOneLine">22 deterministic checks govern trade readiness.</span><button type="button" id="showAgentRoom" class="subtle-btn">Inspect specialists ↘</button></div>
     <div class="security-strip" id="signalFeedNotice"><span class="status-dot amber"></span><span>Historical analysis only until verified data is available. No brokerage execution.</span></div>
     <div class="quote-strip"><div><span id="selectedSymbol" class="ticker-title">NVDA</span><small>US equities · technical context</small></div><div class="quote-number"><strong id="selectedPrice">—</strong><small id="selectedChange">Awaiting completed price bars</small></div><div><small>LAST COMPLETED BAR</small><strong id="lastBarTime">—</strong></div><div><small>INDICATOR ALIGNMENT</small><strong id="indicatorScore">—</strong></div></div>
     <div class="signal-grid">
@@ -80,7 +81,23 @@
        <article class="card pattern-card"><div class="card-head"><div><div class="eyebrow">LIVE-ELIGIBLE SETUP CHECK</div><h2>Opening-range breakout</h2></div><span id="patternStatus" class="signal-tag">Waiting for bars</span></div>
        <div class="pattern-stats"><div><small>OPENING HIGH</small><strong id="openingHigh">—</strong></div><div><small>OPENING LOW</small><strong id="openingLow">—</strong></div><div><small>RELATIVE VOLUME</small><strong id="confirmedVolume">—</strong></div></div><p id="patternExplanation" class="subtle-note">Uses 9:30–10:00 a.m. New York opening range with completed 1-, 5- or 15-minute candles. Requires trend and volume confirmation.</p></article>
        <article class="card chart-card"><div class="chart-title"><div><div class="eyebrow">PRICE STRUCTURE</div><h2>Verified historical chart</h2></div><div class="chart-controls"><label for="barInterval">Bars</label><select id="barInterval"><option value="5min" selected>5 min · intraday</option><option value="15min">15 min</option><option value="1min">1 min</option><option value="1day">Daily · context</option></select></div></div><div class="chart-wrap"><canvas id="priceChart" aria-label="Candlestick price chart. A text summary of the loaded prices is available above." role="img"></canvas><div id="chartPlaceholder" class="chart-placeholder"><span class="chart-art">▥</span><strong>No verified price history loaded</strong><p>Choose Analyze to load completed bars. Data from public widgets is not used to calculate these signals.</p></div></div><div class="chart-footer"><span><i class="key-dot green"></i> Candles</span><span><i class="key-dot blue"></i> Previous resistance</span><span><i class="key-dot red"></i> Previous support</span><span>Scenario lines are conditional illustrations, not forecasts</span></div></article>
-       <article class="card agent-room-card" aria-labelledby="agentRoomTitle">
+       <article class="card claude-desk-card" aria-labelledby="claudeDeskTitle">
+ <div class="card-head"><div><div class="eyebrow">REAL CLAUDE SPECIALISTS · OPT-IN</div><h2 id="claudeDeskTitle">Claude research council</h2><p>10 separate Claude specialists + 1 Claude supervisor. Server-fetches market data, news and timeframe context; deterministic safety vetoes cannot be overridden.</p></div><span class="signal-tag" id="claudeDeskStatus">Not configured</span></div>
+ <p class="subtle-note" id="claudeDeskIntro">Select a stock and sign in with Google. Actual Claude model requests require your server-side Anthropic API key and permission.</p>
+ <div class="claude-actions"><button class="primary-btn" type="button" id="runClaudeCouncil">Investigate with 11 Claude agents</button><small>Explicit request only. 2 runs/account/day and 16 platform-wide, subject to API billing.</small></div>
+ <div class="claude-supervisor" id="claudeSupervisor"><strong>Supervisor verdict</strong><p>No Claude investigation has been run. Technical safety controls remain independent.</p></div>
+ <div id="claudeAgentResults" class="claude-agent-list"><p class="subtle-note">Individual Claude specialist reports appear here, including abstentions and failed calls.</p></div>
+ </article>
+ <article class="card integrations-card" aria-labelledby="integrationsTitle">
+ <div class="eyebrow">REAL-TIME INPUTS · OPTIONAL CONNECTIONS</div><h2 id="integrationsTitle">TradingView & scheduled scans</h2>
+ <p>TradingView sends Pine Script alerts into a secured webhook. Market-data quotes must still come from an entitled licensed provider. External alerts never place orders.</p>
+ <div class="integration-state"><strong>TradingView webhook</strong><span id="tvState">Checking configuration…</span></div>
+ <div class="integration-state"><strong>Scheduled scanner</strong><span id="cronState">Requires separate Cloudflare Worker and shared KV binding</span></div>
+ <div class="integration-actions"><button id="tvRefresh" class="subtle-btn" type="button">View my TradingView alerts</button><button id="cronRefresh" class="subtle-btn" type="button">View latest scheduled scan</button></div>
+ <div id="integrationResults" class="integration-results" aria-live="polite">Sign in with Google, configure the bridge and click a button to view events.</div>
+ <p class="subtle-note">The webhook uses a dedicated 32+ character integration token and sender verification. Never put a broker credential or Anthropic API key in a TradingView alert.</p>
+ </article>
+ <article class="card agent-room-card" aria-labelledby="agentRoomTitle">
         <div class="card-head">
          <div><div class="eyebrow">MULTI-SPECIALIST RESEARCH · 22 CHECKS</div>
          <h2 id="agentRoomTitle">The Agent Room</h2>
@@ -122,7 +139,7 @@
     </div>
    </section>
    <section class="page" data-section="scanner">
-    <div class="page-heading"><div><div class="eyebrow">SCANNER / YOUR SYMBOLS</div><h1>Opportunity scanner</h1><p>Compare up to six watchlist symbols on completed real market bars—not a fake market-wide sweep.</p></div><button id="scanButton" class="primary-btn" type="button">Run watchlist scan ↗</button></div><div class="security-strip"><span class="status-dot amber"></span><span>Requires an authorized Twelve Data subscription. Historical scores are not forecasts or orders.</span></div><div class="card"><div class="card-head"><div><h2>Technical candidates</h2><p id="scanSummary">No scan completed. Rankings will appear only after actual data is retrieved.</p></div></div><div class="table-scroller"><table class="scanner-table"><thead><tr><th>SYMBOL</th><th>PRICE</th><th>TECHNICAL BIAS</th><th>ALIGNMENT</th><th>BAR TIME</th><th></th></tr></thead><tbody id="scannerResults"><tr><td colspan="6" class="empty-inline">No scan results. Use Run watchlist scan after connecting market data.</td></tr></tbody></table></div></div>
+    <div class="page-heading"><div><div class="eyebrow">AUTOMATIC MARKET DISCOVERY</div><h1>Opportunity scanner</h1><p>Compare up to six watchlist symbols on completed real market bars—not a fake market-wide sweep.</p></div><button id="scanButton" class="primary-btn" type="button">Run watchlist scan ↗</button></div><div id="discoveryScannerHost"></div><div class="security-strip"><span class="status-dot amber"></span><span>Requires an authorized Twelve Data subscription. Historical scores are not forecasts or orders.</span></div><div class="card"><div class="card-head"><div><h2>Technical candidates</h2><p id="scanSummary">No scan completed. Rankings will appear only after actual data is retrieved.</p></div></div><div class="table-scroller"><table class="scanner-table"><thead><tr><th>SYMBOL</th><th>PRICE</th><th>TECHNICAL BIAS</th><th>ALIGNMENT</th><th>BAR TIME</th><th></th></tr></thead><tbody id="scannerResults"><tr><td colspan="6" class="empty-inline">No scan results. Use Run watchlist scan after connecting market data.</td></tr></tbody></table></div></div>
    </section>
    <section class="page" data-section="news">
     <div class="page-heading"><div><div class="eyebrow">DISCOVER / TRUSTED PUBLISHERS</div><h1>News &amp; catalysts<br><em>that matter.</em></h1><p>Company developments, earnings and macro events. Each story links to its source.</p></div></div>
