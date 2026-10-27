@@ -1,16 +1,16 @@
 {
   "name": "Rangeform — Market Intelligence",
   "short_name": "Rangeform",
-  "description": "Interactive market charts, research, news and a personal workspace",
+  "description": "Rangeform V10 market intelligence, research agents, opportunities, personal account and paper practice",
   "id": "/",
-  "start_url": "/research",
+  "start_url": "/v9.html#overview",
   "scope": "/",
   "display": "standalone",
   "display_override": [
     "standalone"
   ],
-  "background_color": "#0d1623",
-  "theme_color": "#0d1623",
+  "background_color": "#f6f8fb",
+  "theme_color": "#f6f8fb",
   "orientation": "any",
   "icons": [
     {
@@ -22,18 +22,29 @@
   ],
   "shortcuts": [
     {
-      "name": "Market Desk",
-      "short_name": "Markets",
-      "url": "/market.html"
+      "name": "Overview",
+      "short_name": "Home",
+      "url": "/v9.html#overview",
+      "icons": [
+        {
+          "src": "/static/rangeform-official-icon.png",
+          "sizes": "96x96"
+        }
+      ]
     },
     {
-      "name": "Advanced Research",
-      "short_name": "Research",
-      "url": "/research"
+      "name": "Opportunity Scanner",
+      "short_name": "Scanner",
+      "url": "/v9.html#scanner"
     },
     {
-      "name": "My Workspace",
-      "short_name": "Workspace",
+      "name": "Trade Signals",
+      "short_name": "Signals",
+      "url": "/v9.html#signals"
+    },
+    {
+      "name": "My Account",
+      "short_name": "Account",
       "url": "/account.html"
     }
   ]
