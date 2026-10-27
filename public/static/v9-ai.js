@@ -174,7 +174,7 @@ function bind(){
   const scanner=Boolean(x.scheduled_scanner_storage_bound);
   const p=x.tradingview_components||{};
   const missing=[
-   !p.receiver_secret?'encrypted webhook token':null,
+   !p.receiver_token?'encrypted webhook token':null,
    !p.event_store?'TV_EVENTS KV binding':null,
    !p.private_owner?'private owner ID':null
   ].filter(Boolean);
