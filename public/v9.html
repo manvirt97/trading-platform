@@ -5,8 +5,8 @@
 <meta name="description" content="Rangeform: evidence-first market research, conditional trade plans and market news.">
 <title>Rangeform — Market intelligence</title>
 <link rel="icon" type="image/png" href="/static/rangeform-official-icon.png">
-<link rel="stylesheet" href="/static/v9.css?v=6">
-<script src="/static/v9.js?v=6" defer></script><script src="/static/v9-ai.js?v=2" type="module"></script><script src="/static/v9-paper.js?v=1" defer></script>
+<link rel="stylesheet" href="/static/v9.css?v=7">
+<script src="/static/v9.js?v=7" defer></script><script src="/static/v9-ai.js?v=3" type="module"></script><script src="/static/v9-paper.js?v=1" defer></script>
 </head>
 <body data-view="overview" data-theme="light">
 <div class="app">
@@ -87,6 +87,15 @@
  <div class="claude-actions"><button class="primary-btn" type="button" id="runClaudeCouncil">Investigate with 11 Claude agents</button><small>Explicit request only. 2 runs/account/day and 16 platform-wide, subject to API billing.</small></div>
  <div class="claude-supervisor" id="claudeSupervisor"><strong>Supervisor verdict</strong><p>No Claude investigation has been run. Technical safety controls remain independent.</p></div>
  <div id="claudeAgentResults" class="claude-agent-list"><p class="subtle-note">Individual Claude specialist reports appear here, including abstentions and failed calls.</p></div>
+ </article>
+ <article class="card integrations-card" aria-labelledby="integrationsTitle">
+ <div class="eyebrow">REAL-TIME INPUTS · OPTIONAL CONNECTIONS</div><h2 id="integrationsTitle">TradingView & scheduled scans</h2>
+ <p>TradingView sends Pine Script alerts into a secured webhook. Market-data quotes must still come from an entitled licensed provider. External alerts never place orders.</p>
+ <div class="integration-state"><strong>TradingView webhook</strong><span id="tvState">Checking configuration…</span></div>
+ <div class="integration-state"><strong>Scheduled scanner</strong><span id="cronState">Requires separate Cloudflare Worker and shared KV binding</span></div>
+ <div class="integration-actions"><button id="tvRefresh" class="subtle-btn" type="button">View my TradingView alerts</button><button id="cronRefresh" class="subtle-btn" type="button">View latest scheduled scan</button></div>
+ <div id="integrationResults" class="integration-results" aria-live="polite">Sign in with Google, configure the bridge and click a button to view events.</div>
+ <p class="subtle-note">The webhook uses a dedicated 32+ character integration token and sender verification. Never put a broker credential or Anthropic API key in a TradingView alert.</p>
  </article>
  <article class="card agent-room-card" aria-labelledby="agentRoomTitle">
         <div class="card-head">
