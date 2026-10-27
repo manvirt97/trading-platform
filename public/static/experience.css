@@ -347,26 +347,8 @@ body[data-theme=light] .news-columns .tv-news-frame{background:#fff}
 .sidebar .brand-mark img{display:block;width:100%;height:100%;object-fit:contain;border-radius:13px}
 .sidebar-backdrop{display:none}
 .sidebar-backdrop[hidden]{display:none!important}
-@media(min-width:1081px){
- .topbar{position:sticky}
- .topbar .global-nav{position:absolute;left:calc(50% - 126px);top:50%;transform:translate(-50%,-50%);display:grid;grid-template-columns:repeat(3,minmax(0,1fr));width:465px;min-width:465px;max-width:465px;gap:5px;margin:0;padding:4px;border:1px solid var(--border);border-radius:13px;background:var(--surface)}
- .topbar .global-nav a{min-width:0;text-align:center;overflow:hidden;text-overflow:ellipsis;padding:11px 6px}
- .topbar .top-actions{margin-left:auto}
- .topbar .crumb{max-width:135px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
-}
-@media(min-width:1081px) and (max-width:1450px){
- .topbar .global-nav{width:420px;min-width:420px;max-width:420px}
- .topbar .global-nav a{font-size:11px}
- .topbar .local-clock,.topbar .et-clock{display:none}
- .topbar .time-cluster{display:none}
-}
-@media(min-width:681px) and (max-width:1080px){
- .topbar{display:grid;grid-template-columns:180px minmax(0,1fr);grid-template-rows:45px 45px;height:97px;align-items:center;padding:4px 17px}
- .topbar .top-left{grid-column:1;grid-row:1}
- .topbar .global-nav{grid-column:1/-1;grid-row:2;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));width:100%;margin:0;gap:5px}
- .topbar .global-nav a{width:100%;text-align:center}
- .topbar .top-actions{grid-column:2;grid-row:1;justify-content:flex-end}
-}
+/* Header: old fixed-width absolute nav and competing intermediate breakpoints
+   removed. A single responsive grid layout now lives in topbar-v10.css. */
 @media(max-width:1000px){
  body.sidebar-active{overflow:hidden;touch-action:pan-y}
  .sidebar{z-index:150!important;box-shadow:16px 0 85px #0008;overscroll-behavior-y:contain}
