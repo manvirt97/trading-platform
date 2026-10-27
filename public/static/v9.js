@@ -86,7 +86,7 @@ async function scan(){if(state.scanning)return;if(!state.configured){toast('Conn
 const results=[];for(const sym of state.watch){try{const x=await analyzeSymbol(sym,'1day');results.push([sym,x])}catch(e){results.push([sym,{error:e.message}])}renderScan(results)}
 results.sort((a,b)=>{const sa=a[1]?.score, sb=b[1]?.score;return (Number.isFinite(sb)?sb:-1)-(Number.isFinite(sa)?sa:-1)});renderScan(results);
 for(const sym of ['SPY','NVDA','TSLA','SHOP']){const x=state.market.get(sym);const q=document.querySelector('[data-quote="'+sym+'"]'),delta=document.querySelector('[data-change="'+sym+'"]');if(x){q.textContent=money(x.last);delta.textContent=pct(x.change_pct)+' · '+ageLabel(x.last_bar_utc);delta.className=Number(x.change_pct)>=0?'positive':'negative'}}
-state.scanning=false;for(const id of ['scanButton','overviewScan']){$(id).disabled=false;$(id).innerHTML=id==='scanButton'?'Run watchlist scan ↗':'Scan my watchlist <span>↗</span>'}
+state.scanning=false;for(const id of ['scanButton','overviewScan']){$(id).disabled=false;$(id).innerHTML=id==='scanButton'?'Run watchlist scan ↗':'Explore opportunities <span>↗</span>'}
 toast(results.filter(x=>!x[1]?.error).length+' of '+results.length+' symbols analyzed. Review data age before acting.')}
 async function inspect(sym){setMonitor(false);state.symbol=sym;$('symbolInput').value=sym;setPage('signals');await runAnalysis()}
 function clearAnalysis(message){state.analysis=null;state.opportunity=null;state.agentRoom=null;resetAgentRoom(message);resetOpportunity(message);
@@ -283,7 +283,7 @@ $('symbolInput').addEventListener('keydown',e=>{if(e.key==='Enter')runAnalysis()
 $('analyzeBtn').onclick=runAnalysis;$('monitorRefresh').onclick=()=>runAnalysis();
  $('monitorToggle').onclick=()=>setMonitor(!monitor.enabled);
 $('barInterval').onchange=()=>{setMonitor(false);clearAnalysis('Interval changed. Analyze again to load valid bars.')};
-$('overviewScan').onclick=scan;$('scanButton').onclick=scan;$('watchAdd').onclick=addWatch;
+$('overviewScan').onclick=()=>setPage('scanner');$('scanButton').onclick=scan;$('watchAdd').onclick=addWatch;
 $('discoveryRefresh').onclick=discoverMarket;$('discoveryUniverse').onchange=()=>{state.discoveryUniverse=$('discoveryUniverse').value;state.discovery=null;discoverMarket()};
 $('riskAccount').addEventListener('input',renderRisk);$('riskPercent').addEventListener('input',renderRisk);
 $('newsSearchBtn').onclick=()=>loadNews(true);$('newsQuery').addEventListener('keydown',e=>{if(e.key==='Enter')loadNews(true)});
