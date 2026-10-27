@@ -38,12 +38,12 @@ test('API rejects unsupported universes and missing provider without making netw
  assert.equal(result.status,503);
  assert.equal((await result.json()).code,'PROVIDER_OFF');
 });
-test('new home includes automatic discovery and both AI experiences with setup visibility',()=>{
+test('new home includes on-demand discovery and both AI experiences with setup visibility',()=>{
  const html=read('public/v9.html'),client=read('public/static/v9.js'),ai=read('public/static/v9-ai.js');
  for(const id of ['discoveryResults','discoveryUniverse','discoveryRefresh','assistantAnswer','assistantUseAI','assistantExplain','assistantSignIn','assistantQuestion'])assert.match(html,new RegExp('id="'+id+'"'));
  assert.match(client,/\/api\/market-discovery/);
  assert.match(client,/rangeform:discovery/);
- assert.match(client,/600000/);
+ assert.match(client,/automatic six-ticker polling is disabled/);
  assert.match(ai,/\/api\/profile-config/);
  assert.match(ai,/\/api\/research-ai/);
  assert.match(ai,/getIdToken/);

@@ -5,7 +5,7 @@ import {UNIVERSES,candidateFromAnalysis,rankCandidates} from '../_shared/discove
 import {onRequestGet as getNews} from './news.js';
 
 const expiryMs=10*60*1000;
-const headers={'cache-control':'public, max-age=600','x-content-type-options':'nosniff'};
+const headers={'cache-control':'no-store','x-content-type-options':'nosniff'};
 const reply=(obj,status=200)=>new Response(JSON.stringify(obj),{status,headers:{'content-type':'application/json; charset=utf-8',...headers}});
 async function enrichNews(request,rows){
  // Only the highest-ranked candidate gets a headline cross-check in the
@@ -34,6 +34,7 @@ export async function onRequestGet({request,env}){
   try{const old=await cache.match(key);if(old){const payload=await old.json();if(Number.isFinite(Date.parse(payload.checked_at))&&Date.now()-Date.parse(payload.checked_at)<expiryMs)return reply({...payload,cache:'edge-cache'})}}catch{/* Proceed to bounded fetch */ }
  }
  const symbols=UNIVERSES[universe],interval='5min',started=Date.now(),result=[],errors=[];
+ let limited=false,retry=65;
  // Serial groups of 2 cap concurrency and prevent a single browser request from
  // requesting an entire market. Provider credit consumption: at most 6 bars calls.
  for(let i=0;i<symbols.length;i+=2){
@@ -45,8 +46,13 @@ export async function onRequestGet({request,env}){
   batch.forEach((p,j)=>{
    const symbol=symbols[i+j];
    if(p.status==='fulfilled')result.push(p.value);
-   else errors.push({symbol,reason:String(p.reason?.message||'Data not available').slice(0,140)});
+   else{
+    const e=p.reason||{};
+    if(e.code==='PROVIDER_RATE_LIMIT'){limited=true;retry=Math.max(retry,Number(e.retryAfterSeconds)||65)}
+    errors.push({symbol,reason:String(e.message||'Data not available').slice(0,140)});
+   }
   });
+  if(limited)break; // Never spend the remaining API budget on hopeless requests.
  }
  const ranked=rankCandidates(result);
  await enrichNews(request,ranked);
@@ -57,10 +63,11 @@ export async function onRequestGet({request,env}){
   refresh_interval_seconds:600,processing_ms:Date.now()-started,cache:'new',
   actionable:ranked.filter(x=>['BUY_WATCH','SELL_WATCH'].includes(x.status)).length,
   items:ranked.map(({priority,grade,...candidate})=>candidate),
-  errors,
-  note:'Automatic research across a fixed 6-symbol sample only. Ranked alignment is not probability of profit. Market-closed or stale candles never produce actionable watches.'
+  errors,rate_limited:limited,retry_after_seconds:limited?retry:null,
+  note:'On-demand research across a fixed 6-symbol sample only. Ranked alignment is not probability of profit. Market-closed or stale candles never produce actionable watches.'
  };
- const response=reply(data,ranked.length?200:503);
- if(cache&&ranked.length){try{await cache.put(key,response.clone())}catch{/* Cache is optional. */}}
+ const code=ranked.length?200:limited?429:503;
+ const response=reply(code===429?{...data,error:'Twelve Data API quota reached. Scanning paused until the provider limit resets.',code:'PROVIDER_RATE_LIMIT'}:data,code);
+ if(cache&&ranked.length&&!limited){try{await cache.put(key,response.clone())}catch{/* Cache is optional. */}}
  return response;
 }

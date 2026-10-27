@@ -1,5 +1,6 @@
+import {getTwelveData} from './provider-quota.js';
 export const json=(body,status=200)=>new Response(JSON.stringify(body),{status,headers:{'content-type':'application/json; charset=utf-8','cache-control':'no-store','x-content-type-options':'nosniff','referrer-policy':'no-referrer'}});
-export async function wrap(fn){try{return json(await fn())}catch(e){return json({error:e.message||'Request failed'},e instanceof TypeError?500:400)}}
+export async function wrap(fn){try{return json(await fn())}catch(e){const status=e?.code==='PROVIDER_RATE_LIMIT'?429:e?.status===403?403:e instanceof TypeError?500:400;return new Response(JSON.stringify({error:e.message||'Request failed',code:e?.code||'REQUEST_UNAVAILABLE',retry_after_seconds:e?.retryAfterSeconds||null}),{status,headers:{'content-type':'application/json; charset=utf-8','cache-control':'no-store',...(status===429?{'retry-after':String(e?.retryAfterSeconds||65)}:{})}})}}
 export const WATCH=['AAPL','NVDA','TSLA','MSFT','AMZN','AMD','META','GOOGL','SOFI'];
 
 const INTERVAL_MS={ '1min':60000,'5min':300000,'15min':900000,'1day':86400000 };
@@ -46,15 +47,19 @@ export async function getData(request,env,force){
  let primaryError='';
  if(env.TWELVEDATA_API_KEY){
   try{
-   const q=new URLSearchParams({symbol,interval,outputsize:'300',apikey:env.TWELVEDATA_API_KEY,format:'JSON',timezone:'UTC'});
-   const response=await fetch('https://api.twelvedata.com/time_series?'+q,{
-    headers:{Accept:'application/json'},signal:AbortSignal.timeout(9000),
-    cf:{cacheTtl:interval==='1day'?900:60,cacheEverything:true}
-   });
-   if(!response.ok)throw Error('Twelve Data HTTP '+response.status);
-   const body=await response.json();
-   return {bars:parseTwelve(body,interval),meta:{source:'twelvedata',freshness:'PROVIDER BARS — CHECK LAST BAR / EXCHANGE DELAY',source_detail:'Twelve Data OHLCV; delays and exchange rights vary by plan',currency:body.meta?.currency||'USD',interval}};
-  }catch(e){primaryError=String(e?.message||'Primary provider unavailable').slice(0,100)}
+   const provider=await getTwelveData({request,env,symbol,interval});
+   return {bars:parseTwelve(provider.data,interval),meta:{source:'twelvedata',
+    freshness:'PROVIDER HISTORICAL BARS — CHECK LAST BAR / EXCHANGE DELAY',
+    source_detail:'Twelve Data completed historical OHLCV; API response '+provider.cache_state+' at '+provider.fetched_at+'. Exchange delays and display rights vary by plan.',
+    fetched_at:provider.fetched_at,cache_state:provider.cache_state,credits_left:provider.credits_left,
+    currency:provider.data.meta?.currency||'USD',interval}};
+  }catch(e){
+   if(e?.code==='PROVIDER_RATE_LIMIT'){
+    if(backupEnabled(env))return getFinnhubBars(env,symbol,interval);
+    throw e;
+   }
+   primaryError=String(e?.message||'Primary provider unavailable').slice(0,160);
+  }
  }else primaryError='Twelve Data secret is not configured';
  if(backupEnabled(env))return getFinnhubBars(env,symbol,interval);
  throw Error('Verified historical bars unavailable: '+primaryError+'. Authorized backup disabled or unavailable.');
