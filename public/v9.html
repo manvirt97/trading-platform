@@ -5,19 +5,20 @@
 <meta name="description" content="Rangeform: evidence-first market research, conditional trade plans and market news.">
 <title>Rangeform — Market intelligence</title>
 <link rel="icon" type="image/png" href="/static/rangeform-official-icon.png">
-<link rel="stylesheet" href="/static/v9.css?v=8"><link rel="stylesheet" href="/static/v11-mobile.css?v=1"><link rel="stylesheet" href="/static/v12-settings-news.css?v=1">
-<script src="/static/v9.js?v=11" defer></script><script src="/static/v9-ai.js?v=4" type="module"></script><script src="/static/v9-paper.js?v=1" defer></script>
+<link rel="stylesheet" href="/static/v9.css?v=8"><link rel="stylesheet" href="/static/v11-mobile.css?v=1"><link rel="stylesheet" href="/static/v12-settings-news.css?v=1"><link rel="stylesheet" href="/static/v13-premium.css?v=1">
+<script src="/static/v9.js?v=12" defer></script><script type="module" src="/static/research-studio.js?v=1"></script><script src="/static/v9-ai.js?v=4" type="module"></script><script src="/static/v9-paper.js?v=1" defer></script>
 </head>
 <body data-view="overview" data-theme="light">
 <div class="app">
  <aside class="sidebar" id="sidebar">
-  <a class="brand" href="/v9.html#overview" aria-label="Rangeform home"><img src="/static/rangeform-official-icon.png" alt="" width="37" height="37"><span><strong>Rangeform</strong><small>V10.4 · MARKET INTELLIGENCE</small></span></a>
+  <a class="brand" href="/v9.html#overview" aria-label="Rangeform home"><img src="/static/rangeform-official-icon.png" alt="" width="37" height="37"><span><strong>Rangeform</strong><small>V13 · RESEARCH &amp; DECISIONS</small></span></a>
   <div class="nav-label">WORKSPACE</div>
   <nav class="side-nav" aria-label="Main navigation">
    <button class="nav-link active" data-page="overview"><span class="nav-icon">◫</span> Overview</button>
    <button class="nav-link" data-page="signals"><span class="nav-icon">↗</span> Trade signals</button>
    <button class="nav-link" data-page="scanner"><span class="nav-icon">◎</span> Opportunity scanner</button>
    <button class="nav-link" data-page="news"><span class="nav-icon">▤</span> News &amp; catalysts</button>
+   <button class="nav-link" data-page="studio"><span class="nav-icon">◈</span> Research Studio <span class="nav-hint">10 tools</span></button>
    <button class="nav-link" type="button" data-page="overview" data-focus="assistantTitle"><span class="nav-icon">✳</span> Research AI</button>
   </nav>
   <div class="nav-label border-label">YOUR TOOLS</div>
@@ -33,7 +34,7 @@
    <button id="mobileMenu" class="icon-button mobile-menu" type="button" aria-label="Open navigation">☰</button>
    <a class="mobile-header-brand" href="/v9.html#overview" aria-label="Rangeform overview"><img src="/static/rangeform-official-icon.png" width="25" height="25" alt=""><strong>Rangeform</strong></a>
    <div class="top-search"><span aria-hidden="true">⌕</span><input type="search" id="globalSearch" maxlength="12" placeholder="Search a symbol (e.g. NVDA, SHOP)" aria-label="Search stock symbol"><kbd>↵</kbd></div>
-   <div class="top-right"><span class="version-marker" title="Visible deployed interface version">V10.4 · CLAUDE COUNCIL</span><div class="market-time"><span>CALGARY</span><strong id="localTime">--:--</strong></div><button id="providerBadge" type="button" class="provider-pill" title="Market data status. Tap for details."><span id="feedDot" class="status-dot amber"></span><span id="feedLabel">Checking feed</span></button><button id="themeToggle" class="icon-button" type="button" aria-label="Toggle light and dark theme">◐</button><a class="user-circle" href="/account.html" title="Account and private settings" aria-label="My workspace">↗</a></div>
+   <div class="top-right"><span class="version-marker" title="Rangeform unified research release">V13 · RESEARCH STUDIO</span><div class="market-time"><span>CALGARY</span><strong id="localTime">--:--</strong></div><button id="providerBadge" type="button" class="provider-pill" title="Market data status. Tap for details."><span id="feedDot" class="status-dot amber"></span><span id="feedLabel">Checking feed</span></button><button id="themeToggle" class="icon-button" type="button" aria-label="Toggle light and dark theme">◐</button><a class="user-circle" href="/account.html" title="Account and private settings" aria-label="My workspace">↗</a></div>
   </header>
   <main class="main" id="main">
    <section class="page visible" data-section="overview">
@@ -148,6 +149,31 @@
     <div class="news-layout"><section class="card news-card"><div class="card-head"><div><div class="eyebrow">SOURCE-LINKED HEADLINES</div><h2 id="newsHeading">Latest market stories</h2></div><small id="newsChecked">Not checked</small></div><div class="news-items" id="newsItems"><p class="empty-inline">Opening latest financial headlines…</p></div></section><aside class="right-flow"><div class="card"><div class="eyebrow">WHY THIS MATTERS</div><h2>Read the story. Then the reaction.</h2><p>News is not a trading signal. Examine what changed, which companies are affected, whether markets have already priced it in, and how fresh the source is.</p><div class="filter-row"><span>✓</span><div><strong>Original publisher</strong><small>Open the source to check details</small></div></div><div class="filter-row"><span>✓</span><div><strong>Category-specific results</strong><small>Changing a filter requests new headlines</small></div></div></div><div class="card article-context-card"><div class="eyebrow">ARTICLE CONTEXT</div><h2 id="articleContextTitle">Choose a story</h2><p id="articleContext">Tap “Source & timing” below a headline to see when it was published and open its original source. Headlines do not establish a trading signal.</p><a id="articleOriginal" href="https://news.google.com/" target="_blank" rel="noopener noreferrer" class="button-link subtle-btn" hidden>Open original story ↗</a></div></aside></div>
    </section>
 
+
+   <section class="page studio-page" data-section="studio" aria-label="Research Studio">
+    <div class="studio-intro">
+     <div><div class="eyebrow">RANGEFORM / INSTITUTIONAL RESEARCH TOOLKIT</div><h1>Think deeper.<br><em>Invest with evidence.</em></h1><p>Ten specialized tools in one connected research workspace. Models calculate only from verified market history or clearly identified inputs.</p></div>
+     <div class="studio-intro-meta"><span class="studio-pill">10 research disciplines</span><span class="studio-pill">Source transparency</span><span class="studio-pill">No invented prices</span></div>
+    </div>
+    <div class="studio-layout">
+      <nav class="studio-nav" id="studioNav" aria-label="Research disciplines">
+       <button class="studio-tab active" data-studio="screener" type="button"><span>01</span> Stock screener</button>
+       <button class="studio-tab" data-studio="dcf" type="button"><span>02</span> DCF valuation</button>
+       <button class="studio-tab" data-studio="portfolio" type="button"><span>03</span> Portfolio risk</button>
+       <button class="studio-tab" data-studio="earnings" type="button"><span>04</span> Earnings</button>
+       <button class="studio-tab" data-studio="blueprint" type="button"><span>05</span> Portfolio blueprint</button>
+       <button class="studio-tab" data-studio="chart" type="button"><span>06</span> Chart breakdown</button>
+       <button class="studio-tab" data-studio="dividend" type="button"><span>07</span> Dividends</button>
+       <button class="studio-tab" data-studio="edge" type="button"><span>08</span> Competitive edge</button>
+       <button class="studio-tab" data-studio="patterns" type="button"><span>09</span> Historical patterns</button>
+       <button class="studio-tab" data-studio="macro" type="button"><span>10</span> Macro impact</button>
+      </nav>
+      <div class="studio-work" id="studioRoot" aria-live="polite">
+        <div class="studio-loading">Opening Research Studio…</div>
+      </div>
+    </div>
+    <p class="studio-legal">Educational research, not individualized investment advice. No broker orders or return guarantees. Data licences, issuer filings, earnings calendars and real-time quote entitlements are separate requirements.</p>
+   </section>
    <section class="page settings-page" data-section="settings" aria-label="Settings">
     <div class="page-heading"><div><div class="eyebrow">YOUR WORKSPACE / PREFERENCES</div><h1>Settings</h1><p>Make Rangeform yours. Appearance and news preferences are saved on this device; private service credentials stay on the server.</p></div></div>
     <div class="settings-grid-v12">

@@ -40,7 +40,7 @@ const oldRoutes={
   backtest:{page:'signals',focus:'agentRoomTitle'}
 };
 function setPage(page,focus=null){
- if(!['overview','signals','scanner','news','settings'].includes(page))return;
+ if(!['overview','signals','scanner','news','settings','studio'].includes(page))return;
  state.view=page;state.focus=focus;
  document.body.dataset.view=page;
  $$('[data-section]').forEach(el=>el.classList.toggle('visible',el.dataset.section===page));
@@ -49,7 +49,7 @@ function setPage(page,focus=null){
   el.classList.toggle('active',active);
   if(active)el.setAttribute('aria-current','page');else el.removeAttribute('aria-current');
  });
- document.title='Rangeform · '+({overview:'Overview',signals:'Trade decision desk',scanner:'Opportunity scanner',news:'News & catalysts',settings:'Settings'}[page]);
+ document.title='Rangeform · '+({overview:'Overview',signals:'Trade decision desk',scanner:'Opportunity scanner',news:'News & catalysts',settings:'Settings',studio:'Research Studio'}[page]);
  history.replaceState(null,'','#'+page);
  closeNav();
  const discovery=document.querySelector('.discovery-card'),host=page==='scanner'?$('discoveryScannerHost'):$('discoveryHome');
@@ -68,7 +68,7 @@ function routeFromHash(){
  const raw=location.hash.slice(1).toLowerCase();
  const legacy=oldRoutes[raw];
  if(legacy){setPage(legacy.page,legacy.focus||null);return}
- setPage(['overview','signals','scanner','news','settings'].includes(raw)?raw:'overview');
+ setPage(['overview','signals','scanner','news','settings','studio'].includes(raw)?raw:'overview');
 }
 function closeNav(){$('sidebar').classList.remove('open');$('navShade').hidden=true}
 function initTheme(){let theme;try{theme=localStorage.getItem('rf_v9_theme')||localStorage.getItem('rangeform_theme')||'light'}catch{}setTheme(theme)}
