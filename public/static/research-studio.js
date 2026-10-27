@@ -13,7 +13,7 @@ const cleanSymbol=x=>/^[A-Z][A-Z0-9.-]{0,9}$/.test(String(x||'').trim().toUpperC
 const escapeStr=x=>String(x??'').replace(/[&<>"']/g,s=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[s]));
 const box=(id,title,description,source,body)=>({id,title,description,source,body});
 const input=(id,label,placeholder='',type='number',value='')=>`<label class="research-field"><span>${label}</span><input id="rs-${id}" name="${id}" type="${type}" ${type==='number'?'step="any"':''} placeholder="${placeholder}" value="${value}" autocomplete="off"></label>`;
-const select=(id,label,options)=>`<label class="research-field"><span>${label}</span><select id="rs-${id}" name="${id}">${options.map(([value,title])=>`<option value="${value}">${title}</option>`).join('')}</select></label>`;
+const select=(id,label,options)=>{const ratings=["pricing","cost","switching","distribution","innovation"];const entries=ratings.includes(id)?[["","Choose an evidence rating"],...options]:options;return `<label class="research-field"><span>${label}</span><select id="rs-${id}" name="${id}">${entries.map(([value,title])=>`<option value="${value}">${title}</option>`).join("")}</select></label>`;};
 const textarea=(id,label,example,rows=5)=>`<label class="research-field wide"><span>${label}</span><textarea id="rs-${id}" name="${id}" rows="${rows}" spellcheck="false" placeholder="${example}"></textarea></label>`;
 const action=(id,label)=>`<button type="button" class="primary-btn studio-action" data-run="${id}">${label} <span aria-hidden="true">↗</span></button>`;
 const tools=[
@@ -76,6 +76,7 @@ box('edge','Competitive edge','Structure a business-moat comparison: pricing pow
 box('patterns','Historical pattern finder','Explore month-of-year returns and sample sizes from dated closing-price history, with warnings about weak evidence.','Source: your CSV of historical daily closes · data is processed locally',
  `<div class="studio-form-grid">${input('patternSymbol','Ticker / market','e.g. SPY','text')}
  ${textarea('dailyPrices','Daily closes as date,close (YYYY-MM-DD)','2023-01-03,380.82\n2023-01-04,383.76\n...\n2026-10-26,...',6)}</div>
+ <label class="studio-file-field"><span>Or import a price-history CSV from your device (no upload)</span><input type="file" id="rs-priceFile" accept=".csv,text/csv"></label>
  ${action('patterns','Measure monthly patterns')}
  <div class="research-footnote">Requires at least 13 monthly observations; multi-year samples are much more meaningful. Rate-change reactions, earnings-day returns and recovery studies require separate dated event data, not just price bars.</div>`),
 box('macro','Macro impact','Study qualitative links between rates, inflation, growth and currency changes, with a transparent currency-only scenario for a portfolio you enter.','Source: hypothetical macro changes you set · no automatically verified latest economic release',
@@ -221,6 +222,15 @@ async function run(tool){
 }
 function bootstrap(){
  if(!root||!nav)return;
+ root.addEventListener('change',async event=>{
+  const target=event.target;if(target?.id!=='rs-priceFile')return;
+  const file=target.files?.[0];if(!file)return;
+  if(file.size>500000){error('File exceeds the 500 KB local import limit.');return}
+  try{const csv=await file.text();if(!csv.includes(','))throw Error('CSV must contain date,close rows.');
+   $('dailyPrices').value=csv;const output=$('result');
+   if(output)output.replaceChildren(statement('CSV loaded locally. Select Measure monthly patterns to analyze it.'));
+  }catch(e){error('Could not read CSV: '+e.message)}
+ });
  nav.addEventListener('click',e=>{
   const button=e.target.closest('[data-studio]');if(!button)return;present(button.dataset.studio);
   if(window.innerWidth<900)root.scrollIntoView({behavior:'smooth',block:'start'});
