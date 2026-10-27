@@ -19,7 +19,8 @@ export async function checkOwnerQuote(env,symbol,uid,{fetcher=fetch,now=Date.now
  if(!SYMBOL.test(symbol))throw httpError(400,'INVALID_SYMBOL','Enter a valid US stock symbol.');
  if(!config.configured)throw httpError(503,'QUOTE_NOT_CONFIGURED','Owner-only Alpaca quote checks are not configured in Cloudflare.');
  if(uid!==env.TRADING_QUOTE_OWNER_UID)throw httpError(403,'OWNER_ONLY','Private data access is restricted to the authorized project owner.');
- const cacheKey=uid+'|'+symbol+'|'+config.feed,prior=quoteCache.get(cacheKey);
+ // The account key ID is only kept server-side and scopes cached quotes to the licensed account.
+ const cacheKey=uid+'|'+symbol+'|'+config.feed+'|'+env.ALPACA_DATA_KEY_ID,prior=quoteCache.get(cacheKey);
  if(prior&&now<prior.until)return {...prior.result,cache_status:'recent-owner-check'};
  if(quoteCache.size>120)for(const key of [...quoteCache.keys()].slice(0,40))quoteCache.delete(key);
  const url='https://data.alpaca.markets/v2/stocks/'+encodeURIComponent(symbol)+'/quotes/latest?feed='+config.feed;
