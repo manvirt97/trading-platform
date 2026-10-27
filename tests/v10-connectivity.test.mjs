@@ -89,10 +89,11 @@ test('V10 visible scanner, 11-Claude console, supervisor and verified provider s
 });
 
 
-test('Claude 5.5 request omits banned sampling parameters and uses model-correct thinking mode',()=>{
+test('Claude request uses a minimal Messages payload and no unsupported thinking flags',()=>{
  const code=read('functions/api/claude-desk.js');
  assert.doesNotMatch(code,/temperature\s*:/);
  assert.doesNotMatch(code,/top_p\s*:/);
  assert.doesNotMatch(code,/top_k\s*:/);
- assert.match(code,/JSON.stringify\(\{model,max_tokens:maxTokens,system,messages:/);\n assert.doesNotMatch(code,/thinking:\{type:model===/);
+ assert.match(code,/JSON.stringify\(\{model,max_tokens:maxTokens,system,messages:/);
+ assert.doesNotMatch(code,/thinking:\{type:model===/);
 });
