@@ -120,3 +120,21 @@ body[data-theme=dark] .daydesk-page{--dd-positive:#79c3a3;--dd-negative:#dd9b98;
 @media(prefers-reduced-motion:reduce){
  .daydesk-page *{scroll-behavior:auto!important;transition:none!important}
 }
+
+/* Owner-only bid/ask verification is a separate low-frequency snapshot tool. */
+.daydesk-quote-card>h2{font-size:19px;margin:5px 0 10px;letter-spacing:-.04em}
+.daydesk-quote-card>button{width:100%;min-height:42px;margin:9px 0 6px}
+.daydesk-quote-results{margin-top:11px;padding:13px;background:var(--muted-card);border:1px solid var(--line);border-radius:11px;color:var(--secondary);font-size:11px;line-height:1.65;overflow-wrap:anywhere}
+.daydesk-quote-results>strong{display:block;margin-bottom:10px;color:var(--ink);font-size:13px}
+.daydesk-quote-results[data-quote-state=recent]{border-left:3px solid var(--dd-positive)}
+.daydesk-quote-results[data-quote-state=stale]{border-left:3px solid var(--dd-vwap)}
+.daydesk-quote-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.daydesk-quote-grid>div{padding:9px;border:1px solid var(--line);border-radius:8px;background:var(--card)}
+.daydesk-quote-grid span{display:block;color:var(--secondary);font-size:10px}
+.daydesk-quote-grid strong{display:block;color:var(--ink);font-size:13px;font-variant-numeric:tabular-nums;margin-top:4px;overflow-wrap:anywhere}
+.settings-owner-steps{display:grid;gap:12px;margin:14px 0;padding-left:24px;font-size:12px;color:var(--secondary);line-height:1.75}
+.settings-owner-steps li{padding-left:6px;overflow-wrap:anywhere}
+.settings-owner-steps strong{color:var(--ink)}
+.settings-owner-steps code{background:var(--muted-card);border:1px solid var(--line);padding:2px 5px;border-radius:5px;font-size:11px;color:var(--ink)}
+.settings-owner-steps a{color:var(--blue);text-decoration:underline;text-underline-offset:2px}
+@media(max-width:400px){.daydesk-quote-grid{grid-template-columns:1fr}}

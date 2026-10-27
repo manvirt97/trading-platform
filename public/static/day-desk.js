@@ -147,6 +147,71 @@ async function load(){
  }catch(e){if(id===requestSeq){reset('No verified chart data.');status('missing',String(e.message||'Provider unavailable.'))}}
  finally{if(id===requestSeq){btn.disabled=false;btn.textContent='Check intraday setup ↗'}}
 }
+// Only an explicit click can make a quote request. This is deliberately
+// separate from historical candle analysis to avoid mixing feeds or claiming
+// that a stale chart candle is a current executable trade.
+let quotesConfigured=false;
+async function readPrivateQuoteConfiguration(){
+ try{
+  const r=await fetch('/api/status',{cache:'no-store'});if(!r.ok)throw Error('Status unavailable');
+  const d=await r.json();
+  quotesConfigured=d.owner_quote_checks_configured===true;
+  const type=d.owner_quote_feed==='sip'?'SIP consolidated':'IEX single-venue';
+  text('day-quote-setup',quotesConfigured?
+   'Private '+type+' quote API configured. You must sign in with the authorized project owner Google account to verify the feed.':
+   'Owner quote access not configured. Follow Settings → Make the Day Trading Desk operational.');
+  text('settingsQuotesState',quotesConfigured?'Owner quote checks configured · actual market response unverified':'Owner quote checks not yet configured');
+  text('settingsQuotesDescription',quotesConfigured?'Feed selected: '+type+'. Credentials and owner are set, but live quote access is not verified until a successful authenticated test.':'Set two encrypted Alpaca secrets, your Firebase owner UID, the enable flag and authorized feed in Cloudflare.');
+  const dot=$('settingsQuotesDot');if(dot)dot.className='status-dot '+(quotesConfigured?'green':'amber');
+ }catch{
+  text('day-quote-setup','Could not read quote setup. Check deployment and Settings.');
+  text('settingsQuotesState','Quote setup check unavailable');
+ }
+}
+function clearQuote(){
+ const root=$('day-quote-results');root.replaceChildren(elt('span','',
+  'No bid/ask verified for this symbol. Select Check latest bid/ask snapshot after sign-in.'));
+}
+async function testOwnerQuote(){
+ const symbol=$('day-symbol').value.trim().toUpperCase(),button=$('day-quote-test'),root=$('day-quote-results');
+ if(!symbolOK(symbol)){root.replaceChildren(elt('p','daydesk-risk-error','Enter a valid US ticker before checking quotes.'));return}
+ if(!quotesConfigured){
+  root.replaceChildren(elt('p','daydesk-muted','Private quotes are not configured. Open Settings and follow the six setup steps.'));return
+ }
+ button.disabled=true;button.textContent='Checking quote…';
+ root.replaceChildren(elt('p','daydesk-muted','Checking the authorized snapshot. No market order will be placed.'));
+ try{
+  // Reuse the signed-in Firebase session already initialized by Research AI.
+  // Never place Alpaca secret credentials or a key in a URL/browser bundle.
+  const [{getApps,getApp},{getAuth}]=await Promise.all([
+   import('https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js'),
+   import('https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js')
+  ]);
+  if(!getApps().length)throw Error('Open Research AI and sign in with Google, then return to Day Trading Desk.');
+  const auth=getAuth(getApp());if(typeof auth.authStateReady==='function')await auth.authStateReady();
+  const user=auth.currentUser;if(!user)throw Error('Sign in with your authorized Google account through Research AI first.');
+  const token=await user.getIdToken();
+  const response=await fetch('/api/owner-quote?'+new URLSearchParams({symbol}),{
+   cache:'no-store',headers:{'Authorization':'Bearer '+token,'Accept':'application/json'}
+  });
+  const data=await response.json();
+  if(!response.ok||data.error)throw Error(data.error||'Quote check unsuccessful');
+  if(data.symbol!==symbol||data.execution_ready!==false||data.broker_orders!==false)throw Error('The quote response did not pass validation.');
+  if($('day-symbol').value.trim().toUpperCase()!==symbol)return;
+  root.replaceChildren();
+  const title=elt('strong','',data.quote_state==='RECENT_SNAPSHOT'?'Recent, verified '+data.feed.toUpperCase()+' snapshot':'Historical / stale quote · not a current entry');
+  const grid=elt('div','daydesk-quote-grid');
+  for(const [label,value] of [
+   ['Bid',price(data.bid)],['Ask',price(data.ask)],
+   ['Spread',price(data.spread)],['Spread (bps)',fmt(data.spread_bps,1)],
+   ['Quote age',data.quote_age_seconds+' sec'],['Vendor',data.coverage]
+  ]){const item=elt('div');item.append(elt('span','',label),elt('strong','',value));grid.append(item)}
+  root.append(title,grid,elt('p','daydesk-disclaimer',
+   'Quote: '+et(data.quote_time)+' · Checked '+et(data.checked_at)+'. '+data.note));
+  if(data.quote_state!=='RECENT_SNAPSHOT')root.dataset.quoteState='stale';else root.dataset.quoteState='recent';
+ }catch(e){root.replaceChildren(elt('p','daydesk-risk-error',String(e.message||'Quote unavailable').slice(0,270)))}
+ finally{button.disabled=false;button.textContent='Check latest bid/ask snapshot'}
+}
 function calculateRisk(){
  const attrs={account:'account',riskPct:'pct',entry:'entry',stop:'stop',capitalPct:'alloc',dailyLoss:'daily',usedDailyLoss:'used',slippageBps:'slip',fees:'fees'};
  const input=Object.fromEntries(Object.entries(attrs).map(([key,id])=>[key,$('day-risk-'+id).value]));
@@ -165,12 +230,14 @@ function calculateRisk(){
 }
 function init(){
  if(!$('day-load'))return;
- reset('No market data checked yet.');clockTick();setInterval(clockTick,60000);passiveFeed();
+ reset('No market data checked yet.');clockTick();setInterval(clockTick,60000);passiveFeed();readPrivateQuoteConfiguration();
  $('day-load').addEventListener('click',load);
+ $('day-quote-test').addEventListener('click',testOwnerQuote);
  $('day-symbol').addEventListener('keydown',e=>{if(e.key==='Enter')load()});
  $('day-interval').addEventListener('change',()=>{requestSeq++;reset('Interval changed; check the new interval.');status('missing','Recheck to avoid using levels from a different interval.')});
+ $('day-symbol').addEventListener('input',clearQuote);
  for(const button of document.querySelectorAll('[data-day-ticker]'))button.addEventListener('click',()=>{
-  $('day-symbol').value=button.dataset.dayTicker;requestSeq++;reset('New ticker selected. Choose Check intraday setup to load it.');
+  $('day-symbol').value=button.dataset.dayTicker;requestSeq++;reset('New ticker selected. Choose Check intraday setup to load it.');clearQuote();
   status('missing','No price request yet for '+button.dataset.dayTicker+'.');
  });
  $('day-use-levels').addEventListener('click',()=>{
