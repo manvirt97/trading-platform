@@ -57,7 +57,7 @@ test('V10 app boots and main navigation plus news filters respond in a browser-l
   localStorage:{getItem(){return null},setItem(){}},
   fetch:async path=>{fetches.push(String(path));return {ok:true,status:200,json:async()=>String(path).includes('/api/status')?{twelvedata_enabled:false,finnhub_fallback_enabled:false}:{items:[],as_of:'2026-10-26T10:00:00Z',sources_ok:1,sources_total:1,availability:'available'}}},
   CustomEvent:class{constructor(type,opts){this.type=type;this.detail=opts.detail}},
-  URLSearchParams,Date,Intl,console,Math,Number,String,Array,Map,Set,Error,
+  URLSearchParams,AbortController,Date,Intl,console,Math,Number,String,Array,Map,Set,Error,
   setTimeout:()=>1,clearTimeout(){},setInterval:()=>1,clearInterval(){},
   requestAnimationFrame:callback=>callback()
  };
