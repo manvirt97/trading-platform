@@ -3,7 +3,7 @@ import {getData} from '../_shared/http.js';
 import {analyze} from '../_shared/core.js';
 const json=(x,n=200)=>Response.json(x,{status:n,headers:{'cache-control':'no-store'}});
 export async function onRequestPost({request,env}){
- if(!env.DB||!env.AI||env.AI_ENABLED!=='on')return json({error:'Research AI is not enabled on this deployment. Check the Workers AI binding and account setup.'},503);
+ if(!env.DB||!env.AI||env.AI_ENABLED!=='on')return json({error:!env.DB?'Research AI storage is not connected. Add the D1 binding named DB in Cloudflare and redeploy.':!env.AI?'Workers AI binding named AI is missing. Add the binding in Cloudflare and redeploy.':'AI_ENABLED must be on in the deployed Cloudflare environment.',code:!env.DB?'DB_NOT_CONNECTED':!env.AI?'AI_BINDING_MISSING':'AI_DISABLED'},503);
  let uid;try{uid=await userId(request,env)}catch(e){return authError(e)}
  if(!request.headers.get('content-type')?.includes('application/json'))return json({error:'JSON required'},415);
  let raw=await request.text();if(raw.length>5000)return json({error:'Question too long'},413);
@@ -70,5 +70,14 @@ export async function onRequestPost({request,env}){
  ],max_tokens:480,temperature:0.2});
  const response=String(answer.response||answer.choices?.[0]?.message?.content||'').slice(0,2200);
  return json({answer:response||'AI did not return an answer. Try again.',model:selected.label,as_of:new Date().toISOString(),limitations:verifiedChart?'Grounded in server-retrieved historical bars. Not a live executable quote or proven forecast; verify spreads and catalysts.':'Educational analysis without live market-data context or a proven forecast. Verify with current sources.'})
- }catch{return json({error:'AI is temporarily unavailable or its free compute allowance has been exhausted.'},503)}
+ }catch(error){
+  const msg=String(error?.message||'');
+  const missingSchema=/no such table|does not exist|SQLITE_ERROR|D1_ERROR/i.test(msg);
+  const badModel=/model.+(unavailable|not found|not supported)|invalid model|unknown model/i.test(msg);
+  const credits=/quota|rate.limit|limit exceeded|usage limit|429|credit/i.test(msg);
+  return json({
+   error:missingSchema?'AI account database tables are not initialized. Apply the migrations and redeploy.':badModel?'The selected AI model is unavailable for this Cloudflare account. Try another enabled model.':credits?'Workers AI usage limit reached. Check Cloudflare AI quotas.':'Research AI request failed. Check Cloudflare Workers AI runtime logs and binding configuration.',
+   code:missingSchema?'DB_MIGRATION_REQUIRED':badModel?'MODEL_UNAVAILABLE':credits?'AI_QUOTA_REACHED':'AI_RUNTIME_ERROR'
+  },503);
+ }
 }
