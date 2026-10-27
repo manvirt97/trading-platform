@@ -8,7 +8,7 @@ const pct=v=>Number.isFinite(Number(v))?(Number(v)>0?'+':'')+number(v,2)+'%':'�
 const stamp=v=>{const date=new Date(v);return Number.isFinite(+date)?date.toLocaleString('en-CA',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit',timeZone:'America/New_York'})+' ET':'Time unavailable'};
 const ageLabel=v=>{let t=Date.parse(v);if(!Number.isFinite(t))return 'Unknown';let m=Math.max(0,Math.floor((Date.now()-t)/60000));return m<60?m+' min old':m<1440?Math.floor(m/60)+'h old':Math.floor(m/1440)+'d old'};
 const symbolOK=s=>/^[A-Z][A-Z0-9.-]{0,9}$/.test(s);
-const state={view:'overview',symbol:'NVDA',watch:[],configured:false,newsCategory:'all',newsCache:new Map(),market:new Map(),analysis:null,opportunity:null,scanning:false,newsLoading:false,provider:'Not configured'};
+const state={view:'overview',symbol:'NVDA',watch:[],configured:false,newsCategory:'all',newsCache:new Map(),market:new Map(),analysis:null,opportunity:null,discovery:null,discoveryLoading:false,discoveryUniverse:'leaders',scanning:false,newsLoading:false,provider:'Not configured'};
 let toastTimeout=0;
 const monitor={enabled:false,timer:null,lastAlertKey:'',busy:false};
 const toast=(message)=>{const el=$('toast');el.textContent=String(message).slice(0,250);el.hidden=false;clearTimeout(toastTimeout);toastTimeout=setTimeout(()=>{el.hidden=true},4800)};
@@ -17,7 +17,7 @@ function saveWatch(){try{localStorage.setItem('rf_v9_watch',JSON.stringify(state
 function setTheme(v){document.body.dataset.theme=v==='dark'?'dark':'light';try{localStorage.setItem('rf_v9_theme',document.body.dataset.theme)}catch{}}
 const create=(tag,className,text)=>{let el=document.createElement(tag);if(className)el.className=className;if(text!=null)el.textContent=String(text);return el};
 async function request(url){const res=await fetch(url,{cache:'no-store',headers:{Accept:'application/json'}});let d;try{d=await res.json()}catch{throw Error('Received an invalid response.')}if(!res.ok||d.error)throw Error(d.error||d.note||'Request unavailable ('+res.status+')');return d}
-function setPage(page){if(!['overview','signals','scanner','news'].includes(page))return;state.view=page;document.body.dataset.view=page;$$('[data-section]').forEach(p=>p.classList.toggle('visible',p.dataset.section===page));$$('.nav-link[data-page]').forEach(el=>{el.classList.toggle('active',el.dataset.page===page);el.setAttribute('aria-current',el.dataset.page===page?'page':'false')});document.title='Rangeform · '+({overview:'Overview',signals:'Trade decision desk',scanner:'Market scanner',news:'News & catalysts'}[page]);history.replaceState(null,'','#'+page);window.scrollTo({top:0,behavior:'instant'});closeNav();if(page==='news'&&!state.newsCache.has(state.newsCategory+'|'+$('newsQuery').value.trim()))loadNews();if(page==='signals'&&state.analysis)renderAnalysis(state.analysis)}
+function setPage(page){if(!['overview','signals','scanner','news'].includes(page))return;state.view=page;document.body.dataset.view=page;$$('[data-section]').forEach(p=>p.classList.toggle('visible',p.dataset.section===page));$$('.nav-link[data-page]').forEach(el=>{el.classList.toggle('active',el.dataset.page===page);el.setAttribute('aria-current',el.dataset.page===page?'page':'false')});document.title='Rangeform · '+({overview:'Overview',signals:'Trade decision desk',scanner:'Market scanner',news:'News & catalysts'}[page]);history.replaceState(null,'','#'+page);window.scrollTo({top:0,behavior:'instant'});closeNav();if(page==='news'&&!state.newsCache.has(state.newsCategory+'|'+$('newsQuery').value.trim()))loadNews();if(page==='signals'&&state.analysis)renderAnalysis(state.analysis);if(page==='overview'&&state.configured&&!state.discovery)discoverMarket()}
 function closeNav(){$('sidebar').classList.remove('open');$('navShade').hidden=true}
 function initTheme(){let theme;try{theme=localStorage.getItem('rf_v9_theme')||localStorage.getItem('rangeform_theme')||'light'}catch{}setTheme(theme)}
 function localClock(){try{$('localTime').textContent=new Intl.DateTimeFormat('en-CA',{timeZone:'America/Edmonton',hour:'numeric',minute:'2-digit'}).format(new Date())}catch{$('localTime').textContent='—'}}
@@ -29,8 +29,50 @@ async function loadProvider(){
   const detail=$('connectionDetails');detail.replaceChildren();
   detail.append(create('p','',state.configured?'Twelve Data is enabled in Cloudflare. Historical bars are retrieved on demand, subject to your plan and exchange permissions. This is not a verified live trading quote.':'Twelve Data is not enabled for chart analysis. You can still read public financial news. To unlock technical signals, connect an authorized API in Data & settings.'));
   $('signalFeedNotice').lastElementChild.textContent=state.configured?'Provider configured. Always check the completed bar timestamp, market status and execution spread.':'No verified market-data feed. Historical analysis and trades are unavailable until connected.';
- }catch(e){$('feedLabel').textContent='Data status unavailable';$('sideStatus').textContent='Status unavailable';$('connectionDetails').textContent='Could not check provider settings: '+e.message}
+  if(state.configured&&state.view==='overview')discoverMarket();else if(!state.configured)discoveryReset('No authorized price-data feed. Connect Twelve Data to enable automatic discovery.');
+ }catch(e){discoveryReset('Could not verify market-data configuration: '+e.message);$('feedLabel').textContent='Data status unavailable';$('sideStatus').textContent='Status unavailable';$('connectionDetails').textContent='Could not check provider settings: '+e.message}
 }
+// Fixed-universe discovery: never present research alignment as guaranteed profit.
+function discoveryReset(note){
+ state.discovery=null;const root=$('discoveryResults');root.replaceChildren();
+ const row=create('tr'),cell=create('td','empty-inline',note);cell.colSpan=6;row.append(cell);root.append(row);
+ $('discoveryStatus').textContent=note;$('discoveryTimestamp').textContent='No verified candidates';
+ window.dispatchEvent(new CustomEvent('rangeform:discovery',{detail:{state:'unavailable',reason:note,items:[]}}));
+}
+function discoveryRender(result){
+ state.discovery=result;
+ $('discoveryStatus').textContent=result.scanned+' of '+result.universe_size+' symbols checked · '+(result.actionable||0)+' conditional watches. Not a whole-market scan.';
+ $('discoveryTimestamp').textContent='Checked '+stamp(result.checked_at)+' · '+(result.cache==='edge-cache'?'cached up to 10 min':'new analysis');
+ const root=$('discoveryResults');root.replaceChildren();
+ if(!result.items?.length){discoveryReset('No verified results. '+(result.errors?.[0]?.reason||'Check exchange coverage.'));return}
+ for(const item of result.items){
+  const tr=create('tr');tr.append(create('td','',item.symbol));
+  const st=create('td'),label=item.status==='BUY_WATCH'?'Buy watch':item.status==='SELL_WATCH'?'Bearish watch':item.status==='WAIT_STALE'?'Historical only':'Wait';
+  st.append(create('span','signal-tag '+(item.status==='BUY_WATCH'?'bull':item.status==='SELL_WATCH'?'bear':''),label));tr.append(st);
+  tr.append(create('td','',item.quality_score==null?'—':item.quality_score+'/100'));
+  tr.append(create('td','',item.bar_time?ageLabel(item.bar_time):'No timestamp'));
+  const why=create('td','',item.supporting_patterns?.[0]?.name||item.reason||'No confirmed pattern');why.title=item.reason||'';tr.append(why);
+  const cell=create('td'),button=create('button','cell-btn','Inspect ↗');button.type='button';button.onclick=()=>inspect(item.symbol);cell.append(button);tr.append(cell);root.append(tr);
+ }
+ window.dispatchEvent(new CustomEvent('rangeform:discovery',{detail:result}));
+}
+async function discoverMarket(){
+ if(state.discoveryLoading)return;
+ if(!state.configured){discoveryReset('No authorized price-data provider. Automatic discovery is unavailable.');return}
+ const target=state.discoveryUniverse;state.discoveryLoading=true;$('discoveryRefresh').disabled=true;$('discoveryRefresh').textContent='Checking sample…';
+ try{
+  const result=await request('/api/market-discovery?'+new URLSearchParams({universe:target}));
+  if(target!==state.discoveryUniverse)return;
+  discoveryRender(result);
+ }catch(e){if(target===state.discoveryUniverse)discoveryReset('Automatic scan unavailable: '+e.message)}
+ finally{state.discoveryLoading=false;$('discoveryRefresh').disabled=false;$('discoveryRefresh').textContent='Scan sample ↻'}
+}
+function scheduleDiscovery(){
+ const due=()=>{const time=Date.parse(state.discovery?.checked_at);return !Number.isFinite(time)||Date.now()-time>=600000};
+ setInterval(()=>{if(!document.hidden&&state.configured&&!state.discoveryLoading&&state.view==='overview'&&due())discoverMarket()},60000);
+ document.addEventListener('visibilitychange',()=>{if(!document.hidden&&state.view==='overview'&&state.configured&&due())discoverMarket()});
+}
+
 function renderWatch(){let root=$('watchList');root.replaceChildren();for(const symbol of state.watch){const row=create('div','watch-item'),open=create('button',''),rm=create('button','delete-symbol','×');open.type='button';open.append(create('strong','',symbol),create('small','',state.market.has(symbol)?money(state.market.get(symbol).last)+' · '+pct(state.market.get(symbol).change_pct):'Price not requested'));open.addEventListener('click',()=>inspect(symbol));rm.title='Remove '+symbol;rm.setAttribute('aria-label','Remove '+symbol);rm.addEventListener('click',()=>{state.watch=state.watch.filter(x=>x!==symbol);saveWatch();renderWatch()});row.append(open,rm);root.append(row)}}
 function addWatch(){if($('watchNew'))return;const el=create('div','watch-item');el.id='watchNew';const input=create('input');input.maxLength=10;input.placeholder='Enter ticker';input.setAttribute('aria-label','New watchlist symbol');input.style.cssText='width:100%;border:1px solid var(--line);border-radius:8px;padding:9px;background:var(--card);color:var(--ink)';const done=create('button','cell-btn','Add');done.onclick=()=>{let sym=input.value.trim().toUpperCase();if(!symbolOK(sym)){toast('Please enter a valid ticker symbol.');return}if(!state.watch.includes(sym)&&state.watch.length>=6){toast('A watchlist scan supports up to six symbols.');return}state.watch=[...new Set([...state.watch,sym])];saveWatch();renderWatch()};input.addEventListener('keydown',e=>{if(e.key==='Enter')done.click();if(e.key==='Escape')el.remove()});el.append(input,done);$('watchList').append(el);input.focus()}
 function assessment(x){const daily=x.interval==='1day',ms=Date.now()-Date.parse(x.last_bar_utc),fresh=Number.isFinite(ms)&&ms>=0&&ms<(daily?4.5*86400000:22*60000);const complete=x.data_quality==='complete-ohlcv'&&Array.isArray(x.bar_history)&&x.bar_history.length>=35;const score=Number(x.score);
@@ -181,7 +223,7 @@ function renderNews(data){$('newsChecked').textContent='Checked '+dateString(dat
 data.items.forEach((item,i)=>{if(!/^https:\/\//.test(item.url))return;const row=create('article','news-item'),num=create('span','news-item-num',String(i+1).padStart(2,'0')),content=create('div','news-item-content'),meta=create('div','story-meta'),link=create('a','',item.title),info=create('small','',(item.source||'Publisher')+' · '+ageLabel(item.date));meta.append(create('span','',item.topic||'MARKETS'),create('span','',ageLabel(item.date)),create('span','',item.source||'Public news'));link.href=item.url;link.target='_blank';link.rel='noopener noreferrer';link.className='story-link';link.append(create('span','sr-only',''));const h=create('h3');h.append(link);content.append(meta,h,info);row.append(num,content);row.addEventListener('click',e=>{if(e.target.closest('a'))return;selectArticle(item)});const select=create('button','cell-btn','Details');select.type='button';select.title='View source details';select.onclick=()=>selectArticle(item);row.append(select);root.append(row)})
 }
 function selectArticle(item){$('articleContextTitle').textContent=item.title;$('articleContext').textContent=(item.source||'Source')+' · published '+stamp(item.date)+'. Verify the full article and price reaction before drawing conclusions. The headline is not a trade signal.';const link=$('articleOriginal');link.href=item.url;link.hidden=false}
-function bind(){initTheme();state.watch=readWatch();renderWatch();localClock();setInterval(localClock,60000);
+function bind(){initTheme();state.watch=readWatch();renderWatch();scheduleDiscovery();localClock();setInterval(localClock,60000);
 $$('[data-page]').forEach(el=>el.addEventListener('click',()=>setPage(el.dataset.page)));
 $('mobileMenu').onclick=()=>{$('sidebar').classList.toggle('open');$('navShade').hidden=!$('sidebar').classList.contains('open')};$('navShade').onclick=closeNav;
 $('themeToggle').onclick=()=>setTheme(document.body.dataset.theme==='dark'?'light':'dark');
@@ -192,6 +234,7 @@ $('analyzeBtn').onclick=runAnalysis;$('monitorRefresh').onclick=()=>runAnalysis(
  $('monitorToggle').onclick=()=>setMonitor(!monitor.enabled);
 $('barInterval').onchange=()=>{setMonitor(false);clearAnalysis('Interval changed. Analyze again to load valid bars.')};
 $('overviewScan').onclick=scan;$('scanButton').onclick=scan;$('watchAdd').onclick=addWatch;
+$('discoveryRefresh').onclick=discoverMarket;$('discoveryUniverse').onchange=()=>{state.discoveryUniverse=$('discoveryUniverse').value;state.discovery=null;discoverMarket()};
 $('riskAccount').addEventListener('input',renderRisk);$('riskPercent').addEventListener('input',renderRisk);
 $('newsSearchBtn').onclick=()=>loadNews(true);$('newsQuery').addEventListener('keydown',e=>{if(e.key==='Enter')loadNews(true)});
 $$('[data-category]').forEach(el=>el.onclick=()=>{state.newsCategory=el.dataset.category;$$('[data-category]').forEach(x=>x.classList.toggle('selected',x===el));loadNews()});
