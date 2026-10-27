@@ -323,3 +323,6 @@ body[data-theme=dark] .verdict-card.bear{background:linear-gradient(100deg,#402b
 .integration-event:last-child{border:0}
 .integration-event span{font-size:11px}
 @media(max-width:740px){.supervisor-bar{flex-wrap:wrap}.supervisor-bar>span:nth-child(2){flex:1 1 100%;order:3}.supervisor-bar button{margin-left:auto}.claude-agent-list{grid-template-columns:1fr}.integration-state{align-items:flex-start;flex-direction:column}.integration-state span{text-align:left}}
+
+.version-marker{font-weight:800;font-size:10px;letter-spacing:.05em;color:var(--blue);border:1px solid var(--line);background:var(--blue-soft);padding:7px 9px;border-radius:8px;white-space:nowrap}
+@media(max-width:1180px){.version-marker{display:none}}
