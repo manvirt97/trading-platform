@@ -5,7 +5,7 @@ import {discountedCashFlow,portfolioRisk,earningsSurprises,allocationReview,divi
  */
 const root=document.getElementById('studioRoot');
 const nav=document.getElementById('studioNav');
-const state={selected:'screener',portfolio:null,loading:false};
+const state={selected:'screener',portfolio:null,loading:false,lastBrief:''};
 const money=(x,d=2)=>Number.isFinite(x)?x.toLocaleString('en-CA',{minimumFractionDigits:d,maximumFractionDigits:d}):'Not available';
 const n=x=>x===''?NaN:Number(x);
 const signed=x=>Number.isFinite(x)?(x>=0?'+':'')+money(x,1)+'%':'Not available';
@@ -100,20 +100,35 @@ function valuesResult(title,values,notes=[],rows=[]){
  if(values.length)area.append(metrics);
  if(rows.length)area.append(makeTable(rows));
  for(const note of notes){area.append(statement(note))}
+ const source=tools.find(t=>t.id===state.selected)?.source||'User-provided inputs';
+ state.lastBrief=[
+   'Rangeform Research Studio · '+title,
+   'Generated: '+new Date().toISOString(),
+   'Source: '+source,
+   'Metrics:',...values.map(([k,v])=>'- '+k+': '+v),
+   'Observations:',...notes.map(x=>'- '+x),
+   'Supporting table:',...rows.slice(0,35).map(x=>x.join(' | ')),
+   'No guaranteed outcomes. Confirm cited data and use independent broker quotes before trading.'
+ ].join('\n');
+ const actions=elem('div','studio-result-actions');
+ const copy=elem('button','subtle-btn','Copy research brief');copy.type='button';copy.dataset.researchAction='copy';
+ const draft=elem('button','subtle-btn','Draft question for Research AI');draft.type='button';draft.dataset.researchAction='draft';
+ actions.append(copy,draft);
+ area.append(actions,statement('Nothing is submitted to an AI model automatically. Copying or drafting a question is your choice.'));
 }
 function makeTable(rows){const table=elem('table','studio-table');const body=elem('tbody');
  for(const row of rows){const tr=elem('tr');
  for(const [i,v] of row.entries()){const e=elem(i===0?'th':'td','',v);if(i===0)e.scope='row';tr.append(e)}
  body.append(tr)}
  table.append(body);const scroll=elem('div','studio-table-scroll');scroll.append(table);return scroll}
-function error(message){const area=$('result');if(!area)return;area.replaceChildren(statement(message,'error'))}
+function error(message){state.lastBrief='';const area=$('result');if(!area)return;area.replaceChildren(statement(message,'error'))}
 function parseRows(input,min=1){
  const lines=String(input).split(/\r?\n/).map(x=>x.trim()).filter(Boolean);
  if(lines.length<min)throw Error('Enter at least '+min+' properly formatted row'+(min===1?'':'s')+'.');
  return lines.map(line=>line.split(',').map(s=>s.trim()));
 }
 function present(tool){
- state.selected=tool;
+ state.selected=tool;state.lastBrief='';
  for(const tab of nav.querySelectorAll('[data-studio]')){const active=tab.dataset.studio===tool;tab.classList.toggle('active',active);tab.setAttribute('aria-current',active?'true':'false')}
  const t=tools.find(x=>x.id===tool);if(!t)return;
  // Body contains fixed, bundled templates only; never interpolates remote news or portfolio values.
@@ -190,14 +205,16 @@ async function run(tool){
     const d=await getJSON('/api/analyze?'+new URLSearchParams({source:'twelvedata',symbol,interval:'1day'}));
     if(!Array.isArray(d.bar_history)||!Number.isFinite(Number(d.last))||!Number.isFinite(Date.parse(d.last_bar_utc)))throw Error('Unverified or incomplete price history.');
     const b=d.bar_history.map(x=>Number(x.close));
+    const listed=v=>typeof v==='number'&&Number.isFinite(v)?money(v):'Unavailable';
+    const relation=typeof d.indicators?.sma20==='number'&&Number.isFinite(d.indicators.sma20)?(Number(d.last)>d.indicators.sma20?'Above':'At or below'):'Unavailable relative to';
     const ma200=b.length>=200?b.slice(-200).reduce((a,x)=>a+x,0)/200:null;
     const lookback=period=>b.length>=period+1?100*(b.at(-1)/b.at(-1-period)-1):null;
     valuesResult('Verified chart study · '+symbol,[['Last historical close',money(Number(d.last))+' '+(d.currency||'')],['Last completed bar',new Date(d.last_bar_utc).toLocaleString('en-CA')],['Indicator alignment',(d.score??'—')+'/100'],['RSI 14',String(d.indicators?.rsi14??'Unavailable')]],
     ['All prices are historical completed bars, not an executable broker quote. The indicator score is not a success probability.',
-     'Trend: '+(Number(d.last)>Number(d.indicators?.sma20)?'Above':'At or below')+' SMA20, based on available bars.',
+     'Trend: '+relation+' SMA20, based on available bars.',
      'One-month close-to-close: '+(lookback(21)==null?'Unavailable':signed(lookback(21)))+'. Six-month: '+(lookback(126)==null?'Unavailable':signed(lookback(126)))+'. One-year: '+(lookback(252)==null?'Unavailable':signed(lookback(252)))+'.',
      'Patterns: '+(d.patterns?.length?d.patterns.map(p=>p.name+' ('+p.type+')').join(', '):'None meeting the programmed criteria.')],
-    [['Support (20 bars)',money(Number(d.indicators?.support20))],['Resistance (20 bars)',money(Number(d.indicators?.resistance20))],['SMA20',money(Number(d.indicators?.sma20))],['SMA50',money(Number(d.indicators?.sma50))],['SMA200',ma200==null?'Need 200 bars':money(ma200)],['Relative volume',String(d.indicators?.rel_volume??'Unavailable')+'×']]);
+    [['Support (20 bars)',listed(d.indicators?.support20)],['Resistance (20 bars)',listed(d.indicators?.resistance20)],['SMA20',listed(d.indicators?.sma20)],['SMA50',listed(d.indicators?.sma50)],['SMA200',ma200==null?'Need 200 bars':money(ma200)],['Relative volume',String(d.indicators?.rel_volume??'Unavailable')+'×']]);
    }finally{button.disabled=false;button.textContent='Analyze real chart history ↗'}return;
   }
  }catch(e){error(String(e?.message||'Research calculation unavailable.').slice(0,350))}
@@ -209,6 +226,25 @@ function bootstrap(){
   if(window.innerWidth<900)root.scrollIntoView({behavior:'smooth',block:'start'});
  });
  root.addEventListener('click',event=>{
+  const exportButton=event.target.closest('[data-research-action]');
+  if(exportButton){
+   if(!state.lastBrief)return;
+   if(exportButton.dataset.researchAction==='copy'){
+    if(navigator.clipboard?.writeText)navigator.clipboard.writeText(state.lastBrief).then(()=>{exportButton.textContent='Copied ✓'}).catch(()=>{exportButton.textContent='Copy unavailable here'});
+    else exportButton.textContent='Clipboard access unavailable';
+   }
+   if(exportButton.dataset.researchAction==='draft'){
+    const prompt='Explain and critically review this research brief. Distinguish verified historical bars from entered assumptions. List missing data, risks, alternative scenarios and what would invalidate the conclusion. Do not invent numbers or guarantee trades.\\n\\n'+state.lastBrief;
+    const assistant=document.getElementById('assistantQuestion');
+    if(!assistant){error('Research AI editor is not loaded. Use Copy research brief instead.');return}
+    assistant.value=prompt;
+    const navAI=document.querySelector('.nav-link[data-page="overview"][data-focus="assistantTitle"]');
+    if(navAI)navAI.click();
+    else window.location.hash='overview';
+    assistant.focus({preventScroll:true});
+   }
+   return;
+  }
   const button=event.target.closest('[data-run]');if(button&&!state.loading){state.loading=true;Promise.resolve(run(button.dataset.run)).finally(()=>{state.loading=false})}
  });
  present('screener');
