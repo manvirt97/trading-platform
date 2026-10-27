@@ -29,6 +29,7 @@ function setTheme(v){
  const themeMeta=document.querySelector('meta[name="theme-color"]');
  if(themeMeta)themeMeta.setAttribute('content',document.body.dataset.theme==='dark'?'#101923':'#f6f8fb');
  try{localStorage.setItem('rf_v9_theme',document.body.dataset.theme)}catch{}
+ if($('settingsTheme'))$('settingsTheme').value=document.body.dataset.theme;
 }
 const create=(tag,className,text)=>{let el=document.createElement(tag);if(className)el.className=className;if(text!=null)el.textContent=String(text);return el};
 async function request(url){const res=await fetch(url,{cache:'no-store',headers:{Accept:'application/json'}});let d;try{d=await res.json()}catch{throw Error('Received an invalid response.')}if(!res.ok||d.error)throw Error(d.error||d.note||'Request unavailable ('+res.status+')');return d}
@@ -36,10 +37,10 @@ const oldRoutes={
   copilot:{page:'overview',focus:'assistantTitle'},ai:{page:'overview',focus:'assistantTitle'},
   radar:{page:'scanner'},market:{page:'overview'},
   risk:{page:'signals',focus:'riskAccount'},journal:{page:'signals',focus:'paperTitle'},
-  backtest:{page:'signals',focus:'agentRoomTitle'},settings:{page:'signals',focus:'connectionDetails'}
+  backtest:{page:'signals',focus:'agentRoomTitle'}
 };
 function setPage(page,focus=null){
- if(!['overview','signals','scanner','news'].includes(page))return;
+ if(!['overview','signals','scanner','news','settings'].includes(page))return;
  state.view=page;state.focus=focus;
  document.body.dataset.view=page;
  $$('[data-section]').forEach(el=>el.classList.toggle('visible',el.dataset.section===page));
@@ -48,13 +49,14 @@ function setPage(page,focus=null){
   el.classList.toggle('active',active);
   if(active)el.setAttribute('aria-current','page');else el.removeAttribute('aria-current');
  });
- document.title='Rangeform · '+({overview:'Overview',signals:'Trade decision desk',scanner:'Opportunity scanner',news:'News & catalysts'}[page]);
+ document.title='Rangeform · '+({overview:'Overview',signals:'Trade decision desk',scanner:'Opportunity scanner',news:'News & catalysts',settings:'Settings'}[page]);
  history.replaceState(null,'','#'+page);
  closeNav();
  const discovery=document.querySelector('.discovery-card'),host=page==='scanner'?$('discoveryScannerHost'):$('discoveryHome');
  if(discovery&&host)host.after(discovery);
  if(page==='news'&&!state.newsCache.has(state.newsCategory+'|'+$('newsQuery').value.trim()))loadNews();
  if(page==='signals'&&state.analysis)renderAnalysis(state.analysis);
+ if(page==='settings')syncSettingsControls();
  if((page==='overview'||page==='scanner')&&state.configured&&!state.discovery)discoverMarket();
  if(focus){
   requestAnimationFrame(()=>{
@@ -66,10 +68,37 @@ function routeFromHash(){
  const raw=location.hash.slice(1).toLowerCase();
  const legacy=oldRoutes[raw];
  if(legacy){setPage(legacy.page,legacy.focus||null);return}
- setPage(['overview','signals','scanner','news'].includes(raw)?raw:'overview');
+ setPage(['overview','signals','scanner','news','settings'].includes(raw)?raw:'overview');
 }
 function closeNav(){$('sidebar').classList.remove('open');$('navShade').hidden=true}
 function initTheme(){let theme;try{theme=localStorage.getItem('rf_v9_theme')||localStorage.getItem('rangeform_theme')||'light'}catch{}setTheme(theme)}
+const newsCategoryOptions=['all','earnings','rates','energy','canada','technology'];
+function getLocalSetting(key,fallback){
+ try{return localStorage.getItem(key)||fallback}catch{return fallback}
+}
+function putLocalSetting(key,value){
+ try{localStorage.setItem(key,value)}catch{toast('This browser could not save your preference.')}
+}
+function initWorkspacePrefs(){
+ const density=getLocalSetting('rf_news_density','comfortable');
+ const category=getLocalSetting('rf_news_category','all');
+ document.body.dataset.newsDensity=density==='compact'?'compact':'comfortable';
+ state.newsCategory=newsCategoryOptions.includes(category)?category:'all';
+ $('[data-category]').forEach(el=>el.classList.toggle('selected',el.dataset.category===state.newsCategory));
+ syncSettingsControls();
+}
+function syncSettingsControls(){
+ if($('settingsTheme'))$('settingsTheme').value=document.body.dataset.theme;
+ if($('settingsNewsDensity'))$('settingsNewsDensity').value=document.body.dataset.newsDensity||'comfortable';
+ if($('settingsNewsCategory'))$('settingsNewsCategory').value=state.newsCategory;
+}
+function syncProviderSettings(message,configured){
+ const dot=$('settingsProviderDot'),status=$('settingsProviderState'),description=$('settingsProviderDescription');
+ if(!dot||!status||!description)return;
+ dot.className='status-dot '+(configured?'green':'amber');
+ status.textContent=configured?'Provider configured · historical bars': 'Feed unavailable or not enabled';
+ description.textContent=message;
+}
 function localClock(){try{$('localTime').textContent=new Intl.DateTimeFormat('en-CA',{timeZone:'America/Edmonton',hour:'numeric',minute:'2-digit'}).format(new Date())}catch{$('localTime').textContent='—'}}
 async function loadProvider(){
  try{const p=await request('/api/status');state.configured=Boolean(p.twelvedata_enabled||p.finnhub_fallback_enabled);state.provider=p.twelvedata_enabled?'Twelve Data enabled':p.finnhub_fallback_enabled?'Finnhub authorized backup enabled':'No authorized bars';
@@ -79,8 +108,9 @@ async function loadProvider(){
   const detail=$('connectionDetails');detail.replaceChildren();
   detail.append(create('p','',state.configured?state.provider+' in Cloudflare. Completed historical bars are fetched on demand. Exchange permissions, delay and broker execution must be independently checked.':'Twelve Data is not enabled for chart analysis. You can still read public financial news. To unlock technical signals, connect an authorized API in Data & settings.'));
   $('signalFeedNotice').lastElementChild.textContent=state.configured?'Provider configured. Always check the completed bar timestamp, market status and execution spread.':'No verified market-data feed. Historical analysis and trades are unavailable until connected.';
+  syncProviderSettings(state.configured?state.provider+' is enabled. Confirm recent bars and entitlements; this does not prove live quotes.':'No authorized historical price feed is enabled. Cloudflare server secrets are configured outside the browser.',state.configured);
   if(state.configured&&['overview','scanner'].includes(state.view))discoverMarket();else if(!state.configured)discoveryReset('No authorized price-data feed. Connect Twelve Data to enable automatic discovery.');
- }catch(e){discoveryReset('Could not verify market-data configuration: '+e.message);$('feedLabel').textContent='Data status unavailable';$('sideStatus').textContent='Status unavailable';$('connectionDetails').textContent='Could not check provider settings: '+e.message}
+ }catch(e){syncProviderSettings('Could not check the server-side data connection: '+e.message,false);discoveryReset('Could not verify market-data configuration: '+e.message);$('feedLabel').textContent='Data status unavailable';$('sideStatus').textContent='Status unavailable';$('connectionDetails').textContent='Could not check provider settings: '+e.message}
 }
 // Fixed-universe discovery: never present research alignment as guaranteed profit.
 function discoveryReset(note){
@@ -334,15 +364,61 @@ async function loadNews(force=false){
   $('newsChecked').textContent='Source unavailable';
  }finally{if(newsController===controller){newsController=null;state.newsLoading=false}}
 }
-function renderNews(data){$('newsChecked').textContent='Checked '+dateString(data.as_of)+' · '+(data.sources_ok||0)+'/'+(data.sources_total||0)+' feeds';const root=$('newsItems');root.replaceChildren();if(!data.items?.length){root.append(create('p','empty-inline',data.note||'No recent articles matched this search.'));return}
-data.items.forEach((item,i)=>{if(!/^https:\/\//.test(item.url))return;const row=create('article','news-item'),num=create('span','news-item-num',String(i+1).padStart(2,'0')),content=create('div','news-item-content'),meta=create('div','story-meta'),link=create('a','',item.title),info=create('small','',(item.source||'Publisher')+' · '+ageLabel(item.date));meta.append(create('span','',item.topic||'MARKETS'),create('span','',ageLabel(item.date)),create('span','',item.source||'Public news'));link.href=item.url;link.target='_blank';link.rel='noopener noreferrer';link.className='story-link';link.append(create('span','sr-only',''));const h=create('h3');h.append(link);content.append(meta,h,info);row.append(num,content);row.addEventListener('click',e=>{if(e.target.closest('a'))return;selectArticle(item)});const select=create('button','cell-btn','Details');select.type='button';select.title='View source details';select.onclick=()=>selectArticle(item);row.append(select);root.append(row)})
+function renderNews(data){
+ $('newsChecked').textContent='Checked '+dateString(data.as_of)+' · '+(data.sources_ok||0)+'/'+(data.sources_total||0)+' feeds';
+ const root=$('newsItems');root.replaceChildren();
+ if(!data.items?.length){root.append(create('p','empty-inline',data.note||'No recent articles matched this search.'));return}
+ for(const item of data.items){
+  // Publisher URLs only; never put untrusted RSS text into innerHTML.
+  if(!/^https:\/\//.test(item.url||''))continue;
+  const card=create('article','news-item');
+  const content=create('div','news-item-content');
+  const meta=create('div','story-meta');
+  meta.append(create('span','',item.topic||'MARKETS'),create('span','',ageLabel(item.date)),create('span','',item.source||'Publisher'));
+  const heading=create('h3');
+  const titleLink=create('a','story-link',item.title);
+  titleLink.href=item.url;titleLink.target='_blank';titleLink.rel='noopener noreferrer';
+  heading.append(titleLink);
+  const actions=create('div','story-actions');
+  const original=create('a','story-original','Read article ↗');
+  original.href=item.url;original.target='_blank';original.rel='noopener noreferrer';
+  const details=create('button','story-context-toggle','Source & timing');
+  details.type='button';details.setAttribute('aria-expanded','false');
+  details.setAttribute('aria-label','Show publisher and timing for '+item.title);
+  const info=create('div','story-context-panel');
+  info.hidden=true;
+  info.append(create('strong','',item.source||'Original publisher'));
+  info.append(create('p','', 'Published '+stamp(item.date)+'. Check the original article for context. This headline alone is not a trade signal.'));
+  const originalInline=create('a','story-original','Open original source ↗');
+  originalInline.href=item.url;originalInline.target='_blank';originalInline.rel='noopener noreferrer';
+  info.append(originalInline);
+  details.onclick=()=>{
+   const open=details.getAttribute('aria-expanded')==='true';
+   $$('.story-context-toggle[aria-expanded="true"]').forEach(b=>{
+    b.setAttribute('aria-expanded','false');b.textContent='Source & timing';
+   });
+   $$('.story-context-panel').forEach(p=>p.hidden=true);
+   info.hidden=open;
+   details.setAttribute('aria-expanded',String(!open));
+   details.textContent=open?'Source & timing':'Hide source info';
+   if(!open)selectArticle(item);
+  };
+  actions.append(original,details);
+  content.append(meta,heading,actions,info);
+  card.append(content);
+  root.append(card);
+ }
 }
-function selectArticle(item){$('articleContextTitle').textContent=item.title;$('articleContext').textContent=(item.source||'Source')+' · published '+stamp(item.date)+'. Verify the full article and price reaction before drawing conclusions. The headline is not a trade signal.';const link=$('articleOriginal');link.href=item.url;link.hidden=false}
-function bind(){initTheme();state.watch=readWatch();renderWatch();bindAgentFilters();$('showAgentRoom')?.addEventListener('click',()=>$('agentRoomTitle')?.scrollIntoView({behavior:'smooth',block:'start'}));scheduleDiscovery();localClock();setInterval(localClock,60000);
+function selectArticle(item){
+ $('articleContextTitle').textContent=item.title;
+ $('articleContext').textContent=(item.source||'Publisher')+' · published '+stamp(item.date)+'. Check the publisher and price reaction before drawing a conclusion; the headline alone is not a trading signal.';
+ const link=$('articleOriginal');link.href=item.url;link.hidden=false;
+}
+function bind(){initTheme();initWorkspacePrefs();state.watch=readWatch();renderWatch();bindAgentFilters();$('showAgentRoom')?.addEventListener('click',()=>$('agentRoomTitle')?.scrollIntoView({behavior:'smooth',block:'start'}));scheduleDiscovery();localClock();setInterval(localClock,60000);
 $$('[data-page]').forEach(el=>el.addEventListener('click',()=>setPage(el.dataset.page,el.dataset.focus||null)));
 $('mobileMenu').onclick=()=>{$('sidebar').classList.toggle('open');$('navShade').hidden=!$('sidebar').classList.contains('open')};$('navShade').onclick=closeNav;
 $('themeToggle').onclick=()=>setTheme(document.body.dataset.theme==='dark'?'light':'dark');
-$('providerBadge').onclick=()=>setPage('signals');
+$('providerBadge').onclick=()=>setPage('settings');
 $('globalSearch').addEventListener('keydown',e=>{if(e.key==='Enter'){let sym=e.target.value.trim().toUpperCase();if(!symbolOK(sym)){toast('Enter a symbol like NVDA or SHOP');return}inspect(sym)}});
 $('symbolInput').addEventListener('keydown',e=>{if(e.key==='Enter')runAnalysis()});
 $('analyzeBtn').onclick=runAnalysis;$('monitorRefresh').onclick=()=>runAnalysis();
@@ -352,7 +428,30 @@ $('overviewScan').onclick=()=>setPage('scanner');$('scanButton').onclick=scan;$(
 $('discoveryRefresh').onclick=discoverMarket;$('discoveryUniverse').onchange=()=>{state.discoveryUniverse=$('discoveryUniverse').value;state.discovery=null;discoverMarket()};
 $('riskAccount').addEventListener('input',renderRisk);$('riskPercent').addEventListener('input',renderRisk);
 $('newsSearchBtn').onclick=()=>loadNews(true);$('newsQuery').addEventListener('keydown',e=>{if(e.key==='Enter')loadNews(true)});
-$$('[data-category]').forEach(el=>el.onclick=()=>{state.newsCategory=el.dataset.category;$$('[data-category]').forEach(x=>x.classList.toggle('selected',x===el));loadNews()});
+$('[data-category]').forEach(el=>el.onclick=()=>{
+ state.newsCategory=el.dataset.category;
+ putLocalSetting('rf_news_category',state.newsCategory);
+ $('[data-category]').forEach(x=>x.classList.toggle('selected',x===el));
+ syncSettingsControls();loadNews();
+});
+$('settingsTheme').onchange=e=>setTheme(e.target.value);
+$('settingsNewsDensity').onchange=e=>{
+ const density=e.target.value==='compact'?'compact':'comfortable';
+ document.body.dataset.newsDensity=density;
+ putLocalSetting('rf_news_density',density);
+};
+$('settingsNewsCategory').onchange=e=>{
+ const category=e.target.value;
+ if(!newsCategoryOptions.includes(category))return;
+ state.newsCategory=category;putLocalSetting('rf_news_category',category);
+ $('[data-category]').forEach(x=>x.classList.toggle('selected',x.dataset.category===category));
+ loadNews(true);
+};
+$('settingsCheckProvider').onclick=async()=>{
+ const button=$('settingsCheckProvider');button.disabled=true;button.textContent='Checking…';
+ try{await loadProvider();toast('Provider configuration checked. Market quotes and exchange permissions are separate.')}
+ finally{button.disabled=false;button.textContent='Check connection ↻'}
+};
 window.addEventListener('resize',()=>{if(state.analysis)drawChart(state.analysis)});
 loadProvider();window.addEventListener('hashchange',routeFromHash);
 routeFromHash();
