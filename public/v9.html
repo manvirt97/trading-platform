@@ -5,8 +5,8 @@
 <meta name="description" content="Rangeform: evidence-first market research, conditional trade plans and market news.">
 <title>Rangeform — Market intelligence</title>
 <link rel="icon" type="image/png" href="/static/rangeform-official-icon.png">
-<link rel="stylesheet" href="/static/v9.css?v=8"><link rel="stylesheet" href="/static/v11-mobile.css?v=1"><link rel="stylesheet" href="/static/v12-settings-news.css?v=1"><link rel="stylesheet" href="/static/v13-premium.css?v=1"><link rel="stylesheet" href="/static/v14-unified.css?v=1"><link rel="stylesheet" href="/static/v15-daydesk.css?v=1">
-<script src="/static/v9.js?v=14" defer></script><script type="module" src="/static/research-studio.js?v=1"></script><script src="/static/v9-ai.js?v=5" type="module"></script><script src="/static/v9-paper.js?v=1" defer></script><script type="module" src="/static/day-desk.js?v=1"></script>
+<link rel="stylesheet" href="/static/v9.css?v=8"><link rel="stylesheet" href="/static/v11-mobile.css?v=1"><link rel="stylesheet" href="/static/v12-settings-news.css?v=1"><link rel="stylesheet" href="/static/v13-premium.css?v=1"><link rel="stylesheet" href="/static/v14-unified.css?v=1"><link rel="stylesheet" href="/static/v15-daydesk.css?v=2">
+<script src="/static/v9.js?v=14" defer></script><script type="module" src="/static/research-studio.js?v=1"></script><script src="/static/v9-ai.js?v=5" type="module"></script><script src="/static/v9-paper.js?v=1" defer></script><script type="module" src="/static/day-desk.js?v=2"></script>
 </head>
 <body data-view="overview" data-theme="light">
 <div class="app">
@@ -121,6 +121,17 @@
         <div><span>Relative volume</span><strong id="day-relative-volume">—</strong></div>
         <div><span>Historical bar age</span><strong id="day-age">—</strong></div>
        </div>
+      </section>
+      <section class="card daydesk-quote-card" aria-labelledby="day-quote-title">
+       <div class="eyebrow">OWNER-ONLY · OPTIONAL MARKET QUOTES</div>
+       <h2 id="day-quote-title">Verify bid &amp; ask</h2>
+       <p id="day-quote-setup" class="daydesk-disclaimer" role="status">Private Alpaca quote checks are optional. Set up the licensed feed in Settings, then sign in to inspect one symbol.</p>
+       <button class="subtle-btn" type="button" id="day-quote-test">Check latest bid/ask snapshot</button>
+       <div id="day-quote-results" class="daydesk-quote-results" aria-live="polite">
+        <span>Not checked. No streaming quote or executable spread verified.</span>
+       </div>
+       <p class="daydesk-disclaimer">IEX is a single exchange, not consolidated NBBO. Even a recent snapshot is not a continuous feed or a guaranteed executable price.</p>
+       <button class="subtle-btn" data-page="settings" type="button">Connection setup in Settings ↗</button>
       </section>
       <section class="card daydesk-plan-card">
        <div class="eyebrow">CONDITIONAL TRADE RESEARCH</div><h2>Entry and invalidation</h2>
@@ -270,6 +281,20 @@
       <div class="settings-provider"><span id="settingsProviderDot" class="status-dot amber"></span><div><strong id="settingsProviderState">Checking data connection…</strong><small id="settingsProviderDescription">Connecting to Rangeform's server-side data-status endpoint.</small></div></div>
       <div class="settings-actions"><button id="settingsCheckProvider" class="subtle-btn" type="button">Check connection ↻</button><a class="subtle-btn button-link" href="https://github.com/manvirt97/trading-platform/blob/main/V9_IMPLEMENTATION.md" target="_blank" rel="noopener noreferrer">Data setup guide ↗</a></div>
       <p class="settings-footnote">Connection status does not verify streaming quotes, exchange licences, bid/ask spreads or brokerage access. Never enter secret market-data keys into this page.</p>
+     </section>
+     <section class="card settings-panel" aria-labelledby="settingsRealtimeTitle">
+      <div class="card-head"><div><div class="eyebrow">PRIVATE MARKET-DATA CONNECTION</div><h2 id="settingsRealtimeTitle">Make the Day Trading Desk operational</h2><p>These steps unlock owner-only quote verification. No market-data credentials are entered into this website.</p></div></div>
+      <div class="settings-provider"><span id="settingsQuotesDot" class="status-dot amber"></span><div><strong id="settingsQuotesState">Checking owner quote configuration…</strong><small id="settingsQuotesDescription">Authenticated snapshot checks require separate Alpaca market-data secrets, an owner UID and the correct feed permissions.</small></div></div>
+      <ol class="settings-owner-steps">
+       <li><strong>Confirm licensing.</strong> Decide whether you're using this privately or displaying prices to other people. Free IEX coverage is single-venue; full US coverage needs separately licensed SIP.</li>
+       <li><strong>Create permitted market-data credentials.</strong> Use <a href="https://app.alpaca.markets/" target="_blank" rel="noopener noreferrer">Alpaca's account dashboard ↗</a> if eligible for market-data access. Never use employer accounts or share keys in chat.</li>
+       <li><strong>Add Cloudflare secrets.</strong> Open your project in <a href="https://dash.cloudflare.com/" target="_blank" rel="noopener noreferrer">Cloudflare ↗</a> → Workers &amp; Pages → <em>rangeform</em> → Settings → Variables and Secrets. Add encrypted <code>ALPACA_DATA_KEY_ID</code> and <code>ALPACA_DATA_SECRET_KEY</code>.</li>
+       <li><strong>Lock it to your Google account.</strong> In <a href="https://console.firebase.google.com/" target="_blank" rel="noopener noreferrer">Firebase Authentication ↗</a>, copy only your authorized account's User UID. In Cloudflare, add it as <code>TRADING_QUOTE_OWNER_UID</code>. Do not share the UID publicly.</li>
+       <li><strong>Enable private checks.</strong> Add <code>REALTIME_QUOTE_CHECKS_ENABLED=on</code> and <code>ALPACA_DATA_FEED=iex</code> (or <code>sip</code> only with SIP access). Redeploy Production and sign in through Research AI.</li>
+       <li><strong>Verify, don't assume.</strong> In Day Trading Desk press <em>Check latest bid/ask snapshot</em>. Confirm actual timestamp, spread and coverage. If unavailable, review the error and your vendor account permissions.</li>
+      </ol>
+      <p class="settings-footnote">A recent bid/ask snapshot does not make Rangeform a streaming or broker-execution product. Check licensing before expanding access beyond the owner.</p>
+      <div class="settings-actions"><a class="subtle-btn button-link" href="https://github.com/manvirt97/trading-platform/blob/main/OWNER_LIVE_DATA_SETUP_V16.md" target="_blank" rel="noopener noreferrer">Detailed connection walkthrough ↗</a><a class="subtle-btn button-link" href="/v9.html#daydesk">Go to Day Trading Desk ↗</a></div>
      </section>
      <section class="card settings-panel" aria-labelledby="settingsAiTitle">
       <div class="card-head"><div><div class="eyebrow">AI SERVICE HEALTH</div><h2 id="settingsAiTitle">Claude model diagnostics</h2><p>Check model access without running the eleven-agent investigation or spending generation tokens.</p></div></div>
