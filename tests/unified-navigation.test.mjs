@@ -8,7 +8,7 @@ test('legacy Market Desk links redirect to new workspace, not old HTML',()=>{
  for(const path of ['/market.html','/market','/market/']){
   assert.ok(redirects.includes(path+' /v9.html#overview 302'),path+' must redirect');
  }
- assert.ok(read('public/market-classic.html').includes('TradingView Market Desk'));
+ assert.ok(read('public/market-classic.html').includes('Legacy Market Desk'));
  assert.match(read('public/research.html'),/new URLSearchParams\(location\.search\)\.has\('classic'\)/);
 });
 test('phone app manifests and each shortcut target modern pages',()=>{
