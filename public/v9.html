@@ -5,8 +5,8 @@
 <meta name="description" content="Rangeform: evidence-first market research, conditional trade plans and market news.">
 <title>Rangeform — Market intelligence</title>
 <link rel="icon" type="image/png" href="/static/rangeform-official-icon.png">
-<link rel="stylesheet" href="/static/v9.css?v=3">
-<script src="/static/v9.js?v=3" defer></script><script src="/static/v9-ai.js?v=1" type="module"></script>
+<link rel="stylesheet" href="/static/v9.css?v=4">
+<script src="/static/v9.js?v=4" defer></script><script src="/static/v9-ai.js?v=1" type="module"></script>
 </head>
 <body data-view="overview" data-theme="light">
 <div class="app">
@@ -80,6 +80,26 @@
        <article class="card pattern-card"><div class="card-head"><div><div class="eyebrow">LIVE-ELIGIBLE SETUP CHECK</div><h2>Opening-range breakout</h2></div><span id="patternStatus" class="signal-tag">Waiting for bars</span></div>
        <div class="pattern-stats"><div><small>OPENING HIGH</small><strong id="openingHigh">—</strong></div><div><small>OPENING LOW</small><strong id="openingLow">—</strong></div><div><small>RELATIVE VOLUME</small><strong id="confirmedVolume">—</strong></div></div><p id="patternExplanation" class="subtle-note">Uses 9:30–10:00 a.m. New York opening range with completed 1-, 5- or 15-minute candles. Requires trend and volume confirmation.</p></article>
        <article class="card chart-card"><div class="chart-title"><div><div class="eyebrow">PRICE STRUCTURE</div><h2>Verified historical chart</h2></div><div class="chart-controls"><label for="barInterval">Bars</label><select id="barInterval"><option value="5min" selected>5 min · intraday</option><option value="15min">15 min</option><option value="1min">1 min</option><option value="1day">Daily · context</option></select></div></div><div class="chart-wrap"><canvas id="priceChart" aria-label="Candlestick price chart. A text summary of the loaded prices is available above." role="img"></canvas><div id="chartPlaceholder" class="chart-placeholder"><span class="chart-art">▥</span><strong>No verified price history loaded</strong><p>Choose Analyze to load completed bars. Data from public widgets is not used to calculate these signals.</p></div></div><div class="chart-footer"><span><i class="key-dot green"></i> Candles</span><span><i class="key-dot blue"></i> Previous resistance</span><span><i class="key-dot red"></i> Previous support</span><span>Scenario lines are conditional illustrations, not forecasts</span></div></article>
+       <article class="card agent-room-card" aria-labelledby="agentRoomTitle">
+        <div class="card-head">
+         <div><div class="eyebrow">MULTI-SPECIALIST RESEARCH · 22 CHECKS</div>
+         <h2 id="agentRoomTitle">The Agent Room</h2>
+         <p>Rule-based specialists, not 22 autonomous AI models. Missing data is never counted as agreement.</p></div>
+         <span class="signal-tag" id="agentRoomVerdict">Awaiting data</span>
+        </div>
+        <div class="agent-summary" id="agentRoomSummary">No valid analysis loaded. Each specialist will report its evidence or reason for abstaining.</div>
+        <div id="agentRoomVeto" class="agent-veto" hidden></div>
+        <div class="agent-filters" role="group" aria-label="Filter research specialists">
+          <button type="button" class="selected" data-agent-filter="all" aria-pressed="true">All checks</button>
+          <button type="button" data-agent-filter="Safety" aria-pressed="false">Safety</button>
+          <button type="button" data-agent-filter="Trend" aria-pressed="false">Trend</button>
+          <button type="button" data-agent-filter="Momentum" aria-pressed="false">Momentum</button>
+          <button type="button" data-agent-filter="Structure" aria-pressed="false">Structure</button>
+          <button type="button" data-agent-filter="unavailable" aria-pressed="false">Unavailable</button>
+        </div>
+        <div class="agent-grid" id="agentRoomGrid"><p class="subtle-note">Open Trade Signals and analyze a symbol to inspect the specialists.</p></div>
+        <p class="subtle-note">A watch requires a validated opening-range pattern, enough evidenced votes, and no safety veto. Trade execution and potential profit are never guaranteed.</p>
+       </article>
        <article class="card catalyst-card"><div class="eyebrow">NEWS CROSS-CHECK</div><h2>Latest relevant headlines</h2><p class="subtle-note" id="catalystStatus">News is checked separately and never assumed to be bullish or bearish from a headline.</p><div id="catalystList" class="catalyst-list"><p>Run an analysis to check dated publisher headlines.</p></div></article>
        <article class="card volume-card"><div class="eyebrow">CANDLE-VOLUME CONCENTRATION</div><h2>Where recent bars were most active</h2><div id="volumeProfile" class="volume-profile"><p>No historical candles loaded.</p></div><p class="subtle-note">Approximate volume distribution from completed candles; NOT an order-book heatmap, Level II liquidity or options flow.</p></article>
        <article class="card rationale-card"><div class="eyebrow">EVIDENCE EXPLAINED</div><h2>Why the verdict?</h2><div id="evidenceText" class="rationale-content">Technical evidence appears here after provider analysis. Scores reflect indicator alignment—not probability of profit.</div></article>
