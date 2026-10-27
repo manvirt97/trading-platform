@@ -23,9 +23,11 @@ test('phone app manifests and each shortcut target modern pages',()=>{
 });
 test('modern sidebar routes tools inside V10 without accidental classic navigation',()=>{
  const html=read('public/v9.html'),js=read('public/static/v9.js');
- for(const label of ['Research AI','Risk planner','Paper journal','Data status'])assert.ok(html.includes(label));
- for(const focus of ['assistantTitle','riskAccount','paperTitle','connectionDetails'])
+ for(const label of ['Research AI','Risk planner','Paper journal','Settings'])assert.ok(html.includes(label));
+ for(const focus of ['assistantTitle','riskAccount','paperTitle'])
   assert.match(html,new RegExp('data-focus="'+focus+'"'));
+ assert.match(html,/data-page="settings"/);
+ assert.match(html,/data-section="settings"/);
  assert.doesNotMatch(html,/<a class="nav-link" href="\/research\.html\?classic=1#/);
  assert.doesNotMatch(html,/Open classic workspace/);
  assert.match(js,/function routeFromHash\(\)/);
