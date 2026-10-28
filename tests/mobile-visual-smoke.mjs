@@ -16,7 +16,7 @@ try {
   });
   const page=await context.newPage();
   await page.route('**/*',route=>{
-   if(route.request().url.startsWith(base))return route.continue();
+   if(route.request().url().startsWith(base))return route.continue();
    return route.abort();
   });
   for(const path of ['/account.html','/algo.html','/bot.html','/v9.html']){
