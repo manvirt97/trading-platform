@@ -46,6 +46,7 @@ function showBook(){
  else setMsg('feedMessage','No fresh market snapshot. Paper actions are disabled until the exchange responds.');
  $('feedPill').textContent=freshness()?'Kraken book · fresh':error?'Exchange unavailable':'Quote not verified';
  $('feedPill').className='chip'+(freshness()?' ok':error?' bad':'');
+ const dot=document.querySelector('.statusdot');if(dot){dot.classList.toggle('online',Boolean(freshness()));dot.classList.toggle('offline',Boolean(error))}
 }
 function paperStatus(){
  const m=quoteMetrics();
@@ -81,7 +82,7 @@ function renderJournal(){
 }
 function render(){showBook();paperStatus()}
 async function refresh(){
- if(busy||document.visibilityState==='hidden')return;
+ if(busy||document.visibilityState==='hidden'||$('cryptoPanel').hidden)return;
  busy=true;lastAttemptAt=Date.now();$('refresh').disabled=true;$('refresh').textContent='Checking exchange…';error=null;
  const pair=currentPair(),control=new AbortController(),timeout=setTimeout(()=>control.abort(),8500);
  try{
@@ -137,6 +138,7 @@ function exportCSV(){
 }
 function setTab(active){
  const crypto=active==='crypto';$('cryptoPanel').hidden=!crypto;$('contractsPanel').hidden=crypto;
+ if(crypto&&!freshness())refresh();
  $('cryptoTab').classList.toggle('selected',crypto);$('contractsTab').classList.toggle('selected',!crypto);
  $('cryptoTab').setAttribute('aria-selected',String(crypto));$('contractsTab').setAttribute('aria-selected',String(!crypto));
 }
