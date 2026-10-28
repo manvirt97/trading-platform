@@ -88,7 +88,7 @@ test('mobile dock is solid, edge-attached and never exposes scrolling content',(
 test('every top-level view shares saved palette before first paint',()=>{
  for(const path of ['public/research.html','public/market.html','public/account.html']){
   const html=load(path);
-  assert.match(html,/theme-sync\.js\?v=(?:3|4)/);
+  assert.match(html,/theme-sync\.js\?v=(?:3|4|22)/);
   assert.match(html,/theme-sync\.css\?v=2/);
  }
  const theme=load('public/static/theme-sync.js');
