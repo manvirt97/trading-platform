@@ -26,6 +26,8 @@ jobs:
           curl --fail --silent http://127.0.0.1:8999/account.html > /dev/null
       - name: Verify installed-iPhone layout at 320, 375, 390 CSS px
         run: node tests/mobile-visual-smoke.mjs
+      - name: Verify real iPhone header layout on News, Day Desk, and Trade Signals
+        run: node tests/mobile-header-geometry-v28.mjs
       - name: Verify installed-app update prompt and safe refresh
         run: node tests/pwa-update-visual-smoke.mjs
       - name: Verify cross-page visual design and theme persistence

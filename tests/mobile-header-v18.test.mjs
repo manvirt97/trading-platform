@@ -25,7 +25,7 @@ test('Algorithmic and Autonomous desks now share the current Rangeform mobile he
   assert.match(html,/id="theme"/);
   assert.match(html,/class="rf-top-search"/);
   assert.match(html,/id="rfNavShade"/);
-  assert.match(html,/rangeform-design-v26\.css\?v=27/);
+  assert.match(html,/rangeform-design-v26\.css\?v=28/);
  }
  assert.match(read('public/algo.html'),/id="feedPill"/);
  assert.match(read('public/bot.html'),/id="botBadge"/);

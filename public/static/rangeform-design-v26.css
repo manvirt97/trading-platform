@@ -293,3 +293,91 @@ body .daydesk-session,body .daydesk-toolbar{background:var(--card);border-color:
  html body .topbar,html body .main{max-width:100%;min-width:0}
  html body .daydesk-toolbar{min-width:0}
 }
+
+/* V28 mobile header regression fix.
+   V26 body .content-shell>.topbar {display:flex} outranked the two-row
+   responsive grid in v11-mobile.css. On iPhone this put the symbol search
+   beside the logo and status buttons, clipping "Rangeform" and the input.
+   Scope to Main / News / Trade Signals / Day Desk; do not touch APIs. */
+@media(max-width:940px){
+ html body .content-shell>.topbar{
+  display:grid;
+  grid-template-columns:44px minmax(0,1fr) 91px;
+  grid-template-rows:44px 46px;
+  grid-template-areas:"menu brand actions" "search search search";
+  align-items:center;
+  justify-content:stretch;
+  column-gap:9px;
+  row-gap:10px;
+  width:100%;max-width:100%;min-width:0;
+  height:auto;min-height:0;
+  padding:10px 13px 12px;
+  overflow:visible;
+  box-sizing:border-box;
+ }
+ html body .content-shell>.topbar .mobile-menu{
+  display:grid;grid-area:menu;
+  width:44px;min-width:44px;height:44px;min-height:44px;
+  padding:0;margin:0;place-items:center;
+ }
+ html body .content-shell>.topbar .mobile-header-brand{
+  grid-area:brand;display:flex;align-items:center;
+  width:100%;min-width:0;max-width:100%;
+  gap:8px;overflow:hidden;white-space:nowrap;
+  color:var(--ink);text-decoration:none;
+ }
+ html body .content-shell>.topbar .mobile-header-brand img{
+  display:block;width:28px;height:28px;flex:0 0 28px;object-fit:contain;
+ }
+ html body .content-shell>.topbar .mobile-header-brand strong{
+  display:block;min-width:0;max-width:100%;font-size:17px;
+  line-height:1.15;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+ }
+ html body .content-shell>.topbar .top-right{
+  grid-area:actions;display:flex;justify-content:flex-end;align-items:center;
+  width:91px;min-width:91px;max-width:91px;gap:7px;margin:0;padding:0;
+ }
+ html body .content-shell>.topbar .top-right .version-marker,
+ html body .content-shell>.topbar .top-right .market-time,
+ html body .content-shell>.topbar .top-right .user-circle{display:none!important}
+ html body .content-shell>.topbar .top-right .provider-pill{
+  position:relative;display:grid;place-items:center;
+  flex:0 0 42px;width:42px;min-width:42px;max-width:42px;
+  height:44px;min-height:44px;padding:0;margin:0;
+  border:1px solid var(--line);border-radius:11px;
+  background:var(--card);color:var(--secondary);
+ }
+ html body .content-shell>.topbar .top-right .provider-pill #feedLabel{
+  position:absolute;width:1px;height:1px;overflow:hidden;
+  clip:rect(0 0 0 0);clip-path:inset(50%);white-space:nowrap;
+ }
+ html body .content-shell>.topbar .top-right .provider-pill .status-dot{
+  display:block;flex:0 0 11px;width:11px;height:11px;margin:0;
+ }
+ html body .content-shell>.topbar .top-right #themeToggle{
+  flex:0 0 42px;display:grid;place-items:center;
+  width:42px;min-width:42px;height:44px;min-height:44px;
+  border-radius:11px;padding:0;margin:0;
+ }
+ html body .content-shell>.topbar .top-search{
+  grid-area:search;display:flex;align-items:center;
+  flex:none;width:100%;min-width:0;max-width:100%;
+  height:46px;min-height:46px;margin:0;
+  padding:0 13px;gap:9px;
+  box-sizing:border-box;
+ }
+ html body .content-shell>.topbar .top-search input{
+  flex:1 1 auto;min-width:0;width:100%;max-width:100%;
+  font-size:16px;line-height:1.3;
+ }
+ html body .content-shell>.topbar .top-search kbd{display:none}
+}
+@media(max-width:940px){
+ html.rangeform-ios-standalone body .content-shell>.topbar{
+  padding-top:max(62px,env(safe-area-inset-top,0px));
+ }
+}
+@media(max-width:355px){
+ html body .content-shell>.topbar{padding-left:10px;padding-right:10px;column-gap:7px}
+ html body .content-shell>.topbar .mobile-header-brand strong{font-size:16px}
+}

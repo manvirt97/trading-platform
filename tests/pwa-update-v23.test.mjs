@@ -7,10 +7,10 @@ test('all canonical pages load same installed-app release checker',()=>{
  const paths=['public/v9.html','public/account.html','public/algo.html','public/bot.html'];
  for(const path of paths){
   const html=read(path);
-  assert.match(html,/pwa-update-v27\.js\?v=27/,'missing refresh code on '+path);
+  assert.match(html,/pwa-update-v28\.js\?v=28/,'missing refresh code on '+path);
   assert.match(html,/viewport-fit=cover/,'must protect installed iPhone safe areas on '+path);
  }
- const checker=read('public/static/pwa-update-v27.js');
+ const checker=read('public/static/pwa-update-v28.js');
  assert.match(checker,/navigator\.standalone===true/);
  assert.match(checker,/document\.addEventListener\('visibilitychange'/);
  assert.match(checker,/window\.addEventListener\('pageshow'/);
@@ -28,8 +28,8 @@ test('all canonical pages load same installed-app release checker',()=>{
 
 test('release metadata is revalidated rather than retaining a stale offline shell',()=>{
  const meta=JSON.parse(read('public/release.json'));
- assert.equal(meta.version,'27');
- assert.equal(meta.build,'rangeform-v27-mobile-fullwidth-hotfix');
+ assert.equal(meta.version,'28');
+ assert.equal(meta.build,'rangeform-v28-iphone-header-grid');
  const headers=read('public/_headers');
  assert.match(headers,/\/release\.json\n  Cache-Control: no-store, max-age=0/);
  for(const path of ['algo.html','bot.html','account.html','v9.html'])
