@@ -25,16 +25,22 @@ try {
    const isMain=path==='/v9.html';
    if(isAccount)await page.locator('#accountMobileMenu').click();
    if(isMain)await page.locator('#mobileMenu').click();
+   // Wait for the 180ms drawer animation. Otherwise CI snapshots capture a
+   // partially offscreen drawer and falsely appear to show a clipped menu.
+   if(isAccount||isMain)await page.waitForTimeout(260);
    const logo=isAccount?'.account-rail-brand':isMain?'.sidebar .brand':'.rail .logo';
-   const dimensions=await page.evaluate((logo)=>{
+   const navLink=isAccount?'.account-rail-link':isMain?'.sidebar .nav-link':null;
+   const dimensions=await page.evaluate(({logo,navLink})=>{
     const el=document.querySelector(logo);
     if(!el) return null;
     const r=el.getBoundingClientRect();
-    return {top:r.top,bottom:r.bottom,height:r.height,
+    const link=navLink?document.querySelector(navLink)?.getBoundingClientRect():null;
+    return {top:r.top,bottom:r.bottom,left:r.left,right:r.right,height:r.height,
+      link:link?{left:link.left,right:link.right,top:link.top,bottom:link.bottom}:null,
       mobile:document.documentElement.classList.contains('rangeform-ios-standalone'),
       viewport:document.documentElement.clientWidth,
       scrollWidth:document.documentElement.scrollWidth};
-   },logo);
+   },{logo,navLink});
    const file=path.replace(/[^a-z0-9]+/gi,'-')+'-'+width+'.png';
    await page.screenshot({path:'artifacts/mobile/'+file});
    assert.ok(dimensions, 'Missing mobile navigation logo '+path);
@@ -42,6 +48,14 @@ try {
    // OS clock occupies the first ~50 CSS px. Logo must start below it.
    assert.ok(dimensions.top>=54,JSON.stringify({path,width,...dimensions}));
    assert.ok(dimensions.bottom<=820, 'Logo offscreen '+path);
+   if(isAccount||isMain){
+    assert.ok(dimensions.left>=-2&&dimensions.right<=width+2,
+      'Opened drawer logo clipped horizontally: '+JSON.stringify({path,width,...dimensions}));
+    assert.ok(dimensions.link&&dimensions.link.left>=-2&&dimensions.link.right<=width+2,
+      'Opened drawer navigation link clipped horizontally: '+JSON.stringify({path,width,...dimensions}));
+    assert.ok(dimensions.link.top>=0&&dimensions.link.top<820,
+      'Opened drawer navigation link not reachable in viewport: '+JSON.stringify({path,width,...dimensions}));
+   }
    assert.ok(dimensions.scrollWidth<=width+2,'Unexpected horizontal page overflow '+path);
    if(isAccount){
     assert.equal(await page.locator('#accountMobileMenu').getAttribute('aria-expanded'),'true');
