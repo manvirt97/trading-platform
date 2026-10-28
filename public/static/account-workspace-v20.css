@@ -1,0 +1,58 @@
+/* V20: Account & Sign-in uses the same Rangeform workspace shell as the
+   main, Algorithmic and Autonomous desks. Legacy account form IDs remain intact. */
+body{--bg:#f2f4f2;--panel:#fbfcfb;--edge:#d9e2df;--text:#1d2c34;--sub:#5c707b;--accent:#365e6c;--soft:#edf1f0;--shadow:0 9px 25px rgba(29,45,51,.035);background:var(--bg);color:var(--text);font-family:"Manrope","DM Sans",Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+body.dark{--bg:#101a22;--panel:#17242e;--edge:#324551;--text:#e8efee;--sub:#b3c5cc;--accent:#a4c1cb;--soft:#20303b;--shadow:0 10px 27px rgba(3,9,15,.09)}
+.account-app{display:grid;grid-template-columns:254px minmax(0,1fr);min-height:100dvh;width:100%}
+.account-workspace{min-width:0;width:100%}
+.account-rail{background:var(--panel);border-right:1px solid var(--edge);padding:21px 13px 16px;position:sticky;top:0;height:100dvh;display:flex;flex-direction:column;overflow-y:auto;scrollbar-width:thin}
+.account-rail-brand{display:flex;gap:10px;align-items:center;text-decoration:none;color:var(--text);padding:5px 9px 23px}
+.account-rail-brand img{border-radius:10px;object-fit:cover;flex-shrink:0}
+.account-rail-brand strong{display:block;font-size:21px;letter-spacing:-.055em;font-weight:800;line-height:1.1}
+.account-rail-brand small{display:block;color:var(--sub);font-size:9px;letter-spacing:.13em;font-weight:800;line-height:1.5}
+.account-rail-label{font-size:9px;letter-spacing:.15em;font-weight:800;color:var(--sub);padding:9px 12px;margin:0}
+.account-rail-links{display:flex;flex-direction:column;gap:2px;min-width:0}
+.account-rail-link{display:flex;align-items:center;gap:11px;min-height:39px;margin:0;padding:9px 12px;border-radius:9px;font-size:11.5px;line-height:1.3;font-weight:760;text-decoration:none;color:var(--sub);border:1px solid transparent;white-space:normal}
+.account-rail-link:hover{background:var(--soft);color:var(--text);border-color:var(--edge)}
+.account-rail-link.current{background:var(--soft);color:var(--text);border-color:var(--edge);box-shadow:inset 3px 0 #b19b80}
+.account-nav-ico{font-size:17px;min-width:19px;text-align:center;color:var(--sub)}
+.account-topbar{position:sticky;top:0;z-index:25;width:100%;min-width:0;margin:0;min-height:72px;display:flex;gap:14px;justify-content:space-between;align-items:center;background:var(--panel);border-bottom:1px solid var(--edge);padding:10px clamp(14px,2.5vw,35px)}
+.account-back{font-size:12px;font-weight:700;color:var(--accent);white-space:nowrap;text-decoration:none}
+.account-top-title{font-size:10px;font-weight:800;letter-spacing:.15em;color:var(--sub)}
+.account-topbar .head-actions{margin-left:0}
+.account-topbar .icon-btn{min-height:44px;min-width:44px;height:44px;width:44px}
+.account-workspace>.wrap{max-width:1536px;width:100%;min-width:0;padding:24px clamp(14px,3vw,40px) 32px;margin:auto}
+.account-workspace .hero{padding:24px clamp(19px,2.6vw,30px);border-radius:16px;background:var(--panel);box-shadow:var(--shadow);border:1px solid var(--edge);margin-bottom:17px}
+.account-workspace .hero::before{display:none}
+.account-workspace .hero h1{font-size:clamp(28px,3.6vw,45px);color:var(--text)}
+.account-workspace .hero h1 em{color:var(--sub)}
+.account-workspace .tile,.account-workspace .warning{background:var(--panel);color:var(--text);border-color:var(--edge);box-shadow:var(--shadow)}
+.account-workspace .overline{color:var(--sub)}
+.account-workspace .tile.content p{color:var(--sub)}
+.account-workspace a{color:var(--accent)}
+.account-workspace .primary{background:#365e6c;border-color:#365e6c;color:#fff}
+.account-owner-setup{display:flex;flex-direction:column;gap:8px;margin:16px 0}
+.account-owner-setup h3{margin:6px 0;font-size:20px}
+.account-owner-setup code{padding:2px 5px;border-radius:4px;background:var(--soft);color:var(--text);overflow-wrap:anywhere}
+.account-owner-actions{display:flex;flex-wrap:wrap;align-items:end;gap:10px}
+.account-owner-uid{flex:1 1 250px;min-width:0;display:grid;gap:5px;padding:12px 14px;border-radius:10px;background:var(--soft);border:1px solid var(--edge)}
+.account-owner-uid small{color:var(--sub);font-size:9px;font-weight:800;letter-spacing:.13em}
+.account-owner-uid strong{font-size:13px;font-weight:770;overflow-wrap:anywhere;user-select:text;color:var(--text)}
+.account-owner-actions .pill{display:inline-flex;align-items:center;min-height:44px;color:var(--text);border-color:var(--edge);background:var(--soft)}
+.account-owner-actions .pill:disabled{opacity:.55;cursor:not-allowed}
+#accountOwnerCopyStatus{margin:0;color:var(--sub)}
+@media(max-width:1020px){.account-app{grid-template-columns:222px minmax(0,1fr)}.account-rail{padding:15px 9px}.account-rail-link{gap:8px;padding:9px}.account-top-title{display:none}}
+@media(max-width:760px){
+ .account-app{display:block;width:100%;min-width:0}
+ .account-rail{height:auto;max-height:none;position:relative;width:100%;padding:12px max(12px,env(safe-area-inset-right)) 10px max(12px,env(safe-area-inset-left));border-right:0;border-bottom:1px solid var(--edge);overflow:visible}
+ .account-rail-brand{padding:4px 8px 9px}
+ .account-rail-label{display:none}
+ .account-rail-links{display:flex;flex-direction:row;flex-wrap:nowrap;gap:5px;width:100%;max-width:100%;min-width:0;overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;padding:3px 0 7px}
+ .account-rail-link{flex:0 0 auto;white-space:nowrap;min-height:44px;padding:9px 11px}
+ .account-nav-ico{font-size:15px;min-width:16px}
+ .account-topbar{position:relative;min-height:60px;gap:10px;padding:8px max(12px,env(safe-area-inset-right)) 8px max(12px,env(safe-area-inset-left))}
+ .account-workspace>.wrap{padding:18px 13px max(25px,env(safe-area-inset-bottom))}
+ .account-workspace .hero{padding:19px 16px}
+ .account-workspace .hero h1{font-size:clamp(28px,8vw,40px)}
+ .account-owner-actions{align-items:stretch}
+ .account-owner-actions .pill{flex:1 1 auto;justify-content:center}
+}
