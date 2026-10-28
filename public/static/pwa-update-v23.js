@@ -68,7 +68,8 @@
    if(!response.ok)return;
    const data=await response.json();
    const build=String(data?.build||'');
-   if(/^rangeform-v[0-9]+-[a-z0-9-]+$/.test(build)&&build!==CURRENT)show(build);
+   const version=/^rangeform-v([0-9]+)-[a-z0-9-]+$/.exec(build);
+   if(version&&Number(version[1])>23&&build!==CURRENT)show(build);
   }catch{/* Offline or provider errors should never block research. */}
   finally{busy=false}
  }
