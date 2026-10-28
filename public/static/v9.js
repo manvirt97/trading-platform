@@ -29,7 +29,7 @@ function setTheme(v){
  document.body.dataset.theme=v==='dark'?'dark':'light';
  const themeMeta=document.querySelector('meta[name="theme-color"]');
  if(themeMeta)themeMeta.setAttribute('content',document.body.dataset.theme==='dark'?'#101923':'#f6f8fb');
- try{localStorage.setItem('rf_v9_theme',document.body.dataset.theme)}catch{}
+ try{localStorage.setItem('rf_v9_theme',document.body.dataset.theme);localStorage.setItem('rangeform_theme',document.body.dataset.theme)}catch{}
  if($('settingsTheme'))$('settingsTheme').value=document.body.dataset.theme;
 }
 const create=(tag,className,text)=>{let el=document.createElement(tag);if(className)el.className=className;if(text!=null)el.textContent=String(text);return el};
