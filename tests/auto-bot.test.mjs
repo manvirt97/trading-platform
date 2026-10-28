@@ -35,7 +35,7 @@ test('stop exits a hypothetical position using bid, with fees and realized loss'
  const entry=advanceBot(state,tick,now),stop=entry.state.position.entry*.97;
  const out=advanceBot(entry.state,market(bars,stop,stop+.1),now+60000);
  assert.equal(out.trade.action,'PAPER_SELL');assert.equal(out.trade.reason,'STOP');assert.ok(out.trade.pnl<0);
- assert.equal(out.state.position,null);assert.equal(out.state.cash+out.state.realizedPnl,10000+2*out.state.realizedPnl?true:true); // independently verify below
+ assert.equal(out.state.position,null);assert.ok(Math.abs(out.state.cash-(10000+out.state.realizedPnl))<.0001);
  assert.ok(out.state.realizedPnl<0);
 });
 test('risk halt and missing/old quotes fail closed',()=>{
