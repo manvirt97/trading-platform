@@ -1,0 +1,82 @@
+/* V21 Account shell: match the actual v9/v14 Rangeform navigation, topbar,
+   typography and uncluttered page heading. Form/account functionality is unchanged. */
+.account-app{display:grid;grid-template-columns:238px minmax(0,1fr);min-height:100dvh;background:var(--bg)}
+.account-workspace{background:var(--bg);min-width:0}
+.account-rail{position:sticky;top:0;z-index:30;height:100dvh;min-width:0;padding:22px 14px 20px;gap:15px;background:var(--sidebar);border-right:1px solid var(--line);box-shadow:none;overflow-y:auto}
+.account-rail-brand{padding:2px 9px 19px;gap:10px;font-size:inherit;color:var(--ink)}
+.account-rail-brand strong{font-size:23px;font-weight:800;letter-spacing:-.065em;line-height:1.06}
+.account-rail-brand small{font-size:9px;color:var(--secondary)}
+.account-rail-label{margin:0;padding:5px 13px 0;font-size:10px;letter-spacing:.15em;font-weight:800;color:var(--secondary)}
+.account-rail-divider{border-top:1px solid var(--line);padding-top:20px}
+.account-rail-links{display:flex;flex-direction:column;gap:4px}
+.account-rail-link{display:flex;align-items:center;gap:12px;width:100%;min-height:45px;padding:12px 14px;margin:0;border:1px solid transparent;border-radius:11px;font-size:14px;font-weight:660;line-height:1.4;color:var(--secondary);white-space:normal}
+.account-nav-ico{width:21px;min-width:21px;font-size:19px;line-height:1;color:var(--secondary)}
+.account-rail-link:hover{background:var(--muted-card);color:var(--ink);border-color:var(--line)}
+.account-rail-link.current{background:var(--blue-soft);color:var(--ink);border-color:var(--line);box-shadow:inset 3px 0 #b19b80}
+.account-rail-link.current .account-nav-ico{color:var(--blue)}
+.account-topbar{position:sticky;top:0;z-index:15;min-height:73px;height:73px;display:flex;align-items:center;justify-content:space-between;gap:23px;padding:0 34px;background:var(--card);color:var(--ink);border-bottom:1px solid var(--line);box-shadow:0 5px 15px rgba(13,26,36,.018)}
+.account-top-search{flex:1 1 auto;min-width:200px;max-width:710px;min-height:42px;display:flex;align-items:center;gap:10px;padding:0 13px;border-radius:10px;border:1px solid var(--line);background:var(--muted-card);color:var(--secondary)}
+.account-top-search>span{flex:0 0 auto;font-size:19px;color:var(--ink);line-height:1}
+.account-top-search input{border:0;outline:none;min-width:0;width:100%;height:40px;padding:0;background:transparent!important;color:var(--ink);font-size:13px;box-shadow:none;appearance:none}
+.account-top-search input::placeholder{color:var(--secondary);opacity:.92}
+.account-top-search:focus-within{outline:2px solid var(--blue);outline-offset:2px}
+.account-top-search kbd{flex:0 0 auto;line-height:1;font-size:13px;color:var(--secondary);border:1px solid var(--line);border-radius:5px;padding:4px 6px}
+.account-header-actions{flex:0 0 auto;display:flex;align-items:center;justify-content:flex-end;gap:10px;min-width:0}
+.account-version-marker{display:inline-flex;align-items:center;min-height:34px;padding:8px 11px;border-radius:9px;background:var(--muted-card);border:1px solid var(--line);color:var(--secondary);font-size:10px;font-weight:800;letter-spacing:.12em;white-space:nowrap}
+.account-status-pill{display:inline-flex;align-items:center;min-height:38px;border:1px solid var(--line);border-radius:11px;padding:9px 12px;background:var(--card);color:var(--secondary)!important;font-size:11px;font-weight:750;text-decoration:none;white-space:nowrap}
+.account-status-pill:hover{background:var(--muted-card);color:var(--ink)!important}
+.account-header-actions .account-theme-toggle{height:39px;width:39px;min-width:39px;min-height:39px;border-radius:11px;background:var(--card);border:1px solid var(--line);color:var(--ink)}
+.account-mobile-menu,.account-mobile-header-brand{display:none}
+.account-nav-shade[hidden]{display:none!important}
+.account-nav-shade{display:none}
+.account-workspace>.wrap{max-width:none;padding:26px clamp(17px,3vw,38px) 34px}
+.account-workspace>.wrap>.hero{display:block;max-width:none;padding:0;margin:0 0 23px;border:0;border-radius:0;background:transparent;box-shadow:none;overflow:visible}
+.account-workspace>.wrap>.hero::before{display:none}
+.account-workspace>.wrap>.hero .overline{color:var(--secondary);font-size:10px;font-weight:800;letter-spacing:.17em}
+.account-workspace>.wrap>.hero h1{margin:7px 0 10px;font-family:inherit;font-size:clamp(31px,3.3vw,46px);font-weight:800;letter-spacing:-.065em;line-height:1.14;color:var(--ink)}
+.account-workspace>.wrap>.hero h1 em{font-style:normal;font-weight:800;color:var(--secondary)}
+.account-workspace>.wrap>.hero p{max-width:740px;margin:0;font-size:15px;line-height:1.6;color:var(--secondary)}
+.account-workspace .tile,.account-workspace .warning{background:var(--card);border:1px solid var(--line);box-shadow:var(--shadow);color:var(--ink)}
+.account-workspace .tile.content{padding:20px 22px}
+.account-workspace .tile.content p,.account-workspace .small-note{color:var(--secondary)}
+.account-workspace .overline{color:var(--secondary)}
+.account-workspace .account-owner-uid{background:var(--muted-card);border-color:var(--line)}
+.account-workspace .account-owner-uid strong{color:var(--ink)}
+.account-workspace .account-owner-actions .pill{background:var(--muted-card);border-color:var(--line);color:var(--ink)}
+.account-workspace .account-owner-setup code{background:var(--muted-card);color:var(--ink)}
+.account-workspace .account-form input,.account-workspace .account-form textarea,.account-workspace .account-form select,.account-workspace .ai-form input,.account-workspace .ai-form select{background:var(--muted-card);border-color:var(--line);color:var(--ink)}
+.account-workspace .primary{background:var(--blue);border-color:var(--blue);color:#fff}
+body[data-theme="dark"] .account-workspace .primary{background:var(--blue);border-color:var(--blue);color:#101a22}
+@media(max-width:1180px){
+ .account-app{grid-template-columns:204px minmax(0,1fr)}
+ .account-rail{padding:18px 10px}
+ .account-rail-brand strong{font-size:20px}
+ .account-topbar{padding:0 22px}
+ .account-version-marker{display:none}
+}
+@media(max-width:940px){
+ .account-app{display:block;min-width:0}
+ .account-rail{position:fixed;top:0;left:0;z-index:50;display:flex;flex-direction:column;width:252px;max-width:min(85vw,300px);height:100dvh;overflow-y:auto;transform:translateX(-105%);transition:transform .18s ease;background:var(--sidebar)}
+ .account-rail.open{transform:translateX(0)}
+ .account-nav-shade:not([hidden]){display:block;position:fixed;inset:0;z-index:49;background:rgba(7,19,30,.48)}
+ .account-topbar{display:grid;grid-template-columns:44px minmax(0,1fr) auto;grid-template-rows:44px 46px;grid-template-areas:"menu brand actions" "search search search";column-gap:11px;row-gap:9px;height:auto;min-height:0;padding:10px 17px 12px;position:sticky;top:0;z-index:40}
+ .account-mobile-menu{grid-area:menu;display:grid;place-items:center;width:42px;height:42px;min-height:42px;border:1px solid var(--line);border-radius:11px;background:var(--card);color:var(--ink);font-size:19px;cursor:pointer}
+ .account-mobile-header-brand{grid-area:brand;display:flex;align-items:center;gap:8px;min-width:0;color:var(--ink);font-size:16px;font-weight:800;text-decoration:none}
+ .account-mobile-header-brand img{border-radius:7px;flex-shrink:0}
+ .account-header-actions{grid-area:actions;min-width:0;gap:8px}
+ .account-header-actions .account-status-pill{display:none}
+ .account-header-actions .account-theme-toggle{min-width:42px;width:42px;height:42px;min-height:42px}
+ .account-top-search{grid-area:search;max-width:none;width:100%;min-height:44px;min-width:0}
+ .account-workspace>.wrap{padding:22px 17px max(28px,env(safe-area-inset-bottom))}
+}
+@media(max-width:640px){
+ .account-topbar{padding-top:max(10px,env(safe-area-inset-top));padding-left:max(11px,env(safe-area-inset-left));padding-right:max(11px,env(safe-area-inset-right))}
+ .account-version-marker{display:none}
+ .account-workspace>.wrap{padding:19px 12px max(25px,env(safe-area-inset-bottom))}
+ .account-workspace>.wrap>.hero h1{font-size:clamp(29px,8vw,39px)}
+ .account-workspace>.wrap>.hero p{font-size:13px}
+ .account-workspace .tile.content{padding:16px}
+ .account-owner-actions{align-items:stretch}
+ .account-owner-actions .pill{flex:1 1 auto;justify-content:center}
+}
+@media(prefers-reduced-motion:reduce){.account-rail{transition:none}}
