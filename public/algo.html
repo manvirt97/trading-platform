@@ -6,21 +6,30 @@
 <link rel="icon" href="/static/rangeform-official-icon.png">
 <link rel="stylesheet" href="/static/theme-sync.css?v=2">
 <link rel="stylesheet" href="/static/algo.css?v=1">
-<script src="/static/theme-sync.js?v=3"></script>
+<link rel="stylesheet" href="/static/workspace-unified-v17.css?v=1">
+<script src="/static/theme-sync.js?v=4"></script>
 <script type="module" src="/static/algo.js?v=1"></script>
 </head><body>
 <div class="shell">
 <aside class="rail" aria-label="Workspace navigation">
 <a class="logo" href="/v9.html#overview"><img alt="" width="37" height="37" src="/static/rangeform-official-icon.png"><span><strong>Rangeform</strong><small>RESEARCH &amp; DECISIONS</small></span></a>
 <span class="nav-tag">WORKSPACE</span>
-<a href="/v9.html#overview" class="rail-link">◫ &nbsp; Overview</a>
-<a href="/v9.html#daydesk" class="rail-link">▥ &nbsp; Day Trading Desk</a>
-<a href="/algo.html" class="rail-link current" aria-current="page">◇ &nbsp; Algorithmic Desk</a>
-<a href="/bot.html" class="rail-link">⟳ &nbsp; Autonomous Paper Bot</a>
-<a href="/v9.html#scanner" class="rail-link">◎ &nbsp; Opportunity scanner</a>
-<a href="/v9.html#studio" class="rail-link">◈ &nbsp; Research Studio</a>
-<a href="/v9.html#settings" class="rail-link">⚙ &nbsp; Settings</a>
-<div class="rail-bottom"><span class="statusdot"></span> Read-only exchange feed<p>No brokerage connection · no real orders</p></div>
+<nav class="rail-links" aria-label="Main navigation">
+<a href="/v9.html#overview" class="rail-link"><span class="nav-symbol" aria-hidden="true">◫</span> Overview</a>
+<a href="/v9.html#daydesk" class="rail-link"><span class="nav-symbol" aria-hidden="true">▥</span> Day Trading Desk</a>
+<a href="/algo.html" class="rail-link current" aria-current="page"><span class="nav-symbol" aria-hidden="true">◇</span> Algorithmic Desk</a>
+<a href="/bot.html" class="rail-link"><span class="nav-symbol" aria-hidden="true">⟳</span> Autonomous Paper Bot</a>
+<a href="/v9.html#signals" class="rail-link"><span class="nav-symbol" aria-hidden="true">↗</span> Trade signals</a>
+<a href="/v9.html#scanner" class="rail-link"><span class="nav-symbol" aria-hidden="true">◎</span> Opportunity scanner</a>
+<a href="/v9.html#news" class="rail-link"><span class="nav-symbol" aria-hidden="true">▤</span> News & catalysts</a>
+<a href="/v9.html#studio" class="rail-link"><span class="nav-symbol" aria-hidden="true">◈</span> Research Studio</a>
+<a href="/v9.html#ai" class="rail-link"><span class="nav-symbol" aria-hidden="true">✳</span> Research AI</a>
+<a href="/v9.html#risk" class="rail-link"><span class="nav-symbol" aria-hidden="true">◇</span> Risk planner</a>
+<a href="/v9.html#journal" class="rail-link"><span class="nav-symbol" aria-hidden="true">▣</span> Paper journal</a>
+<a href="/v9.html#settings" class="rail-link"><span class="nav-symbol" aria-hidden="true">⚙</span> Settings</a>
+<a href="/account.html" class="rail-link"><span class="nav-symbol" aria-hidden="true">☰</span> Account & Sign-in</a>
+</nav>
+<div class="rail-bottom"><span class="statusdot"></span> Read-only Kraken snapshot<p>Manual paper trades only · no real orders</p></div>
 </aside>
 <div class="workspace">
 <header class="topbar">
@@ -29,14 +38,14 @@
 <div class="actions"><span class="chip" id="feedPill">Feed not checked</span><button id="theme" type="button" class="iconbtn" aria-label="Toggle appearance">◐</button></div>
 </header>
 <main>
-<div class="intro"><div><p class="eyebrow">LIVE EXCHANGE DATA · PAPER EXECUTION</p><h1>Test the strategy.<br><em>Trust the evidence.</em></h1><p>Real Kraken spot order-book snapshots, explicit execution costs and a controlled paper ledger. Nothing here places actual orders.</p></div><div class="safety"><strong>EXECUTION LOCKED</strong><span>Real-money trading is not connected.</span><span>Public research only · no keys required</span></div></div>
+<div class="intro"><div><p class="eyebrow">KRAKEN PUBLIC MARKET DEPTH · PAPER SIMULATION</p><h1>Test the strategy.<br><em>Trust the evidence.</em></h1><p>Real Kraken spot order-book snapshots, explicit execution costs and a controlled paper ledger. Nothing here places actual orders.</p></div><div class="safety"><strong>BROKER TRADING NOT CONNECTED</strong><span>Manual paper buys and sells work with a fresh, verified order-book snapshot.</span><span>Real-money orders require a separate authorized broker connection.</span></div></div>
 <div class="tabs" role="tablist" aria-label="Strategy desk sections">
 <button id="cryptoTab" class="tab selected" role="tab" aria-selected="true" aria-controls="cryptoPanel">Crypto strategy lab</button>
 <button id="contractsTab" class="tab" role="tab" aria-selected="false" aria-controls="contractsPanel">Prediction pairing calculator</button>
 </div>
 <section id="cryptoPanel" role="tabpanel" aria-labelledby="cryptoTab">
 <div class="card market-card">
-<div class="section-top"><div><p class="eyebrow">KRAKEN SPOT · EXCHANGE ORDER BOOK</p><h2>Market microstructure</h2><p>Executable bid/ask indications from exchange depth; not continuous streaming.</p></div><div class="controls"><label>Market<select id="pair"><option value="XBTUSD">BTC / USD</option><option value="ETHUSD">ETH / USD</option></select></label><button id="refresh" type="button" class="primary">Refresh snapshot ↻</button></div></div>
+<div class="section-top"><div><p class="eyebrow">KRAKEN SPOT · EXCHANGE ORDER BOOK</p><h2>Market microstructure</h2><p>Exchange bid/ask indications from a public depth snapshot; not a continuously executable brokerage quote.</p></div><div class="controls"><label>Market<select id="pair"><option value="XBTUSD">BTC / USD</option><option value="ETHUSD">ETH / USD</option></select></label><button id="refresh" type="button" class="primary">Refresh snapshot ↻</button></div></div>
 <div id="feedMessage" class="message" role="status">Waiting for first verified market snapshot.</div>
 <div class="stat-grid">
 <div class="stat"><small>BEST BID</small><strong id="bid">—</strong><span>Potential market sell price</span></div>

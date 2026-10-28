@@ -2,23 +2,23 @@
 (()=>{'use strict';
  const key='rangeform_theme';
  const choices=['dark','light','warm'];
- const read=()=>{try{const x=localStorage.getItem(key);return choices.includes(x)?x:'light'}catch{return 'light'}};
+ const read=()=>{try{const x=localStorage.getItem('rf_v9_theme')||localStorage.getItem(key);return choices.includes(x)?x:'light'}catch{return 'light'}};
  const paint=theme=>{
    const t=choices.includes(theme)?theme:'dark';
    document.documentElement.dataset.rfTheme=t;
    document.documentElement.style.colorScheme=t==='light'?'light':'dark';
-   document.documentElement.style.backgroundColor=t==='light'?'#f1f4f8':t==='warm'?'#181713':'#0a1018';
+   document.documentElement.style.backgroundColor=t==='light'?'#f2f4f2':t==='warm'?'#181713':'#101a22';
    if(document.body){document.body.dataset.theme=t;document.body.classList.toggle('dark',t!=='light');document.body.classList.toggle('warm',t==='warm')}
-   document.querySelectorAll('meta[name="theme-color"]').forEach(el=>el.content=t==='light'?'#f1f4f8':t==='warm'?'#181713':'#0a1018');
+   document.querySelectorAll('meta[name="theme-color"]').forEach(el=>el.content=t==='light'?'#f2f4f2':t==='warm'?'#181713':'#101a22');
    document.querySelectorAll('tv-advanced-chart,tv-technical-analysis,tv-market-overview,tv-news-feed').forEach(el=>{const desired=t==='light'?'light':'dark';if(el.getAttribute('theme')!==desired)el.setAttribute('theme',desired)});
    return t;
  };
- const apply=theme=>{let t=paint(theme);try{localStorage.setItem(key,t)}catch{};return t};
+ const apply=theme=>{let t=paint(theme);try{localStorage.setItem(key,t);if(t!=='warm')localStorage.setItem('rf_v9_theme',t)}catch{};return t};
  window.RangeformTheme={read,apply,paint};
  paint(read());
  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>paint(read()),{once:true});else paint(read());
  window.addEventListener('pageshow',()=>paint(read()));
- window.addEventListener('storage',ev=>{if(ev.key===key)paint(read())});
+ window.addEventListener('storage',ev=>{if(ev.key===key||ev.key==='rf_v9_theme')paint(read())});
  document.addEventListener('DOMContentLoaded',()=>{
    const seen=new Set();
    document.querySelectorAll('a[href^="/market"],a[href^="/research"],a[href^="/account"]').forEach(a=>{

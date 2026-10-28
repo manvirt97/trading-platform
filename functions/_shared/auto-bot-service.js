@@ -57,7 +57,7 @@ export async function controlBot(env,action,{capital}={}){
  state.updatedAt=new Date().toISOString();
  return write(env.DB,current,state);
 }
-export async function runPaperTick(env,{now=Date.now(),fetchImpl=fetch}={}){
+export async function runPaperTick(env,{now=Date.now(),fetchImpl=fetch,source='manual'}={}){
  if(!serviceReady(env))return {status:'NOT_CONFIGURED',executed:false};
  const current=await snapshot(env.DB);
  if(!current.state.enabled||current.state.halted)return {status:'PAUSED',executed:false,state:current.state};
@@ -70,6 +70,7 @@ export async function runPaperTick(env,{now=Date.now(),fetchImpl=fetch}={}){
   state.lastTickAt=new Date(now).toISOString();state.lastError=String(e.message).slice(0,180);state.lastSignal='NO_DATA';
   next={state,trade:null,reason:state.lastError};
  }
+ if(source==='cron')next.state.lastCronTickAt=new Date(now).toISOString();
  next.state.updatedAt=new Date(now).toISOString();
  try{
   const saved=await write(env.DB,current,next.state);

@@ -12,7 +12,8 @@ export async function onRequestGet({request,env}){
  const access=await authorize(request,env);if(access.error)return access.error;
  try{
   const saved=await snapshot(env.DB);
-  return reply({mode:'PAPER_ONLY',state:saved.state,revision:saved.revision,background_scheduler:'SEPARATE_WORKER_REQUIRED',broker_connected:false,live_orders_enabled:false});
+  const recentCron=Number.isFinite(Date.parse(saved.state.lastCronTickAt||''))&&Date.now()-Date.parse(saved.state.lastCronTickAt)<240000&&Date.now()>=Date.parse(saved.state.lastCronTickAt);
+  return reply({mode:'PAPER_ONLY',state:saved.state,revision:saved.revision,background_scheduler:recentCron?'RECENT_CRON_TICK':'NOT_VERIFIED',background_last_seen:saved.state.lastCronTickAt||null,broker_connected:false,live_orders_enabled:false});
  }catch(e){return reply({code:'STATE_UNAVAILABLE',error:String(e.message).slice(0,140)},503)}
 }
 export async function onRequestPost({request,env}){

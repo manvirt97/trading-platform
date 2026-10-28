@@ -8,7 +8,7 @@ export default {
   if(controller.cron!=='* * * * *')return;
   // Disabled by default. Fail closed if secrets, D1 or service flag are absent.
   if(!serviceReady(env))return;
-  ctx.waitUntil(runPaperTick(env).then(x=>{
+  ctx.waitUntil(runPaperTick(env,{source:'cron'}).then(x=>{
    if(x.status==='FEED_UNAVAILABLE')console.warn('Rangeform paper bot feed missing; no trade.');
   }).catch(e=>console.error('Autonomous PAPER bot tick failed:',String(e.message).slice(0,160))));
  },
