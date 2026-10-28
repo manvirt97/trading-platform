@@ -1,0 +1,54 @@
+/* V17 unified Rangeform shell for Algorithmic Desk and Autonomous Paper Bot.
+   Match the V14 dashboard palettes and sidebar without changing individual feature logic. */
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap');
+:root{font-family:'Manrope',ui-sans-serif,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif}
+body[data-theme="light"]{
+ color-scheme:light;--bg:#f2f4f2;--panel:#fbfcfb;--panel2:#edf1f0;--fg:#1d2c34;--muted:#5c707b;
+ --stroke:#d9e2df;--accent:#365e6c;--accentfg:#fff;--green:#226f55;--red:#a45355;--shadow:0 9px 25px rgba(29,45,51,.035);
+}
+body[data-theme="dark"]{
+ color-scheme:dark;--bg:#101a22;--panel:#17242e;--panel2:#20303b;--fg:#e8efee;--muted:#b3c5cc;
+ --stroke:#324551;--accent:#a4c1cb;--accentfg:#101a22;--green:#85bca0;--red:#e1a8a8;--shadow:0 10px 27px rgba(3,9,15,.09);
+}
+html[data-rf-theme="light"]{background:#f2f4f2}
+html[data-rf-theme="dark"]{background:#101a22}
+body{font-family:'Manrope',ui-sans-serif,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;line-height:1.55}
+.shell{max-width:none}
+.rail{width:254px;padding:21px 13px 16px;overflow-y:auto;scrollbar-width:thin;background:var(--panel)}
+.rail .logo{padding:5px 9px 23px}
+.rail .logo strong{font-weight:800;letter-spacing:-.055em}
+.rail .nav-tag{padding:9px 12px;font-size:9px}
+.rail-links{display:flex;flex-direction:column;gap:2px}
+.rail-link{display:flex;align-items:center;gap:11px;min-height:39px;margin:0;padding:9px 12px;border-radius:9px;font-size:11.5px;line-height:1.3;font-weight:760;border:1px solid transparent;white-space:normal}
+.rail-link:hover{background:var(--panel2);border-color:var(--stroke)}
+.rail-link.current{background:var(--panel2);border-color:var(--stroke);box-shadow:inset 3px 0 #b19b80}
+.rail-link .nav-symbol{font-size:17px;min-width:19px;text-align:center;color:var(--muted)}
+.rail-link.current .nav-symbol{color:var(--accent)}
+.rail-bottom{border-top:1px solid var(--stroke);margin-top:auto;padding:15px 11px 5px}
+.rail-bottom p{margin:5px 0 0}
+.topbar{background:var(--panel);border-color:var(--stroke);box-shadow:none}
+main{max-width:1536px}
+.card{background:var(--panel);border-color:var(--stroke);box-shadow:var(--shadow)}
+.intro h1{font-weight:830}
+.stat{background:var(--panel2);border-color:var(--stroke)}
+.safety{background:var(--panel);border-color:var(--stroke)}
+.chip,.tag,.message,.iconbtn{border-color:var(--stroke)}
+.back,.source{color:var(--accent)}
+#cronState[data-heartbeat="verified"]{color:var(--green)}
+#cronState[data-heartbeat="unknown"]{color:var(--red)}
+.bot-setup-guide{background:var(--panel2);border:1px solid var(--stroke);border-radius:12px;padding:14px 16px;margin:14px 0;font-size:12px;color:var(--muted)}
+.bot-setup-guide strong{color:var(--fg)}
+.bot-setup-guide ol{padding-left:20px;margin:8px 0;line-height:1.8}
+.bot-setup-guide a{text-decoration:underline;color:var(--accent);text-underline-offset:3px}
+@media(max-width:950px){.rail{width:222px;padding:15px 9px}.rail-link{padding:9px 9px;gap:8px}.topbar{padding:0 19px}}
+@media(max-width:760px){
+ .shell{display:block}.rail{position:relative;width:100%;height:auto;max-height:330px;overflow-y:auto;padding:12px;border-right:none;border-bottom:1px solid var(--stroke)}
+ .rail .logo{padding:4px 8px 9px}
+ .rail .nav-tag,.rail-bottom{display:none}
+ .rail-links{display:flex;flex-direction:row;flex-wrap:nowrap;gap:5px;overflow-x:auto;scrollbar-width:thin;padding:3px 0 6px}
+ .rail-link{flex:0 0 auto;min-height:39px;white-space:nowrap;padding:9px 10px}
+ .rail-link .nav-symbol{font-size:14px;min-width:15px}
+ .topbar{min-height:60px;height:auto;padding:10px 13px}
+ main{padding:18px 13px}
+}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
