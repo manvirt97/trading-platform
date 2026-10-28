@@ -13,15 +13,15 @@
 /v9.html
   Cache-Control: no-store, max-age=0
 /v9
-  Cache-Control: no-cache, must-revalidate
+  Cache-Control: no-store, max-age=0
 /research.html
   Cache-Control: no-store, max-age=0
 /research
-  Cache-Control: no-cache, must-revalidate
+  Cache-Control: no-store, max-age=0
 /account.html
   Cache-Control: no-store, max-age=0
 /account
-  Cache-Control: no-cache, must-revalidate
+  Cache-Control: no-store, max-age=0
 /manifest.webmanifest
   Cache-Control: no-store, max-age=0
 
