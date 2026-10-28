@@ -51,7 +51,7 @@ test('all main workspace destinations exist in both Algorithmic and Bot sidebars
   assert.ok(algo.includes('href="'+route+'"'),route+' missing from Algorithmic sidebar');
   assert.ok(bot.includes('href="'+route+'"'),route+' missing from Bot sidebar');
  }
- assert.match(html,//bot\.html/);
+ assert.ok(html.includes('href="/bot.html"'));
  assert.match(algo,/BROKER TRADING NOT CONNECTED/);
  assert.match(bot,/PAPER TRADING · REAL ORDERS OFF/);
  assert.match(algo,/Manual paper buys and sells work with a fresh/);
