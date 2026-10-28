@@ -23,6 +23,30 @@ try {
    await page.goto(base+path,{waitUntil:'domcontentloaded'});
    const isAccount=path==='/account.html';
    const isMain=path==='/v9.html';
+   if(isMain){
+    // Regression: V26 desktop grid won specificity on phones and crushed
+    // Day Trading Desk into a 150–240px column. Check actual rendered width.
+    await page.evaluate(()=>{location.hash='#daydesk'});
+    await page.locator('.daydesk-page.visible').waitFor({timeout:7000});
+    const geometry=await page.evaluate(()=>{
+     const rect=selector=>document.querySelector(selector)?.getBoundingClientRect();
+     const app=rect('.app'),shell=rect('.content-shell'),main=rect('.main'),
+       desk=rect('.daydesk-page.visible'),heading=rect('.daydesk-heading h1');
+     return {app:app?.width,shell:shell?.width,main:main?.width,
+       desk:desk?.width,heading:heading?.width,
+       vw:document.documentElement.clientWidth,
+       scroll:document.documentElement.scrollWidth,
+       columns:getComputedStyle(document.querySelector('.app')).gridTemplateColumns};
+    });
+    for(const key of ['app','shell','main','desk']){
+     assert.ok(geometry[key]>=width*.93,
+      'MOBILE FULL WIDTH FAIL: '+key+' '+JSON.stringify({width,...geometry}));
+    }
+    assert.ok(geometry.heading>=width*.65,
+      'Day Trading Desk heading squeezed: '+JSON.stringify({width,...geometry}));
+    assert.ok(geometry.scroll<=width+2,'Horizontal overflow: '+JSON.stringify(geometry));
+   }
+
    if(isAccount)await page.locator('#accountMobileMenu').click();
    if(isMain)await page.locator('#mobileMenu').click();
    if(!isAccount&&!isMain)await page.locator('#rfMobileMenu').click();
