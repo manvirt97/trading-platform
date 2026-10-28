@@ -12,8 +12,15 @@ jobs:
     timeout-minutes: 6
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
       - run: npm test
       - run: npm run syntax
+      - name: Validate installed-app release marker
+        env:
+          RANGEFORM_BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
+          RANGEFORM_HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: node scripts/verify-release-marker.mjs

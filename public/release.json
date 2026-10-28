@@ -1,5 +1,5 @@
 {
-  "version": "23",
-  "build": "rangeform-v23-pwa-recovery",
-  "description": "Installed-app update detection and safe refresh"
+  "version": "24",
+  "build": "rangeform-v24-auto-refresh",
+  "description": "Safe automatic updates for installed Home Screen apps"
 }

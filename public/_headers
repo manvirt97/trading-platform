@@ -9,21 +9,21 @@
 # Revalidate HTML and PWA routing rather than reusing an older app shell.
 # Has no effect on dynamic /api/* Pages Functions.
 /
-  Cache-Control: no-cache, must-revalidate
+  Cache-Control: no-store, max-age=0
 /v9.html
-  Cache-Control: no-cache, must-revalidate
+  Cache-Control: no-store, max-age=0
 /v9
-  Cache-Control: no-cache, must-revalidate
+  Cache-Control: no-store, max-age=0
 /research.html
-  Cache-Control: no-cache, must-revalidate
+  Cache-Control: no-store, max-age=0
 /research
-  Cache-Control: no-cache, must-revalidate
+  Cache-Control: no-store, max-age=0
 /account.html
-  Cache-Control: no-cache, must-revalidate
+  Cache-Control: no-store, max-age=0
 /account
-  Cache-Control: no-cache, must-revalidate
+  Cache-Control: no-store, max-age=0
 /manifest.webmanifest
-  Cache-Control: no-cache, must-revalidate
+  Cache-Control: no-store, max-age=0
 
 # Installed Home Screen apps must never reuse a stale release manifest.
 # Other static assets remain cacheable through versioned query strings.
@@ -31,7 +31,15 @@
   Cache-Control: no-store, max-age=0
 /static/pwa-update-v23.js
   Cache-Control: no-cache, must-revalidate
+/static/pwa-update-v24.js
+  Cache-Control: no-store, max-age=0
 /algo.html
-  Cache-Control: no-cache, must-revalidate
+  Cache-Control: no-store, max-age=0
 /bot.html
-  Cache-Control: no-cache, must-revalidate
+  Cache-Control: no-store, max-age=0
+
+/index.html
+  Cache-Control: no-store, max-age=0
+
+/market.html
+  Cache-Control: no-store, max-age=0

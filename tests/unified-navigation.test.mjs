@@ -18,7 +18,7 @@ test('phone app manifests and each shortcut target modern pages',()=>{
  assert.ok(m.shortcuts.some(x=>x.url==='/v9.html#scanner'));
  assert.ok(m.shortcuts.some(x=>x.url==='/v9.html#signals'));
  assert.ok(m.shortcuts.some(x=>x.url==='/account.html'));
- assert.match(read('public/v9.html'),/rel="manifest" href="\/manifest.webmanifest\?v=11"/);
+ assert.match(read('public/v9.html'),/rel="manifest" href="\/manifest.webmanifest\?v=24"/);
  assert.match(read('public/v9.html'),/apple-mobile-web-app-capable/);
 });
 test('modern sidebar routes tools inside V10 without accidental classic navigation',()=>{
@@ -46,6 +46,6 @@ test('account remains fully functional but looks/links like V10',()=>{
 test('old app shells and the phone manifest revalidate on return visits',()=>{
  const headers=read('public/_headers');
  for(const path of ['/','/v9.html','/research','/account.html','/manifest.webmanifest']){
-  assert.ok(headers.includes(path+'\n  Cache-Control: no-cache, must-revalidate'));
+  assert.ok(headers.includes(path+'\n  Cache-Control: no-store, max-age=0'));
  }
 });
