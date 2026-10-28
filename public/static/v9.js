@@ -515,7 +515,16 @@ $('settingsCheckProvider').onclick=async()=>{
 };
 window.addEventListener('resize',()=>{if(state.analysis)drawChart(state.analysis)});
 loadProvider();window.addEventListener('hashchange',routeFromHash);
+// Account's shared symbol search links here with ?symbol=...#signals.
+// Preselect the ticker without an implicit paid provider request.
+const linkedSymbol=new URLSearchParams(location.search).get('symbol')?.trim().toUpperCase();
 routeFromHash();
+if(linkedSymbol&&symbolOK(linkedSymbol)){
+ $('globalSearch').value=linkedSymbol;
+ $('symbolInput').value=linkedSymbol;
+ $('selectedSymbol').textContent=linkedSymbol;
+ state.symbol=linkedSymbol;
+}
 }
 document.addEventListener('DOMContentLoaded',bind);
 })();

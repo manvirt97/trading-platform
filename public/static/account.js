@@ -26,7 +26,29 @@ $('aiForm').addEventListener('submit',async e=>{e.preventDefault();if(!signed||!
  const btn=$('askAI');btn.disabled=true;btn.textContent='Thinking…';try{const choice=$('accountAiModel').value;const result=await request('/api/research-ai','POST',{symbol:$('aiTicker').value,question:$('aiQuestion').value,model:choice});$('aiResponse').textContent=(result.model||'Research AI')+'\n\n'+result.answer+'\n\n'+result.limitations;}catch(e){$('aiResponse').textContent=e.message}finally{btn.disabled=false;btn.textContent='Ask AI'}});
 $('accountAiModel').addEventListener('change',()=>{if(activeUser)sessionStorage.setItem('rangeform_model_'+activeUser.uid,$('accountAiModel').value)});
 function withTimeout(promise,ms,label){let timer;return Promise.race([promise,new Promise((_,reject)=>{timer=setTimeout(()=>reject(Error(label)),ms)})]).finally(()=>clearTimeout(timer))}
-function setupSharedTheme(){const button=$('themeToggle');if(!button)return;const show=()=>{const t=window.RangeformTheme?.read()||'dark';button.textContent=t==='light'?'☾':t==='warm'?'☼':'◐';button.setAttribute('aria-label','Theme: '+t+'. Change appearance')};show();button.onclick=()=>{const options=['dark','light','warm'],now=window.RangeformTheme?.read()||'dark';window.RangeformTheme?.apply(options[(options.indexOf(now)+1)%options.length]);show()}}
+function setupSharedTheme(){
+ const button=$('themeToggle');if(!button)return;
+ // Only light/dark are supported by the unified research workspace.
+ const current=()=>window.RangeformTheme?.read()==='dark'?'dark':'light';
+ const show=()=>{const t=current();button.textContent=t==='light'?'◐':'☾';button.setAttribute('aria-label','Switch to '+(t==='light'?'dark':'light')+' appearance')};
+ if(window.RangeformTheme?.read()==='warm')window.RangeformTheme?.apply('light');
+ show();
+ button.onclick=()=>{window.RangeformTheme?.apply(current()==='light'?'dark':'light');show()};
+ window.addEventListener('pageshow',show);
+}
+function setupAccountNav(){
+ const rail=$('accountRail'),btn=$('accountMobileMenu'),shade=$('accountNavShade');
+ if(!rail||!btn||!shade)return;
+ const close=()=>{rail.classList.remove('open');shade.hidden=true;btn.setAttribute('aria-expanded','false')};
+ btn.addEventListener('click',()=>{
+  const opening=!rail.classList.contains('open');
+  rail.classList.toggle('open',opening);shade.hidden=!opening;
+  btn.setAttribute('aria-expanded',String(opening))
+ });
+ shade.addEventListener('click',close);
+ document.addEventListener('keydown',e=>{if(e.key==='Escape')close()});
+ rail.querySelectorAll('a').forEach(a=>a.addEventListener('click',close));
+}
 function syncOwnerUid(user){
  const field=$('accountOwnerUid'),copy=$('copyAccountOwnerUid'),msg=$('accountOwnerCopyStatus');
  if(!field||!copy)return;
@@ -34,7 +56,7 @@ function syncOwnerUid(user){
  copy.disabled=!user?.uid;
  if(!user&&msg)msg.textContent='Your UID is only shown after you sign in. Never share your password or trading API keys.';
 }
-async function init(){setupSharedTheme();syncOwnerUid(null);$('copyAccountOwnerUid')?.addEventListener('click',async()=>{if(!activeUser?.uid)return;try{await navigator.clipboard.writeText(activeUser.uid);$('accountOwnerCopyStatus').textContent='UID copied. Paste it into Cloudflare as BOT_OWNER_UID (Secret).'}catch{$('accountOwnerCopyStatus').textContent='Clipboard access blocked. Select and manually copy the UID displayed above.'}});const chosen=String(localStorage.getItem('rangeform_brand')||'Rangeform').replace(/[^A-Za-z0-9 .&-]/g,'').slice(0,35).trim()||'Rangeform';const brandEl=document.querySelector('.account-rail-brand strong, .brand b');if(brandEl)brandEl.textContent=chosen;fields();histories();if(/America\/(Edmonton|Vancouver|Toronto|Winnipeg|Halifax|Regina|St_Johns|Moncton|Whitehorse|Yellowknife|Iqaluit)/.test(timezone)&&!localStorage.getItem('trader_guest_profile')){$('region').value='CA'}
+async function init(){setupSharedTheme();setupAccountNav();syncOwnerUid(null);$('copyAccountOwnerUid')?.addEventListener('click',async()=>{if(!activeUser?.uid)return;try{await navigator.clipboard.writeText(activeUser.uid);$('accountOwnerCopyStatus').textContent='UID copied. Paste it into Cloudflare as BOT_OWNER_UID (Secret).'}catch{$('accountOwnerCopyStatus').textContent='Clipboard access blocked. Select and manually copy the UID displayed above.'}});const chosen=String(localStorage.getItem('rangeform_brand')||'Rangeform').replace(/[^A-Za-z0-9 .&-]/g,'').slice(0,35).trim()||'Rangeform';const brandEl=document.querySelector('.account-rail-brand strong, .brand b');if(brandEl)brandEl.textContent=chosen;fields();histories();if(/America\/(Edmonton|Vancouver|Toronto|Winnipeg|Halifax|Regina|St_Johns|Moncton|Whitehorse|Yellowknife|Iqaluit)/.test(timezone)&&!localStorage.getItem('trader_guest_profile')){$('region').value='CA'}
  try{let res=await withTimeout(fetch('/api/profile-config',{cache:'no-store'}),12000,'Account configuration request timed out.');if(!res.ok)throw Error('Account configuration responded with HTTP '+res.status);let c=await res.json();configured=Boolean(c.enabled);aiReady=Boolean(c.ai_enabled);
  if(!configured){status('Guest mode: notes and preferences save ONLY on this device. Cross-device accounts require one-time owner setup in Firebase and Cloudflare D1.');$('authText').textContent='Your profile is stored only in this browser until sign-in is enabled.';return}
  status('Loading Google sign-in…');let [{initializeApp},{getAuth,GoogleAuthProvider,signInWithPopup,onAuthStateChanged,signOut,setPersistence,browserSessionPersistence}]=await withTimeout(Promise.all([import('https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js'),import('https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js')]),15000,'Google sign-in library could not load.');auth=getAuth(initializeApp(c.firebase));await setPersistence(auth,browserSessionPersistence);let provider=new GoogleAuthProvider();provider.setCustomParameters({prompt:'select_account'});

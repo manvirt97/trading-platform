@@ -32,7 +32,7 @@ test('account owner UID is visible after authentication without visiting an obsc
  assert.match(account,/id="ownerSetupHeading"/);
  assert.match(account,/id="accountOwnerUid"/);
  assert.match(account,/id="copyAccountOwnerUid"/);
- assert.match(account,/account\.js\?v=20/);
+ assert.match(account,/account\.js\?v=(?:20|21)/);
  assert.match(js,/function syncOwnerUid\(user\)/);
  assert.match(js,/syncOwnerUid\(u\)/);
  assert.match(js,/navigator\.clipboard\.writeText\(activeUser\.uid\)/);
