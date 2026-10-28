@@ -1,0 +1,36 @@
+name: Mobile visual layout
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  mobile-geometry:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install browser test runner
+        run: |
+          npm install --no-save --package-lock=false playwright@1.56.1
+          npx playwright install --with-deps chromium
+      - name: Serve Rangeform static pages
+        run: |
+          python3 -m http.server 8999 --bind 127.0.0.1 --directory public > /tmp/rangeform-static.log 2>&1 &
+          sleep 2
+          curl --fail --silent http://127.0.0.1:8999/account.html > /dev/null
+      - name: Verify installed-iPhone layout at 320, 375, 390 CSS px
+        run: node tests/mobile-visual-smoke.mjs
+      - name: Save mobile screenshots for regressions
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rangeform-mobile-screenshots
+          path: artifacts/mobile/*.png
+          if-no-files-found: ignore
+          retention-days: 7
