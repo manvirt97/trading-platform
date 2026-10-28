@@ -29,7 +29,7 @@ test('all canonical pages load same installed-app release checker',()=>{
 test('release metadata is revalidated rather than retaining a stale offline shell',()=>{
  const meta=JSON.parse(read('public/release.json'));
  assert.equal(meta.version,'28');
- assert.equal(meta.build,'rangeform-v28-mobile-fullwidth-hotfix');
+ assert.equal(meta.build,'rangeform-v28-iphone-header-grid');
  const headers=read('public/_headers');
  assert.match(headers,/\/release\.json\n  Cache-Control: no-store, max-age=0/);
  for(const path of ['algo.html','bot.html','account.html','v9.html'])
