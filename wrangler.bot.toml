@@ -1,0 +1,18 @@
+name = "rangeform-autonomous-paper-bot"
+main = "worker/autonomous-paper-bot.js"
+compatibility_date = "2026-10-01"
+
+# A separate Worker. Deploy explicitly via Wrangler after reviewing setup.
+# Cloudflare database ID is a resource identifier, not a credential.
+[[d1_databases]]
+binding = "DB"
+database_name = "rangeform-users"
+database_id = "6aa50056-4a2d-4ba1-8517-da4de248322f"
+
+[triggers]
+crons = ["* * * * *"]
+
+[vars]
+# FAIL-CLOSED: change to on only after owner auth, D1 and operations are verified.
+BOT_SERVICE_ENABLED = "off"
+# Set BOT_OWNER_UID using: npx wrangler secret put BOT_OWNER_UID --config wrangler.bot.toml
