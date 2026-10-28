@@ -30,6 +30,14 @@ jobs:
         run: node tests/pwa-update-visual-smoke.mjs
       - name: Verify cross-page visual design and theme persistence
         run: node tests/visual-theme-parity-v26.mjs
+      - name: Save cross-page light and dark screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rangeform-design-parity
+          path: artifacts/theme/*.png
+          if-no-files-found: ignore
+          retention-days: 7
       - name: Save mobile screenshots for regressions
         if: always()
         uses: actions/upload-artifact@v4
