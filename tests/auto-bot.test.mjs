@@ -33,7 +33,8 @@ test('only a completed bullish crossover creates a paper entry',()=>{
 test('stop exits a hypothetical position using bid, with fees and realized loss',()=>{
  const bars=crossoverBars(),tick=market(bars),now=tick.fetchedAt,state=initialBot();state.enabled=true;
  const entry=advanceBot(state,tick,now),stop=entry.state.position.entry*.97;
- const out=advanceBot(entry.state,market(bars,stop,stop+.1),now+60000);
+ const exitBook=market(bars,stop,stop+.1);exitBook.fetchedAt=now+60000;
+ const out=advanceBot(entry.state,exitBook,now+60000);
  assert.equal(out.trade.action,'PAPER_SELL');assert.equal(out.trade.reason,'STOP');assert.ok(out.trade.pnl<0);
  assert.equal(out.state.position,null);assert.ok(Math.abs(out.state.cash-(10000+out.state.realizedPnl))<.0001);
  assert.ok(out.state.realizedPnl<0);
@@ -48,7 +49,7 @@ test('risk halt and missing/old quotes fail closed',()=>{
  assert.equal(stale.state.lastSignal,'NO_DATA');assert.equal(stale.trade,null);
 });
 test('spread guard and depth guard block paper entry',()=>{
- const bars=crossoverBars(),state=initialBot();state.enabled=true,now=market(bars).fetchedAt;
+ const bars=crossoverBars(),state=initialBot(),now=market(bars).fetchedAt;state.enabled=true;
  const wide=advanceBot(state,market(bars,120,130),now);assert.equal(wide.trade,null);assert.match(wide.reason,/Spread/);
  const low=market(bars);low.book.asks[0][1]=.01;
  const illiquid=advanceBot(state,low,now);assert.equal(illiquid.trade,null);assert.match(illiquid.reason,/depth/);
