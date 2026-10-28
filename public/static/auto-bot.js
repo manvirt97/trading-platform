@@ -24,7 +24,7 @@ async function api(method='GET',body=null){
 function render(x){
  if(!x?.state)return;
  state.bot=x.state;const b=state.bot;
- $('botBadge').textContent=b.halted?'Risk halted':b.enabled?'Paper bot enabled':'Paper bot paused';
+ $('botBadge').textContent=b.halted?'Risk halted':b.enabled?(x.background_scheduler==='RECENT_CRON_TICK'?'Paper automation recently active':'Paper enabled · cron unverified'):'Paper bot paused';
  $('botBadge').className='chip'+(b.halted?' bad':b.enabled?' ok':'');
  $('engineState').textContent=b.halted?'RISK HALT':b.enabled?'ENABLED':'PAUSED';
  $('lastCheck').textContent=b.lastTickAt?new Date(b.lastTickAt).toLocaleString('en-CA',{timeZone:'UTC',month:'short',day:'numeric',hour:'numeric',minute:'2-digit',timeZoneName:'short'}):'Never';
