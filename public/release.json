@@ -1,0 +1,5 @@
+{
+  "version": "23",
+  "build": "rangeform-v23-pwa-recovery",
+  "description": "Installed-app update detection and safe refresh"
+}
