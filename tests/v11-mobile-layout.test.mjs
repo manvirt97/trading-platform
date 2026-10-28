@@ -46,6 +46,6 @@ test('mobile sample scanner and watchlist results become compact full-width card
 test('dark theme synchronizes browser status bar without leaking private market data',()=>{
  const js=text('public/static/v9.js');
  assert.match(js,/document\.querySelector\('meta\[name="theme-color"\]'\)/);
- assert.match(js,/dataset\.theme==='dark'\?'#101923':'#f6f8fb'/);
+ assert.match(js,/dataset\.theme==='dark'\?'#0e1116':'#f3f4f2'/);
  assert.doesNotMatch(text('public/static/v11-mobile.css'),/TWELVEDATA_API_KEY|apiKey\s*=/);
 });
