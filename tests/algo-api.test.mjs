@@ -26,6 +26,6 @@ test('strategy desk navigation, safety and modules remain visibly wired',()=>{
  const html=readFileSync(new URL('../public/algo.html',import.meta.url),'utf8');
  const main=readFileSync(new URL('../public/v9.html',import.meta.url),'utf8');
  assert.match(main,/href="\/algo\.html"/);assert.match(html,/id="feedMessage"/);assert.match(html,/id="buy"/);assert.match(html,/id="sell"/);
- assert.match(html,/id="pairEdge"/);assert.match(html,/EXECUTION LOCKED/);assert.match(html,/static\/algo\.js/);
+ assert.match(html,/id="pairEdge"/);assert.match(html,/BROKER TRADING NOT CONNECTED/);assert.match(html,/static\/algo\.js/);
  assert.doesNotMatch(html,/<script(?:\s[^>]*)?>[^\s<]/);
 });
