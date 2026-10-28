@@ -44,6 +44,8 @@ test('public production verification refuses stale release and never claims Work
  assert.match(checker,/\/api\/feed-state/);
  assert.match(checker,/\/api\/auto-bot/);
  assert.match(checker,/cron NOT verified/);
+ assert.match(checker,/response\.status===503/);
+ assert.match(checker,/Pages NOT_CONFIGURED/);
  assert.match(checker,/process\.exitCode=1/);
  assert.doesNotMatch(checker,/BOT_OWNER_UID|CLOUDFLARE_API_TOKEN|Authorization: Bearer/);
 });
