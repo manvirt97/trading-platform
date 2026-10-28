@@ -1,0 +1,23 @@
+/* V22: installed iOS / standalone browser safe-area reserve.
+   Some installed iPhones report env(safe-area-inset-top)=0 while the clock,
+   Wi-Fi and battery are still overlaying the web view. The drawer and toolbar
+   must physically begin BELOW the OS status-bar zone.
+   The class is marked before CSS by theme-sync.js on the separate pages,
+   or by v9.js on the main workspace. Normal browser tabs are unaffected. */
+@media (max-width:940px) {
+ html.rangeform-ios-standalone .account-rail {
+  padding-top:max(62px, env(safe-area-inset-top, 0px));
+  scroll-padding-top:62px;
+ }
+ html.rangeform-ios-standalone .account-topbar {
+  padding-top:max(62px, env(safe-area-inset-top, 0px));
+ }
+ html.rangeform-ios-standalone .rail {
+  padding-top:max(62px, env(safe-area-inset-top, 0px));
+  scroll-padding-top:62px;
+ }
+ html.rangeform-ios-standalone .topbar {
+  padding-top:max(62px, env(safe-area-inset-top, 0px));
+ }
+}
+/* This stylesheet intentionally comes after the V19/V21 layout styles. */
