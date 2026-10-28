@@ -1,5 +1,5 @@
 {
-  "version": "27",
-  "build": "rangeform-v27-mobile-fullwidth-hotfix",
-  "description": "Restore full-width mobile Day Trading Desk and retain V26 unified design"
+  "version": "28",
+  "build": "rangeform-v28-iphone-header-grid",
+  "description": "Restore unclipped two-row mobile header and full-width symbol search"
 }
