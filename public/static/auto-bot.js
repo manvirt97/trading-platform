@@ -9,6 +9,7 @@ function buttons(ready){
  $('pauseBot').disabled=!ready||state.busy||!bot?.enabled;
  $('resetBot').disabled=!ready||state.busy||Boolean(bot?.enabled||bot?.position);
  $('runTick').disabled=!ready||state.busy||!bot?.enabled;
+ $('flattenBot').disabled=!ready||state.busy||!bot?.position;
  $('exportBot').disabled=!bot?.events?.length;
 }
 async function api(method='GET',body=null){
@@ -55,6 +56,7 @@ async function refresh(){
 async function action(kind,more={}){
  if(state.busy||!state.user)return;
  if(kind==='start'&&!confirm('Enable autonomous hypothetical trading? No real broker orders will be placed.'))return;
+ if(kind==='flatten'&&!confirm('Model closing your open PAPER position at the current verified bid and pause the bot? No real exchange order will be placed.'))return;
  if(kind==='reset'&&!confirm('Erase server-side paper trades and reset the stopped, flat ledger?'))return;
  state.busy=true;buttons(false);
  try{
@@ -94,6 +96,7 @@ function init(){
  $('startBot').addEventListener('click',()=>action('start'));
  $('pauseBot').addEventListener('click',()=>action('pause'));
  $('runTick').addEventListener('click',()=>action('run_once'));
+ $('flattenBot').addEventListener('click',()=>action('flatten'));
  $('resetBot').addEventListener('click',()=>action('reset',{capital:Number($('resetCapital').value)}));
  $('exportBot').addEventListener('click',exportCSV);
  buttons(false);setupAuth();
