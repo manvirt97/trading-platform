@@ -28,6 +28,11 @@ function render(x){
  $('botBadge').className='chip'+(b.halted?' bad':b.enabled?' ok':'');
  $('engineState').textContent=b.halted?'RISK HALT':b.enabled?'ENABLED':'PAUSED';
  $('lastCheck').textContent=b.lastTickAt?new Date(b.lastTickAt).toLocaleString('en-CA',{timeZone:'UTC',month:'short',day:'numeric',hour:'numeric',minute:'2-digit',timeZoneName:'short'}):'Never';
+ const cronVerified=x.background_scheduler==='RECENT_CRON_TICK';
+ const cronTime=x.background_last_seen||b.lastCronTickAt;
+ $('cronState').textContent=cronVerified?'RECENT WORKER TICK':'NOT VERIFIED';
+ $('cronState').dataset.heartbeat=cronVerified?'verified':'unknown';
+ $('cronLastSeen').textContent=cronTime?'Last scheduled: '+new Date(cronTime).toLocaleString('en-CA',{timeZone:'UTC',month:'short',day:'numeric',hour:'numeric',minute:'2-digit',timeZoneName:'short'})+(cronVerified?' · fresh':' · not recent'):'No scheduled Worker run recorded';
  $('signal').textContent=String(b.lastSignal||'—').replaceAll('_',' ');
  $('error').textContent=b.lastError||b.haltReason||'No outstanding feed error';
  $('startCapital').textContent=money(b.capital);$('paperCash').textContent=money(b.cash);
@@ -41,7 +46,8 @@ function render(x){
  buttons(true);
  if(b.halted)display('Safety stop triggered: '+(b.haltReason||'Risk guard')+'. No new paper orders will be generated.','error');
  else if(b.lastError)display('Feed check failed: '+b.lastError+'. No substituted prices or paper orders.','error');
- else if(b.enabled)display('Paper strategy enabled. For unattended ticks with the browser closed, verify the separate Cloudflare Cron Worker is deployed and running.','success');
+ else if(b.enabled&&cronVerified)display('Paper strategy enabled and a recent scheduled Worker tick was recorded. This confirms recent paper automation only; no real orders are possible.','success');
+ else if(b.enabled)display('Paper strategy enabled but autonomous scheduled operation is NOT verified. Deploy the separate Cloudflare Worker, then confirm a recent scheduled timestamp.','error');
  else display('Paper bot is paused. No automatic paper trades are being generated.');
 }
 async function refresh(){
@@ -49,6 +55,7 @@ async function refresh(){
  state.busy=true;buttons(false);
  try{const x=await api();render(x);$('connection').textContent='Signed-in owner, shared Cloudflare D1 paper ledger. Background scheduler requires separate Worker.'}
  catch(e){state.bot=null;$('botBadge').className='chip bad';$('botBadge').textContent='Not configured';display(e.message,'error');
+  $('cronState').textContent='NOT CONFIGURED';$('cronState').dataset.heartbeat='unknown';$('cronLastSeen').textContent='Configure Pages owner settings and separate Worker';
   $('connection').textContent=e.code==='NOT_CONFIGURED'?'Cloudflare owner-only bot service is not yet enabled. See setup instructions below.':e.message;
   buttons(false)}
  finally{state.busy=false;buttons(Boolean(state.bot))}
