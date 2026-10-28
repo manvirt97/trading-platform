@@ -53,32 +53,50 @@ main{max-width:1536px}
 }
 @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
 
-
-/* V18: compact two-row mobile header; keep status and appearance usable on narrow
-   phones and avoid clipping under iOS standalone safe areas. Desktop unchanged. */
+/* V19: structurally separate status message and theme toggle rather than using
+   display:contents (which can render inconsistently in mobile Safari).
+   Deliberately served with a new ?v=19 URL to bypass older cached styles. */
+.topbar>.actions{margin-left:auto;min-width:0}
+.topbar>#theme{flex:0 0 39px}
 @media(max-width:760px){
- .shell,.workspace{width:100%;min-width:0}
- .rail{height:auto;max-height:none;overflow:visible;padding-top:max(12px,env(safe-area-inset-top));padding-left:max(12px,env(safe-area-inset-left));padding-right:max(12px,env(safe-area-inset-right))}
- .rail-links{max-width:100%;min-height:44px;-webkit-overflow-scrolling:touch}
+ html,body{max-width:100%}
+ .shell,.workspace{width:100%;max-width:100%;min-width:0}
+ .rail{
+  position:relative;display:flex;flex-direction:column;box-sizing:border-box;
+  width:100%;max-width:100%;height:auto;max-height:none;overflow:visible;
+  padding-top:max(12px,env(safe-area-inset-top));
+  padding-left:max(12px,env(safe-area-inset-left));
+  padding-right:max(12px,env(safe-area-inset-right))
+ }
+ .rail-links{width:100%;max-width:100%;min-width:0;min-height:44px;overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch}
  .rail-link{min-height:44px}
  .topbar{
   display:grid;grid-template-columns:minmax(0,1fr) 44px;
   grid-template-areas:"back theme" "status status";
   grid-template-rows:minmax(44px,auto) auto;
-  align-items:center;column-gap:12px;row-gap:7px;
-  height:auto;min-height:0;width:100%;max-width:100%;
-  padding:10px max(12px,env(safe-area-inset-right)) 12px max(12px,env(safe-area-inset-left));
+  align-items:center;column-gap:10px;row-gap:7px;
+  box-sizing:border-box;width:100%;max-width:100%;min-width:0;
+  height:auto;min-height:0;
+  padding:10px max(12px,env(safe-area-inset-right)) 12px max(12px,env(safe-area-inset-left))
  }
  .topbar>.top-title{display:none}
- .topbar>.back{grid-area:back;min-width:0;max-width:100%;line-height:1.4;white-space:normal;overflow-wrap:anywhere}
- .topbar>.actions{display:contents}
- .topbar .actions>.iconbtn{grid-area:theme;justify-self:end;min-width:44px;width:44px;height:44px}
- .topbar .actions>.chip{grid-area:status;display:flex;align-items:center;justify-self:stretch;min-width:0;max-width:100%;width:100%;min-height:32px;white-space:normal;overflow-wrap:anywhere;border-radius:9px;line-height:1.35}
- main{width:100%;min-width:0;max-width:100%;overflow-wrap:break-word;padding-bottom:max(20px,env(safe-area-inset-bottom))}
+ .topbar>.back{
+  grid-area:back;display:block;min-width:0;max-width:100%;
+  line-height:1.4;white-space:normal;overflow-wrap:anywhere
+ }
+ .topbar>.actions{grid-area:status;display:block;width:100%;max-width:100%;min-width:0;margin:0}
+ .topbar>.actions>.chip{
+  display:flex;align-items:center;box-sizing:border-box;
+  width:100%;max-width:100%;min-width:0;min-height:34px;margin:0;
+  padding:9px 11px;border-radius:9px;
+  white-space:normal;overflow-wrap:anywhere;word-break:normal;line-height:1.4
+ }
+ .topbar>#theme{grid-area:theme;justify-self:end;flex:none;min-width:44px;width:44px;height:44px;margin:0}
+ main{box-sizing:border-box;width:100%;max-width:100%;min-width:0;overflow-wrap:break-word;padding-bottom:max(20px,env(safe-area-inset-bottom))}
  .intro h1{font-size:clamp(29px,8.5vw,44px);overflow-wrap:anywhere}
 }
 @media(max-width:370px){
  .rail .logo strong{font-size:18px}
  .topbar>.back{font-size:11px}
- .topbar .actions>.chip{font-size:10px}
+ .topbar>.actions>.chip{font-size:10px}
 }
