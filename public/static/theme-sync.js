@@ -1,5 +1,13 @@
 /* Shared early appearance and lightweight navigation preload for all Rangeform screens. */
 (()=>{'use strict';
+ // Installed mobile apps may report an iOS top safe-area inset of zero even
+ // while the system clock is visible. Mark the app before styles are parsed.
+ try {
+  const installed=window.navigator.standalone===true||
+   window.matchMedia('(display-mode: standalone)').matches;
+  if(installed)document.documentElement.classList.add('rangeform-ios-standalone');
+ }catch{}
+
  const key='rangeform_theme';
  const choices=['dark','light','warm'];
  const read=()=>{try{const x=localStorage.getItem('rf_v9_theme')||localStorage.getItem(key);return choices.includes(x)?x:'light'}catch{return 'light'}};
