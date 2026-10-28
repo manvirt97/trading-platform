@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#f1f4f8"><meta name="description" content="Rangeform algorithmic research: genuine Kraken spot depth, cost-aware paper trades and a manual prediction-contract pairing calculator.">
+<title>Rangeform · Algorithmic Desk</title>
+<link rel="icon" href="/static/rangeform-official-icon.png">
+<link rel="stylesheet" href="/static/theme-sync.css?v=2">
+<link rel="stylesheet" href="/static/algo.css?v=1">
+<script src="/static/theme-sync.js?v=3"></script>
+<script type="module" src="/static/algo.js?v=1"></script>
+</head><body>
+<div class="shell">
+<aside class="rail" aria-label="Workspace navigation">
+<a class="logo" href="/v9.html#overview"><img alt="" width="37" height="37" src="/static/rangeform-official-icon.png"><span><strong>Rangeform</strong><small>RESEARCH &amp; DECISIONS</small></span></a>
+<span class="nav-tag">WORKSPACE</span>
+<a href="/v9.html#overview" class="rail-link">◫ &nbsp; Overview</a>
+<a href="/v9.html#daydesk" class="rail-link">▥ &nbsp; Day Trading Desk</a>
+<a href="/algo.html" class="rail-link current" aria-current="page">◇ &nbsp; Algorithmic Desk</a>
+<a href="/v9.html#scanner" class="rail-link">◎ &nbsp; Opportunity scanner</a>
+<a href="/v9.html#studio" class="rail-link">◈ &nbsp; Research Studio</a>
+<a href="/v9.html#settings" class="rail-link">⚙ &nbsp; Settings</a>
+<div class="rail-bottom"><span class="statusdot"></span> Read-only exchange feed<p>No brokerage connection · no real orders</p></div>
+</aside>
+<div class="workspace">
+<header class="topbar">
+<a href="/v9.html#daydesk" class="back">← Main workspace</a>
+<span class="top-title">RANGEFORM / ALGORITHMIC DESK</span>
+<div class="actions"><span class="chip" id="feedPill">Feed not checked</span><button id="theme" type="button" class="iconbtn" aria-label="Toggle appearance">◐</button></div>
+</header>
+<main>
+<div class="intro"><div><p class="eyebrow">LIVE EXCHANGE DATA · PAPER EXECUTION</p><h1>Test the strategy.<br><em>Trust the evidence.</em></h1><p>Real Kraken spot order-book snapshots, explicit execution costs and a controlled paper ledger. Nothing here places actual orders.</p></div><div class="safety"><strong>EXECUTION LOCKED</strong><span>Real-money trading is not connected.</span><span>Public research only · no keys required</span></div></div>
+<div class="tabs" role="tablist" aria-label="Strategy desk sections">
+<button id="cryptoTab" class="tab selected" role="tab" aria-selected="true" aria-controls="cryptoPanel">Crypto strategy lab</button>
+<button id="contractsTab" class="tab" role="tab" aria-selected="false" aria-controls="contractsPanel">Prediction pairing calculator</button>
+</div>
+<section id="cryptoPanel" role="tabpanel" aria-labelledby="cryptoTab">
+<div class="card market-card">
+<div class="section-top"><div><p class="eyebrow">KRAKEN SPOT · EXCHANGE ORDER BOOK</p><h2>Market microstructure</h2><p>Executable bid/ask indications from exchange depth; not continuous streaming.</p></div><div class="controls"><label>Market<select id="pair"><option value="XBTUSD">BTC / USD</option><option value="ETHUSD">ETH / USD</option></select></label><button id="refresh" type="button" class="primary">Refresh snapshot ↻</button></div></div>
+<div id="feedMessage" class="message" role="status">Waiting for first verified market snapshot.</div>
+<div class="stat-grid">
+<div class="stat"><small>BEST BID</small><strong id="bid">—</strong><span>Potential market sell price</span></div>
+<div class="stat"><small>BEST ASK</small><strong id="ask">—</strong><span>Potential market buy price</span></div>
+<div class="stat"><small>SPREAD · BASIS POINTS</small><strong id="spread">—</strong><span id="imbalance">Depth balance pending</span></div>
+<div class="stat"><small>SNAPSHOT AGE</small><strong id="age">—</strong><span>Refreshes every 12 seconds while visible</span></div>
+</div>
+<div class="depth-grid">
+<div><div class="depth-head"><strong>Bid depth</strong><span>Price · Size</span></div><div id="bids" class="levels">No verified data</div></div>
+<div><div class="depth-head"><strong>Ask depth</strong><span>Price · Size</span></div><div id="asks" class="levels">No verified data</div></div>
+</div>
+<p class="footnote">Data source: Kraken public REST API, /Depth. Snapshot timestamps indicate when Rangeform fetched the data, not when every order was placed. Quotes can change before execution.</p>
+</div>
+<div class="two-col">
+<section class="card"><div class="section-top"><div><p class="eyebrow">COST-AWARE EXECUTION</p><h2>Trade economics</h2></div></div>
+<div class="inputs">
+<label>Fee per side (bps)<input id="fee" type="number" min="0" max="250" step="1" value="40"></label>
+<label>Slippage per side (bps)<input id="slippage" type="number" min="0" max="250" step="1" value="10"></label>
+<label>Paper order notional (USD)<input id="notional" type="number" min="1" max="100000" step="10" value="100"></label>
+</div>
+<div class="metric-row"><span>Estimated immediate round-trip P&amp;L</span><strong id="roundtrip">—</strong></div>
+<div class="metric-row"><span>Top-of-book quantity sufficient?</span><strong id="depthStatus">—</strong></div>
+<div class="metric-row"><span>Buy all-in with assumptions</span><strong id="buyCost">—</strong></div>
+<div class="metric-row"><span>Immediate sell proceeds</span><strong id="sellProceeds">—</strong></div>
+<p class="footnote">Fee and slippage values are adjustable assumptions, <b>not your verified Kraken account pricing</b>. Simulated fills use visible top-of-book quotes, not actual execution.</p>
+</section>
+<section class="card"><div class="section-top"><div><p class="eyebrow">BROWSER-LOCAL · NO LIVE ORDERS</p><h2>Paper execution</h2></div><span id="lockStatus" class="tag">SIMULATION ONLY</span></div>
+<div class="inputs"><label>Initial paper capital (USD)<input id="capital" type="number" min="100" max="1000000000" step="100" value="10000"></label></div>
+<div class="stat-grid small-stats"><div class="stat"><small>PAPER CASH</small><strong id="cash">$10,000.00</strong></div><div class="stat"><small>EST. LIQUIDATION EQUITY</small><strong id="equity">—</strong></div></div>
+<div class="metric-row"><span>Open position</span><strong id="position">None</strong></div>
+<div class="metric-row"><span>Estimated net realized P&amp;L</span><strong id="realized">$0.00</strong></div>
+<div class="metric-row"><span>Session drawdown / daily limit</span><strong id="drawdown">—</strong></div>
+<div class="paper-buttons"><button id="buy" type="button" class="primary" disabled>Paper buy at ask</button><button id="sell" type="button" disabled>Paper sell at bid</button></div>
+<label class="pause"><input id="pause" type="checkbox"> Pause all paper execution (kill switch)</label>
+<div id="paperMessage" class="message" role="status">A valid fresh exchange snapshot is required before a paper trade can be recorded.</div>
+<p class="footnote">Max one open position · max 5% capital per paper order · 2% daily realized-loss stop. Paper fills are hypothetical and not backtested or broker-verified.</p>
+</section>
+</div>
+<div class="card"><div class="section-top"><div><p class="eyebrow">AUDITABLE ACTIVITY</p><h2>Paper trade journal</h2></div><div class="controls"><button id="export" type="button">Export CSV</button><button id="reset" type="button">Reset paper ledger</button></div></div><div class="tablewrap"><table><thead><tr><th>Time (UTC)</th><th>Event</th><th>Market</th><th>Quantity</th><th>Exec. price</th><th>Cash impact</th></tr></thead><tbody id="journal"><tr><td colspan="6">No paper activity recorded.</td></tr></tbody></table></div></div>
+</section>
+<section id="contractsPanel" role="tabpanel" aria-labelledby="contractsTab" hidden>
+<div class="card"><div class="section-top"><div><p class="eyebrow">CANADIAN-ELIGIBLE CONTRACTS · MANUAL RESEARCH</p><h2>YES + NO pairing economics</h2><p>Enter independently verified prices for the <b>same exact contract event and settlement rules</b>. No live event-market feed is connected.</p></div><span class="tag">MANUAL INPUT</span></div>
+<div class="inputs four">
+<label>YES ask (¢)<input id="yes" type="number" min="1" max="99" step=".1" placeholder="Enter live quote"></label>
+<label>NO ask (¢)<input id="no" type="number" min="1" max="99" step=".1" placeholder="Enter live quote"></label>
+<label>YES fee (¢/contract)<input id="yesFee" type="number" min="0" max="25" step=".1" value="1"></label>
+<label>NO fee (¢/contract)<input id="noFee" type="number" min="0" max="25" step=".1" value="1"></label>
+<label>Number of matched pairs<input id="qty" type="number" min="1" max="100000" step="1" value="100"></label>
+</div>
+<div class="metric-row"><span>Total matched acquisition cost</span><strong id="pairCost">—</strong></div>
+<div class="metric-row"><span>Combined settlement payout</span><strong id="pairPayout">—</strong></div>
+<div class="metric-row"><span>Indicative edge after entered fees</span><strong id="pairEdge">—</strong></div>
+<p id="pairMessage" class="message" role="status">Enter verified market prices to calculate possible paired economics. No prices are invented.</p>
+<p class="footnote">This calculator does not connect to IBKR or Wealthsimple, validate event eligibility, guarantee order fills, or include financing, FX, settlement or unmodeled charges. A paired position can fail if one side does not fill. Check Alberta residency permissions with the provider.</p>
+<a class="source" href="https://www.interactivebrokers.ca/en/trading/products-event-contracts.php" target="_blank" rel="noopener noreferrer">Canadian event contract eligibility &amp; pricing ↗</a>
+</div>
+</section>
+<footer><span>RANGEFORM · RESEARCH AND SIMULATION</span><span>Non-custodial · no automated brokerage orders · no guaranteed returns</span></footer>
+</main></div></div></body></html>
