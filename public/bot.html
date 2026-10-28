@@ -19,7 +19,7 @@
 <div class="card"><div class="section-top"><div><p class="eyebrow">SYSTEM STATUS</p><h2>Bot readiness</h2><p id="connection">Checking owner authentication and server configuration…</p></div><button id="refreshBot" type="button">Refresh status ↻</button></div>
 <div id="botMessage" class="message" role="status">Waiting for server configuration.</div>
 <div class="stat-grid"><div class="stat"><small>ENGINE STATE</small><strong id="engineState">—</strong><span>Server-side enabled state</span></div><div class="stat"><small>LAST CHECK</small><strong id="lastCheck">—</strong><span>UTC timestamp</span></div><div class="stat"><small>STRATEGY</small><strong>EMA 9/21</strong><span>Long-only BTC/USD, 5-minute completed bars</span></div><div class="stat"><small>LAST SIGNAL</small><strong id="signal">—</strong><span id="error">Verified candles required</span></div></div>
-<div class="paper-buttons"><button class="primary" type="button" id="startBot" disabled>Start autonomous paper bot</button><button type="button" id="pauseBot" disabled>Pause immediately</button><button type="button" id="runTick" disabled>Run one verification tick</button></div>
+<div class="paper-buttons"><button class="primary" type="button" id="startBot" disabled>Start autonomous paper bot</button><button type="button" id="pauseBot" disabled>Pause immediately</button><button type="button" id="runTick" disabled>Run one verification tick</button><button type="button" id="flattenBot" disabled>Close hypothetical position &amp; pause</button></div>
 <p class="footnote">Starting here enables paper decisions in the shared D1 ledger. For unattended operation when the browser is closed, deploy and enable the dedicated Cloudflare Cron Worker. The start button does not itself deploy the Worker.</p>
 </div>
 <div class="two-col">
@@ -31,7 +31,7 @@
 <section class="card"><div class="section-top"><div><p class="eyebrow">OWNER CONTROLS</p><h2>Configuration &amp; safety</h2></div></div>
 <label class="autocapital">Reset paper starting balance (USD)<input type="number" id="resetCapital" min="100" max="1000000" step="100" value="10000"></label>
 <button id="resetBot" type="button" disabled>Reset stopped, flat paper ledger</button>
-<p class="footnote">Resets are blocked while the bot is running or holding a position. The server uses optimistic concurrency to avoid duplicate actions.</p>
+<p class="footnote">Resets are blocked while the bot is running or holding a position. Use Close hypothetical position to model a market exit at a fresh bid before resetting. The server uses optimistic concurrency to avoid duplicate actions.</p>
 <div class="metric-row"><span>Firebase sign-in</span><strong id="authState">Checking</strong></div>
 <div class="metric-row"><span>Owner UID (for Cloudflare setup)</span><strong id="uid">—</strong></div>
 <a class="source" href="/account.html">Sign in or manage account ↗</a>
