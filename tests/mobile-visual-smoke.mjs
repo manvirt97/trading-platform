@@ -38,10 +38,13 @@ try {
        scroll:document.documentElement.scrollWidth,
        columns:getComputedStyle(document.querySelector('.app')).gridTemplateColumns};
     });
-    for(const key of ['app','shell','main','desk']){
+    for(const key of ['app','shell','main']){
      assert.ok(geometry[key]>=width*.93,
       'MOBILE FULL WIDTH FAIL: '+key+' '+JSON.stringify({width,...geometry}));
     }
+    // The visible page is inset by 13px main padding on each side.
+    assert.ok(geometry.desk>=width-32,
+      'Day Trading Desk squeezed into desktop grid: '+JSON.stringify({width,...geometry}));
     assert.ok(geometry.heading>=width*.65,
       'Day Trading Desk heading squeezed: '+JSON.stringify({width,...geometry}));
     assert.ok(geometry.scroll<=width+2,'Horizontal overflow: '+JSON.stringify(geometry));
