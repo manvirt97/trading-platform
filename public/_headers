@@ -24,3 +24,14 @@
   Cache-Control: no-cache, must-revalidate
 /manifest.webmanifest
   Cache-Control: no-cache, must-revalidate
+
+# Installed Home Screen apps must never reuse a stale release manifest.
+# Other static assets remain cacheable through versioned query strings.
+/release.json
+  Cache-Control: no-store, max-age=0
+/static/pwa-update-v23.js
+  Cache-Control: no-cache, must-revalidate
+/algo.html
+  Cache-Control: no-cache, must-revalidate
+/bot.html
+  Cache-Control: no-cache, must-revalidate
