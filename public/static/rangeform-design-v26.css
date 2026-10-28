@@ -1,0 +1,258 @@
+/* Rangeform V26 · one website, one design language.
+   Inspired by EquityClimb's calm finance-grade hierarchy, not its branding.
+   Source-of-truth for ALL live public workspaces: Main/Day Desk, Algo, Bot, Account.
+   Loaded last. Never alters trading, auth, quote or paper-order state. */
+:root{font-family:Inter,"Segoe UI Variable Text","Segoe UI",-apple-system,BlinkMacSystemFont,system-ui,sans-serif;font-synthesis:none}
+body[data-theme="light"]{
+ color-scheme:light;
+ --bg:#f3f4f2;--sidebar:#f7f7f4;--card:#fff;--muted-card:#f7f7f4;
+ --ink:#141820;--secondary:#646d79;--line:#e1e3df;
+ --blue:#95733a;--blue-soft:#f3eee4;--green:#247d5f;--green-soft:#eaf4ee;
+ --red:#ac5155;--red-soft:#f8ebec;--amber:#95733a;--amber-soft:#f3eee4;
+ --panel:var(--card);--panel2:var(--muted-card);--fg:var(--ink);
+ --muted:var(--secondary);--stroke:var(--line);--accent:var(--blue);--accentfg:#fff;
+ --edge:var(--line);--text:var(--ink);--sub:var(--secondary);--soft:var(--muted-card);
+ --rf-highlight:#9c7a3c;--rf-heading:#141820;
+ --shadow:0 1px 2px rgba(20,24,32,.022),0 9px 29px rgba(20,24,32,.035);
+}
+body[data-theme="dark"]{
+ color-scheme:dark;
+ --bg:#0e1116;--sidebar:#12171e;--card:#151a21;--muted-card:#1b212a;
+ --ink:#eceff4;--secondary:#aab5c1;--line:#303944;
+ --blue:#c9ab6c;--blue-soft:#2c2922;--green:#79bd9e;--green-soft:#203b34;
+ --red:#e19796;--red-soft:#3b282a;--amber:#d4b67d;--amber-soft:#342b21;
+ --panel:var(--card);--panel2:var(--muted-card);--fg:var(--ink);
+ --muted:var(--secondary);--stroke:var(--line);--accent:var(--blue);--accentfg:#17130a;
+ --edge:var(--line);--text:var(--ink);--sub:var(--secondary);--soft:var(--muted-card);
+ --rf-highlight:#c9ab6c;--rf-heading:#eceff4;
+ --shadow:0 8px 28px rgba(0,0,0,.14);
+}
+html,body{background:var(--bg);color:var(--ink)}
+body{font-family:Inter,"Segoe UI Variable Text","Segoe UI",-apple-system,BlinkMacSystemFont,system-ui,sans-serif;line-height:1.55;-webkit-font-smoothing:antialiased}
+body .app,body .content-shell,body .shell,body .workspace,body .account-app,body .account-workspace{background:var(--bg)}
+body button,body input,body select,body textarea{font-family:inherit}
+body button:focus-visible,body a:focus-visible,body input:focus-visible,body select:focus-visible,body textarea:focus-visible{
+ outline:2px solid var(--rf-highlight);outline-offset:3px;
+}
+body input:not([type=checkbox]),body select,body textarea{accent-color:var(--rf-highlight)}
+body .card,body .account-workspace .tile,body .account-workspace .warning{
+ background:var(--card);border-color:var(--line);border-radius:16px;
+ box-shadow:var(--shadow);color:var(--ink)
+}
+body .stat,body .safety,body .message,body .levels,body .daydesk-risk-results{
+ border-color:var(--line);background:var(--muted-card);color:var(--ink);
+}
+body .card h2,body .tile h2,body .section-top h2{color:var(--ink);letter-spacing:-.03em}
+body .eyebrow,body .overline{color:var(--rf-highlight);font-size:10px;letter-spacing:.13em;font-weight:780}
+body .page-heading h1,body .daydesk-heading h1,body .intro h1,body .account-workspace>.wrap>.hero h1{
+ color:var(--rf-heading);font-size:clamp(29px,3.1vw,43px);font-weight:700;
+ line-height:1.14;letter-spacing:-.045em;
+}
+body .page-heading h1 em,body .intro h1 em,body .account-workspace>.wrap>.hero h1 em{
+ color:var(--secondary);font-style:normal
+}
+body .page-heading p,body .daydesk-heading p,body .intro p:not(.eyebrow),body .account-workspace>.wrap>.hero p{
+ color:var(--secondary);line-height:1.6;font-size:13px
+}
+/* Unified app shell width, white/graphite sidebars and desktop spacing. */
+body .app,body .account-app{grid-template-columns:238px minmax(0,1fr)}
+body .shell{display:flex;max-width:none;width:100%;min-height:100dvh;margin:0}
+body .rail{width:238px;flex:0 0 238px}
+body .sidebar,body .rail,body .account-rail{
+ background:var(--sidebar);border-right:1px solid var(--line);box-shadow:none;
+ padding:22px 14px 20px;gap:12px;
+}
+body .sidebar .brand,body .rail .logo,body .account-rail .account-rail-brand{
+ display:flex;align-items:center;gap:10px;padding:2px 9px 17px;
+ color:var(--ink);text-decoration:none;
+}
+body .sidebar .brand strong,body .rail .logo strong,body .account-rail .account-rail-brand strong{
+ font-size:22px;font-weight:750;letter-spacing:-.055em;line-height:1.1;color:var(--ink)
+}
+body .sidebar .brand small,body .rail .logo small,body .account-rail .account-rail-brand small{
+ color:var(--secondary);font-size:9px;font-weight:750;letter-spacing:.13em
+}
+body .sidebar .nav-label,body .rail .nav-tag,body .account-rail .account-rail-label{
+ display:block;margin:0;padding:9px 12px 5px;
+ color:var(--secondary);font-size:10px;font-weight:750;letter-spacing:.13em
+}
+body .sidebar .border-label,body .rail .nav-tag.rf-tools-label,body .account-rail .account-rail-divider{
+ border-top:1px solid var(--line);padding-top:19px
+}
+body .rail .rail-links{display:flex;flex-direction:column;gap:3px}
+body .sidebar .nav-link,body .rail .rail-link,body .account-rail .account-rail-link{
+ display:flex;align-items:center;gap:12px;
+ width:100%;min-height:44px;margin:0;
+ padding:10px 12px;border-radius:11px;
+ color:var(--secondary);background:transparent;
+ border:1px solid transparent;box-shadow:none;
+ font-size:13px;font-weight:570;line-height:1.4;text-align:left;
+ white-space:normal;text-decoration:none
+}
+body .sidebar .nav-link:hover,body .rail .rail-link:hover,body .account-rail .account-rail-link:hover{
+ color:var(--ink);background:var(--muted-card);border-color:var(--line)
+}
+body .sidebar .nav-link.active,body .rail .rail-link.current,body .account-rail .account-rail-link.current{
+ color:var(--ink);background:var(--blue-soft);
+ border-color:color-mix(in srgb,var(--rf-highlight) 26%,var(--line));
+ box-shadow:inset 3px 0 var(--rf-highlight);font-weight:740
+}
+body .sidebar .nav-icon,body .rail .nav-symbol,body .account-rail .account-nav-ico{
+ color:var(--secondary);width:21px;min-width:21px;font-size:17px;text-align:center
+}
+body .sidebar .nav-link.active .nav-icon,body .rail .rail-link.current .nav-symbol,body .account-rail .account-rail-link.current .account-nav-ico{
+ color:var(--rf-highlight)
+}
+body .rail .rail-bottom{border-top:1px solid var(--line);padding:16px 12px 5px;color:var(--secondary);font-size:11px}
+body .rail .rail-bottom p{color:var(--secondary)}
+/* Unified 73px top search + actions row on each desktop workspace. */
+body .content-shell>.topbar,body .workspace>.topbar,body .account-topbar{
+ display:flex;align-items:center;justify-content:space-between;gap:18px;
+ position:sticky;top:0;z-index:35;
+ width:100%;min-height:73px;height:73px;
+ padding:0 clamp(16px,2.5vw,34px);background:var(--card);
+ border-bottom:1px solid var(--line);box-shadow:none
+}
+body .workspace>.topbar{display:flex}
+body .top-search,body .rf-top-search,body .account-top-search{
+ flex:1 1 auto;display:flex;align-items:center;gap:11px;
+ min-height:43px;height:43px;max-width:720px;min-width:150px;
+ border:1px solid var(--line);background:var(--muted-card);
+ border-radius:11px;padding:0 13px;color:var(--secondary);box-shadow:none
+}
+body .rf-top-search input,body .top-search input,body .account-top-search input{
+ flex:1 1 auto;min-width:0;width:100%;height:39px;padding:0;
+ border:0!important;background:transparent!important;
+ outline:none!important;box-shadow:none!important;color:var(--ink);font-size:13px
+}
+body .rf-top-search kbd,body .top-search kbd,body .account-top-search kbd{
+ border:1px solid var(--line);background:var(--card);color:var(--secondary);border-radius:5px;
+ font-size:11px;white-space:nowrap
+}
+body .rf-top-search:focus-within,body .top-search:focus-within,body .account-top-search:focus-within{
+ outline:2px solid var(--rf-highlight);outline-offset:2px
+}
+body .top-right,body .rf-top-actions,body .account-header-actions{
+ display:flex;align-items:center;justify-content:flex-end;gap:9px;min-width:0
+}
+body .version-marker,body .rf-version-marker,body .account-version-marker{
+ border:1px solid var(--line);border-radius:9px;background:var(--muted-card);
+ color:var(--secondary);font-size:10px;font-weight:750;letter-spacing:.1em;
+ padding:9px 11px;white-space:nowrap
+}
+body .rf-top-actions .chip,body .top-right .provider-pill,body .account-status-pill{
+ min-height:38px;border:1px solid var(--line);border-radius:10px;background:var(--card);
+ padding:9px 12px;color:var(--secondary);font-size:11px;font-weight:700;
+ white-space:normal
+}
+body .top-right #themeToggle,body .rf-top-actions #theme,body .account-header-actions #themeToggle{
+ flex:0 0 40px;width:40px;min-width:40px;height:40px;min-height:40px;
+ border:1px solid var(--line);border-radius:10px;background:var(--card);
+ color:var(--ink);display:grid;place-items:center;cursor:pointer
+}
+body .rf-top-actions #theme{font-size:20px;padding:0}
+body .rf-top-actions .rf-account-link{
+ display:grid;place-items:center;width:40px;height:40px;flex:0 0 40px;
+ border:1px solid var(--line);border-radius:10px;
+ color:var(--secondary);font-size:18px
+}
+body .rf-top-actions .rf-account-link:hover{background:var(--muted-card);color:var(--ink)}
+/* Matching white cards and calm input chrome across trading tools. */
+body .main{padding:26px clamp(17px,3vw,38px) 34px}
+body .workspace>main{max-width:none;padding:26px clamp(17px,3vw,38px) 34px}
+body .account-workspace>.wrap{max-width:none;padding:26px clamp(17px,3vw,38px) 34px}
+body .intro{margin:0 0 22px;gap:18px}
+body .intro h1{margin:6px 0 9px}
+body .intro .safety{
+ flex:0 1 310px;min-width:215px;max-width:370px;
+ padding:17px 19px;border-radius:14px;background:var(--card)
+}
+body .intro .safety strong{color:var(--ink);letter-spacing:.07em}
+body .card{padding:clamp(16px,1.8vw,23px);margin-bottom:17px}
+body .daydesk-page .card{padding:clamp(16px,1.8vw,23px)}
+body .stat{border-radius:12px}
+body .tab.selected{border-bottom-color:var(--rf-highlight);color:var(--ink)}
+body .chip.ok{color:var(--green)}
+body .chip.bad{color:var(--red)}
+body .primary-btn,body .button-link.primary,body button.primary,body .account-workspace .primary{
+ background:var(--rf-highlight)!important;border-color:var(--rf-highlight)!important;
+ color:var(--accentfg)!important
+}
+body .primary-btn:hover,body button.primary:hover{filter:brightness(.97)}
+body .source,body .back,body .text-action,body .account-workspace a:not(.account-rail-link):not(.account-rail-brand){color:var(--rf-highlight)}
+body .rf-topbar .rf-top-actions .chip{font-size:11px}
+body .rf-mobile-menu,body .rf-mobile-brand{display:none}
+/* Preserve visibility of status/error messages and all order-safety warnings. */
+body .message.error,body .tag.bad,body #cronState[data-heartbeat="unknown"]{color:var(--red)}
+body .message.success,body .tag.ok,body #cronState[data-heartbeat="verified"]{color:var(--green)}
+/* Every standalone trading desk now has the same mobile drawer as Main and Account. */
+@media(max-width:940px){
+ body .shell{display:block;min-width:0}
+ body .rail{
+  position:fixed;top:0;left:0;z-index:70;
+  width:252px;max-width:min(85vw,300px);height:100dvh;max-height:none;
+  padding:18px 10px 20px;overflow-x:hidden;overflow-y:auto;
+  border-right:1px solid var(--line);border-bottom:0;
+  transform:translateX(-105%);transition:transform .18s ease;
+  background:var(--sidebar);display:flex;flex-direction:column
+ }
+ body .rail.rf-open{transform:translateX(0)}
+ body .rail .rail-links{
+  display:flex;flex-direction:column;flex-wrap:nowrap;
+  width:100%;min-width:0;max-width:100%;min-height:0;
+  gap:3px;overflow:visible;padding:0
+ }
+ body .rail .rail-link{flex:0 0 auto;min-height:44px;width:100%;padding:10px 12px;white-space:normal}
+ body .rail .nav-tag,body .rail .rail-bottom{display:block}
+ body .rf-nav-shade[hidden]{display:none!important}
+ body .rf-nav-shade{position:fixed;inset:0;z-index:69;background:rgba(7,12,19,.48)}
+ body .workspace>.topbar{
+  display:grid;grid-template-columns:44px minmax(0,1fr) auto;
+  grid-template-rows:44px 46px;
+  grid-template-areas:"menu brand actions" "search search search";
+  column-gap:11px;row-gap:9px;align-items:center;
+  height:auto;min-height:0;position:sticky;top:0;z-index:55;
+  padding:10px 16px 12px;width:100%
+ }
+ body .rf-mobile-menu{
+  display:grid;grid-area:menu;place-items:center;
+  width:44px;height:44px;min-width:44px;
+  border:1px solid var(--line);background:var(--card);color:var(--ink);
+  border-radius:10px;font-size:18px;padding:0
+ }
+ body .rf-mobile-brand{
+  display:flex;grid-area:brand;align-items:center;gap:8px;
+  color:var(--ink);text-decoration:none;font-size:16px;font-weight:750;
+  overflow:hidden;white-space:nowrap
+ }
+ body .rf-mobile-brand img{width:25px;height:25px;border-radius:6px}
+ body .rf-top-search{grid-area:search;max-width:none;width:100%;min-width:0}
+ body .rf-top-actions{grid-area:actions;gap:7px}
+ body .rf-top-actions .rf-version-marker,body .rf-top-actions .chip,body .rf-top-actions .rf-account-link{display:none}
+ body .rf-top-actions #theme{width:44px;height:44px;min-width:44px;min-height:44px}
+ body .workspace>main{padding:20px 13px max(27px,env(safe-area-inset-bottom))}
+ body .intro{display:block;margin-bottom:18px}
+ body .intro .safety{min-width:0;max-width:none;margin-top:16px}
+ body .main{padding:20px 13px max(27px,env(safe-area-inset-bottom))}
+}
+@media(max-width:940px){
+ /* Keep Account and Main drawers at the same 252px + tap-size scale. */
+ body .account-rail{width:252px}
+ body .account-topbar{border-color:var(--line)}
+ body .sidebar{background:var(--sidebar)}
+}
+@media(max-width:700px){
+ body .card{padding:16px}
+ body .page-heading h1,body .daydesk-heading h1,body .intro h1{font-size:clamp(29px,8vw,39px)}
+}
+@media(max-width:940px){
+ html.rangeform-ios-standalone body .rail{
+  padding-top:max(62px,env(safe-area-inset-top,0px))
+ }
+ html.rangeform-ios-standalone body .workspace>.topbar{
+  padding-top:max(62px,env(safe-area-inset-top,0px))
+ }
+}
+@media(prefers-reduced-motion:reduce){
+ body .rail{transition:none}
+}
