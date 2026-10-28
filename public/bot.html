@@ -1,0 +1,47 @@
+<!doctype html><html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#f1f4f8"><title>Rangeform · Autonomous Paper Bot</title>
+<link rel="icon" href="/static/rangeform-official-icon.png">
+<link rel="stylesheet" href="/static/theme-sync.css?v=2">
+<link rel="stylesheet" href="/static/algo.css?v=1">
+<link rel="stylesheet" href="/static/auto-bot.css?v=1">
+<script src="/static/theme-sync.js?v=3"></script><script type="module" src="/static/auto-bot.js?v=1"></script>
+</head><body><div class="shell"><aside class="rail" aria-label="Workspace navigation">
+<a class="logo" href="/v9.html#overview"><img src="/static/rangeform-official-icon.png" width="37" height="37" alt=""><span><strong>Rangeform</strong><small>RESEARCH &amp; DECISIONS</small></span></a><span class="nav-tag">WORKSPACE</span>
+<a href="/v9.html#overview" class="rail-link">◫ &nbsp; Overview</a>
+<a href="/v9.html#daydesk" class="rail-link">▥ &nbsp; Day Trading Desk</a>
+<a href="/algo.html" class="rail-link">◇ &nbsp; Algorithmic Desk</a>
+<a href="/bot.html" class="rail-link current" aria-current="page">⟳ &nbsp; Autonomous Paper Bot</a>
+<a href="/account.html" class="rail-link">⚙ &nbsp; Account &amp; Sign-in</a>
+<div class="rail-bottom">PAPER-ONLY AUTOMATION<p>No broker credentials, no live orders, no leverage.</p></div>
+</aside><div class="workspace"><header class="topbar"><a href="/algo.html" class="back">← Algorithmic Desk</a><span class="top-title">RANGEFORM / AUTONOMOUS PAPER BOT</span><div class="actions"><span id="botBadge" class="chip">Not connected</span><button id="theme" class="iconbtn" aria-label="Toggle appearance">◐</button></div></header>
+<main><div class="intro"><div><p class="eyebrow">UNATTENDED STRATEGY / FIVE-MINUTE BARS</p><h1>Automation with<br><em>accountable rules.</em></h1><p>Server-side scheduled strategy research and hypothetical orders, with transaction-cost assumptions and an audited paper ledger. Never sends real-money orders.</p></div><div class="safety"><strong>REAL ORDERS DISABLED</strong><span>Paper execution only</span><span>Background operation requires separate Worker deployment</span></div></div>
+<div class="card"><div class="section-top"><div><p class="eyebrow">SYSTEM STATUS</p><h2>Bot readiness</h2><p id="connection">Checking owner authentication and server configuration…</p></div><button id="refreshBot" type="button">Refresh status ↻</button></div>
+<div id="botMessage" class="message" role="status">Waiting for server configuration.</div>
+<div class="stat-grid"><div class="stat"><small>ENGINE STATE</small><strong id="engineState">—</strong><span>Server-side enabled state</span></div><div class="stat"><small>LAST CHECK</small><strong id="lastCheck">—</strong><span>UTC timestamp</span></div><div class="stat"><small>STRATEGY</small><strong>EMA 9/21</strong><span>Long-only BTC/USD, 5-minute completed bars</span></div><div class="stat"><small>LAST SIGNAL</small><strong id="signal">—</strong><span id="error">Verified candles required</span></div></div>
+<div class="paper-buttons"><button class="primary" type="button" id="startBot" disabled>Start autonomous paper bot</button><button type="button" id="pauseBot" disabled>Pause immediately</button><button type="button" id="runTick" disabled>Run one verification tick</button></div>
+<p class="footnote">Starting here enables paper decisions in the shared D1 ledger. For unattended operation when the browser is closed, deploy and enable the dedicated Cloudflare Cron Worker. The start button does not itself deploy the Worker.</p>
+</div>
+<div class="two-col">
+<section class="card"><div class="section-top"><div><p class="eyebrow">COSTS &amp; RISK</p><h2>Paper portfolio</h2></div><span class="tag">NO LIVE EXECUTION</span></div><div class="stat-grid small-stats">
+<div class="stat"><small>START CAPITAL</small><strong id="startCapital">—</strong></div><div class="stat"><small>PAPER CASH</small><strong id="paperCash">—</strong></div></div>
+<div class="metric-row"><span>Realized net P&amp;L</span><strong id="pnl">—</strong></div><div class="metric-row"><span>Current paper position</span><strong id="holding">—</strong></div><div class="metric-row"><span>Daily realized net P&amp;L</span><strong id="dayPnl">—</strong></div><div class="metric-row"><span>Today's entries</span><strong id="entries">—</strong></div>
+<p class="footnote">1% initial capital per trade; 1.5% stop threshold, 3% target, 180-minute time stop, 2% daily loss stop, 5% equity drawdown halt, and a limit of 5 entries/day. A stop threshold is not a guaranteed fill. Simulated trading fees: 40 bps per side plus 10 bps slippage per side.</p>
+</section>
+<section class="card"><div class="section-top"><div><p class="eyebrow">OWNER CONTROLS</p><h2>Configuration &amp; safety</h2></div></div>
+<label class="autocapital">Reset paper starting balance (USD)<input type="number" id="resetCapital" min="100" max="1000000" step="100" value="10000"></label>
+<button id="resetBot" type="button" disabled>Reset stopped, flat paper ledger</button>
+<p class="footnote">Resets are blocked while the bot is running or holding a position. The server uses optimistic concurrency to avoid duplicate actions.</p>
+<div class="metric-row"><span>Firebase sign-in</span><strong id="authState">Checking</strong></div>
+<div class="metric-row"><span>Owner UID (for Cloudflare setup)</span><strong id="uid">—</strong></div>
+<a class="source" href="/account.html">Sign in or manage account ↗</a>
+<p class="footnote">Cloudflare must have BOT_OWNER_UID set to your Firebase UID and BOT_SERVICE_ENABLED=on for the Pages and Worker services. Keep broker API keys entirely out of this version.</p>
+</section>
+</div>
+<div class="card"><div class="section-top"><div><p class="eyebrow">AUDITABLE ACTIONS · HYPOTHETICAL FILLS</p><h2>Automated paper journal</h2></div><button id="exportBot" type="button" disabled>Export CSV</button></div>
+<div class="tablewrap"><table><thead><tr><th>UTC</th><th>Action</th><th>Quantity</th><th>Assumed price</th><th>Net P&amp;L</th><th>Decision reason</th></tr></thead><tbody id="events"><tr><td colspan="6">No server-side paper activity verified.</td></tr></tbody></table></div></div>
+<div class="card"><div class="section-top"><div><p class="eyebrow">GO LIVE SAFELY</p><h2>Deployment requirements</h2></div></div>
+<p>This is a working code implementation, not an activated background service until the separate Worker is deployed. Detailed Cloudflare owner instructions are in <a class="source" href="https://github.com/manvirt97/trading-platform/blob/main/AUTONOMOUS_BOT_SETUP.md" target="_blank" rel="noopener noreferrer">AUTONOMOUS_BOT_SETUP.md ↗</a>.</p>
+<p class="footnote">A paper bot can lose money in realistic conditions. No documented strategy profitability or audited results are claimed. Prediction-market automatic execution and real-money Kraken order placement are not included.</p></div>
+<footer><span>RANGEFORM · PAPER AUTONOMATION</span><span>Manual consent required · no real orders · no performance guarantees</span></footer>
+</main></div></div></body></html>
