@@ -61,8 +61,11 @@ if(!release){
   const response=await retrieve('/api/auto-bot');
   let code='UNKNOWN';
   try{code=String((await response.json()).code||'not-provided')}catch{}
-  if(response.status===401)log('Bot authentication','owner settings appear ready (401 to signed-out request); cron NOT verified');
-  else if(response.status===503)log('Bot authentication','not configured in Pages (503, '+code+'); requires owner secret, flag, D1 and redeploy');
+  if(response.status===401)log('Bot authentication','owner gating ready (signed-out 401); separate Worker cron NOT verified');
+  else if(response.status===503){
+   log('Bot authentication','BLOCKED: Pages NOT_CONFIGURED (503, '+code+'); owner secret/flag/DB and Pages redeploy required');
+   process.exitCode=1;
+  }
   else{
    log('Bot authentication','UNEXPECTED HTTP '+response.status+'; cron NOT verified');
    process.exitCode=1;

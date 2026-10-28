@@ -10,7 +10,7 @@
 ## One-time owner authorization — GitHub encrypted secrets
 1. In GitHub, open `manvirt97/trading-platform` -> **Settings -> Secrets and variables -> Actions -> New repository secret** (or configure the equivalent `production-paper` environment secrets).
 2. Create exactly these **encrypted secret names**, with values copied directly from your own authorized accounts:
-   - `CLOUDFLARE_API_TOKEN`: a scoped token from Cloudflare User Profile -> API Tokens with least necessary Workers write, Pages write and related account permissions (not your Global API Key). Do not share it in chat.
+   - `CLOUDFLARE_API_TOKEN`: a scoped Cloudflare **account API token** (not your Global API Key). For the first creation of `rangeform-autonomous-paper-bot`, Cloudflare requires **Workers Admin at the Workers product scope**; Pages secret updates need **Pages Write**. After the Worker exists, you can restrict ongoing deploy permissions to **Workers Editor for that Worker** where supported. Set the correct Cloudflare account scope and never share the token in chat.
    - `CLOUDFLARE_ACCOUNT_ID`: your Cloudflare account ID. Do not confuse with GitHub account ID.
    - `BOT_OWNER_UID`: the Firebase UID displayed after Google sign-in at `https://rangeform.pages.dev/account.html` in **Your owner ID for Cloudflare**. This is an identifier, NOT your password.
 3. No brokerage/exchange API keys are needed or accepted. Keep Cloudflare permissions narrow and revoke tokens if compromised.
