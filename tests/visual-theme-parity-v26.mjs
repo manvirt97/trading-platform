@@ -11,8 +11,8 @@ const browser=await chromium.launch({headless:true});
 try{
  const context=await browser.newContext({viewport:{width:1280,height:860}});
  await context.addInitScript(()=>{
-  localStorage.setItem('rf_v9_theme','light');
-  localStorage.setItem('rangeform_theme','light');
+  if(!localStorage.getItem('rf_v9_theme'))localStorage.setItem('rf_v9_theme','light');
+  if(!localStorage.getItem('rangeform_theme'))localStorage.setItem('rangeform_theme','light');
  });
  const page=await context.newPage();
  await page.route('**/*',route=>{
