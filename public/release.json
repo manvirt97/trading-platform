@@ -1,5 +1,5 @@
 {
-  "version": "26",
-  "build": "rangeform-v26-unified-design",
-  "description": "Rangeform unified EquityClimb-inspired light/dark design across all workspaces"
+  "version": "27",
+  "build": "rangeform-v27-mobile-fullwidth-hotfix",
+  "description": "Restore full-width mobile Day Trading Desk and retain V26 unified design"
 }
