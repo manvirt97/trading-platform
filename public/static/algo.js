@@ -47,6 +47,7 @@ function showBook(){
  $('feedPill').textContent=freshness()?'Kraken book · fresh':error?'Exchange unavailable':'Quote not verified';
  $('feedPill').className='chip'+(freshness()?' ok':error?' bad':'');
  const dot=document.querySelector('.statusdot');if(dot){dot.classList.toggle('online',Boolean(freshness()));dot.classList.toggle('offline',Boolean(error))}
+ const dot=document.querySelector('.statusdot');if(dot){dot.classList.toggle('online',Boolean(freshness()));dot.classList.toggle('offline',Boolean(error))}
 }
 function paperStatus(){
  const m=quoteMetrics();
@@ -138,6 +139,7 @@ function exportCSV(){
 }
 function setTab(active){
  const crypto=active==='crypto';$('cryptoPanel').hidden=!crypto;$('contractsPanel').hidden=crypto;
+ if(crypto&&!freshness())refresh();
  if(crypto&&!freshness())refresh();
  $('cryptoTab').classList.toggle('selected',crypto);$('contractsTab').classList.toggle('selected',!crypto);
  $('cryptoTab').setAttribute('aria-selected',String(crypto));$('contractsTab').setAttribute('aria-selected',String(!crypto));
