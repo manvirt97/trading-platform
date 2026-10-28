@@ -5,6 +5,13 @@
    The class is marked before CSS by theme-sync.js on the separate pages,
    or by v9.js on the main workspace. Normal browser tabs are unaffected. */
 @media (max-width:940px) {
+ html.rangeform-ios-standalone .sidebar {
+  padding-top:max(62px, env(safe-area-inset-top, 0px));
+  scroll-padding-top:62px;
+ }
+ html.rangeform-ios-standalone .sidebar ~ .content-shell .topbar {
+  padding-top:max(62px, env(safe-area-inset-top, 0px));
+ }
  html.rangeform-ios-standalone .account-rail {
   padding-top:max(62px, env(safe-area-inset-top, 0px));
   scroll-padding-top:62px;
