@@ -4,7 +4,7 @@
 import {assumedFill} from '../../public/static/algo-math.mjs';
 export const BOT_PAIR='XBTUSD';
 export const DEFAULTS=Object.freeze({feeBps:40,slipBps:10,fast:9,slow:21,maxSpreadBps:22,positionPercent:1,maxPositionPercent:5,maxDailyLossPercent:2,maxDrawdownPercent:5,maxEntriesPerDay:5,stopPercent:1.5,targetPercent:3,maxHoldMinutes:180,cooldownMinutes:15});
-export function initialBot(){return {mode:'PAPER_ONLY',enabled:false,halted:false,haltReason:'',pair:BOT_PAIR,capital:10000,cash:10000,realizedPnl:0,day:'',dayPnl:0,entriesToday:0,lossStreak:0,lastEntryAt:null,lastProcessedBar:null,lastTickAt:null,lastError:null,lastSignal:'WAITING',position:null,events:[],updatedAt:null};}
+export function initialBot(){return {mode:'PAPER_ONLY',enabled:false,halted:false,haltReason:'',pair:BOT_PAIR,capital:10000,cash:10000,realizedPnl:0,day:'',dayPnl:0,entriesToday:0,lossStreak:0,lastEntryAt:null,lastProcessedBar:null,lastTickAt:null,lastCronTickAt:null,lastError:null,lastSignal:'WAITING',position:null,events:[],updatedAt:null};}
 export const n=x=>typeof x==='number'?x:Number(x);
 function finitePositive(x){return Number.isFinite(n(x))&&n(x)>0}
 export function ema(values,period){
