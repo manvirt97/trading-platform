@@ -7,7 +7,7 @@ test('all canonical pages load same installed-app release checker',()=>{
  const paths=['public/v9.html','public/account.html','public/algo.html','public/bot.html'];
  for(const path of paths){
   const html=read(path);
-  assert.match(html,/pwa-update-v23\.js\?v=23/,'missing refresh code on '+path);
+  assert.match(html,/pwa-update-v24\.js\?v=24/,'missing refresh code on '+path);
   assert.match(html,/viewport-fit=cover/,'must protect installed iPhone safe areas on '+path);
  }
  const checker=read('public/static/pwa-update-v24.js');
