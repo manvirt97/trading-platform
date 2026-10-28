@@ -1,7 +1,7 @@
 {
   "name": "Rangeform — Market Intelligence",
   "short_name": "Rangeform",
-  "description": "Rangeform V10 market intelligence, research agents, opportunities, personal account and paper practice",
+  "description": "Rangeform market research, trade decisions and paper strategy workspace; evergreen Home Screen updates",
   "id": "/",
   "start_url": "/v9.html#overview",
   "scope": "/",
