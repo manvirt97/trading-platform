@@ -17,8 +17,9 @@ test('all separate pages protect the clock and island in iPhone standalone mode'
   assert.ok(css.includes('html.rangeform-ios-standalone '+selector+' {'),'safe drawer selector missing for '+page);
  }
  for(const selector of ['.account-rail','.account-topbar','.rail','.topbar']){
-  const re=new RegExp('html\\.rangeform-ios-standalone \\'+selector.replace('.','\\.')+' \\{[\\s\\S]*?padding-top:max\\(62px, env\\(safe-area-inset-top, 0px\\)\\);');
-  assert.match(css,re,'safe-area floor missing for '+selector);
+  const block=css.split('html.rangeform-ios-standalone '+selector+' {')[1]?.split('}')[0]||'';
+  assert.ok(block.includes('padding-top:max(62px, env(safe-area-inset-top, 0px));'),
+    'safe-area floor missing for '+selector);
  }
  assert.match(css,/@media \(max-width:940px\)/);
  assert.doesNotMatch(css,/body\s*\{[^}]*padding-top/,'never offset the entire page under normal Safari');
