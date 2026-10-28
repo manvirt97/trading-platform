@@ -77,6 +77,6 @@ test('published release marks installed apps as V28',()=>{
  const release=JSON.parse(read('public/release.json'));
  const pwa=read('public/static/pwa-update-v28.js');
  assert.equal(release.version,'28');
- assert.equal(release.build,'rangeform-v28-mobile-fullwidth-hotfix');
+ assert.equal(release.build,'rangeform-v28-iphone-header-grid');
  assert.match(pwa,/const CURRENT=28,/);
 });
