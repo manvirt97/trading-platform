@@ -11,7 +11,7 @@ function load(){
   return {...d,paused:Boolean(d.paused),realized:Number.isFinite(d.realized)?d.realized:0,history:d.history.slice(0,150)};
  }catch{return empty(10000)}
 }
-let ledger=load(),snapshot=null,lastSnapshotAt=0,busy=false,error=null;
+let ledger=load(),snapshot=null,lastSnapshotAt=0,lastAttemptAt=0,busy=false,error=null;
 const set=(id,value)=>{$(id).textContent=value};
 const setMsg=(id,message,kind='')=>{const e=$(id);e.textContent=message;e.className='message'+(kind?' '+kind:'')};
 const save=()=>{try{localStorage.setItem(PERSIST,JSON.stringify(ledger))}catch{setMsg('paperMessage','Local storage unavailable. Journal changes will not survive reopening the page.','error')}};
@@ -54,7 +54,7 @@ function paperStatus(){
  else if(!m.depthSufficient)reason='Insufficient visible top-of-book quantity for this order size.';
  if(ledger.position)reason='One open paper position exists. Close it before opening another.';
  const capitalLocked=Boolean(ledger.history.length||ledger.position);
- $('capital').disabled=capitalLocked;$('capital').value=String(ledger.capital);
+ $('capital').disabled=capitalLocked;if(document.activeElement!==$('capital'))$('capital').value=String(ledger.capital);
  $('pause').checked=ledger.paused;
  set('cash',money(ledger.cash));set('position',ledger.position?PAIRS[ledger.position.pair]+' · '+fmt(ledger.position.qty,7)+' units':'None');
  set('realized',money(ledger.realized));set('drawdown',money(Math.abs(dailyLoss()))+' / '+money(ledger.capital*.02));
@@ -82,7 +82,7 @@ function renderJournal(){
 function render(){showBook();paperStatus()}
 async function refresh(){
  if(busy||document.visibilityState==='hidden')return;
- busy=true;$('refresh').disabled=true;$('refresh').textContent='Checking exchange…';error=null;
+ busy=true;lastAttemptAt=Date.now();$('refresh').disabled=true;$('refresh').textContent='Checking exchange…';error=null;
  const pair=currentPair(),control=new AbortController(),timeout=setTimeout(()=>control.abort(),8500);
  try{
   const response=await fetch('/api/algo-book?pair='+encodeURIComponent(pair),{cache:'no-store',signal:control.signal});
@@ -158,7 +158,7 @@ function init(){
  $('cryptoTab').addEventListener('click',()=>setTab('crypto'));$('contractsTab').addEventListener('click',()=>setTab('contracts'));
  for(const id of ['yes','no','yesFee','noFee','qty'])$(id).addEventListener('input',calculatePair);
  calculatePair();render();refresh();
- setInterval(()=>{if(!busy&&document.visibilityState==='visible'&&Date.now()-lastSnapshotAt>=12000)refresh();else render()},3000);
+ setInterval(()=>{if(!busy&&document.visibilityState==='visible'&&Date.now()-lastAttemptAt>=12000)refresh();else render()},3000);
  document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'&&!freshness())refresh()});
 }
 if(typeof document!=='undefined')document.addEventListener('DOMContentLoaded',init);
