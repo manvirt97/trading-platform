@@ -1,15 +1,15 @@
 /* Early first-paint theme; the same palette is used by all three app screens. */
-html{color-scheme:dark;background:#0a1018}
-html[data-rf-theme="light"]{color-scheme:light;background:#f1f4f8}
+html{color-scheme:dark;background:#0e1116}
+html[data-rf-theme="light"]{color-scheme:light;background:#f3f4f2}
 html[data-rf-theme="warm"]{color-scheme:dark;background:#181713}
 html[data-rf-theme="light"] body{color-scheme:light}
 html[data-rf-theme="dark"] body,html[data-rf-theme="warm"] body{color-scheme:dark}
-html[data-rf-theme="light"] body{--bg:#f1f4f8;--panel:#fff;--edge:#dae4ee;--text:#192b3b;--sub:#566b7d;--accent:#315778;--soft:#e8eff6}
-html[data-rf-theme="dark"] body{--bg:#0a1018;--panel:#111b27;--edge:#2b3d4e;--text:#edf3fa;--sub:#98acbf;--accent:#bdd1df;--soft:#1d2b39}
+html[data-rf-theme="light"] body{--bg:#f3f4f2;--panel:#fff;--edge:#e1e3df;--text:#141820;--sub:#646d79;--accent:#95733a;--soft:#f7f7f4}
+html[data-rf-theme="dark"] body{--bg:#0e1116;--panel:#151a21;--edge:#303944;--text:#eceff4;--sub:#aab5c1;--accent:#c9ab6c;--soft:#1b212a}
 html[data-rf-theme="warm"] body{--bg:#181713;--panel:#2b2721;--edge:#4a4033;--text:#f4eee4;--sub:#c2b39e;--accent:#d8c5aa;--soft:#383228}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
 
 /* Set all Research variables before DOMContentLoaded, preventing dark-to-light flashes. */
-html[data-rf-theme="light"] body{--surface:#fff;--panel:#f7f9fc;--panel2:#e8eff6;--border:#dae4ee;--muted:#566b7d;--lime:#315778;--text:#192b3b;--bg:#f1f4f8}
-html[data-rf-theme="dark"] body{--surface:#111b27;--panel:#172330;--panel2:#1d2b39;--border:#2b3d4e;--muted:#98acbf;--lime:#bdd1df;--text:#edf3fa;--bg:#0a1018}
+html[data-rf-theme="light"] body{--surface:#fff;--panel:#f7f9fc;--panel2:#f7f7f4;--border:#e1e3df;--muted:#646d79;--lime:#95733a;--text:#141820;--bg:#f3f4f2}
+html[data-rf-theme="dark"] body{--surface:#151a21;--panel:#151a21;--panel2:#1b212a;--border:#303944;--muted:#aab5c1;--lime:#c9ab6c;--text:#eceff4;--bg:#0e1116}
 html[data-rf-theme="warm"] body{--surface:#24211d;--panel:#2b2721;--panel2:#383228;--border:#4a4033;--muted:#c2b39e;--lime:#d8c5aa;--text:#f4eee4;--bg:#181713}

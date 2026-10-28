@@ -1,6 +1,6 @@
 <!doctype html><html lang="en"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#f1f4f8"><title>Rangeform · Autonomous Paper Bot</title>
+<meta name="theme-color" content="#f3f4f2"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="default"><meta name="apple-mobile-web-app-title" content="Rangeform"><link rel="manifest" href="/manifest.webmanifest?v=26"><link rel="apple-touch-icon" href="/static/rangeform-official-icon.png?v=1"><title>Rangeform · Autonomous Paper Bot</title>
 <link rel="icon" href="/static/rangeform-official-icon.png">
 <link rel="stylesheet" href="/static/theme-sync.css?v=2">
 <link rel="stylesheet" href="/static/algo.css?v=1">
@@ -8,7 +8,7 @@
 <link rel="stylesheet" href="/static/auto-bot.css?v=1">
 <link rel="stylesheet" href="/static/workspace-palette-v21.css?v=21">
 <script src="/static/theme-sync.js?v=22"></script><script type="module" src="/static/auto-bot.js?v=2"></script>
-<link rel="stylesheet" href="/static/ios-statusbar-v22.css?v=22"><script src="/static/pwa-update-v24.js?v=24" defer></script></head><body><div class="shell"><aside class="rail" aria-label="Workspace navigation">
+<link rel="stylesheet" href="/static/ios-statusbar-v22.css?v=22"><script src="/static/workspace-shell-v26.js?v=26" defer></script><script src="/static/pwa-update-v26.js?v=26" defer></script><link rel="stylesheet" href="/static/rangeform-design-v26.css?v=26"></head><body><div class="shell"><aside class="rail" id="rfRail" aria-label="Workspace navigation">
 <a class="logo" href="/v9.html#overview"><img src="/static/rangeform-official-icon.png" width="37" height="37" alt=""><span><strong>Rangeform</strong><small>RESEARCH &amp; DECISIONS</small></span></a><span class="nav-tag">WORKSPACE</span>
 <nav class="rail-links" aria-label="Main navigation">
 <a href="/v9.html#overview" class="rail-link"><span class="nav-symbol" aria-hidden="true">◫</span> Overview</a>
@@ -20,13 +20,21 @@
 <a href="/v9.html#news" class="rail-link"><span class="nav-symbol" aria-hidden="true">▤</span> News & catalysts</a>
 <a href="/v9.html#studio" class="rail-link"><span class="nav-symbol" aria-hidden="true">◈</span> Research Studio</a>
 <a href="/v9.html#ai" class="rail-link"><span class="nav-symbol" aria-hidden="true">✳</span> Research AI</a>
+</nav>
+<div class="nav-tag rf-tools-label">YOUR TOOLS</div>
+<nav class="rail-links" aria-label="Research tools">
 <a href="/v9.html#risk" class="rail-link"><span class="nav-symbol" aria-hidden="true">◇</span> Risk planner</a>
 <a href="/v9.html#journal" class="rail-link"><span class="nav-symbol" aria-hidden="true">▣</span> Paper journal</a>
 <a href="/v9.html#settings" class="rail-link"><span class="nav-symbol" aria-hidden="true">⚙</span> Settings</a>
 <a href="/account.html" class="rail-link"><span class="nav-symbol" aria-hidden="true">☰</span> Account & Sign-in</a>
 </nav>
 <div class="rail-bottom">AUTONOMOUS SIMULATION<p>No broker credentials, no real orders, no leverage.</p></div>
-</aside><div class="workspace"><header class="topbar"><a href="/algo.html" class="back">← Algorithmic Desk</a><span class="top-title">RANGEFORM / AUTONOMOUS PAPER BOT</span><div class="actions"><span id="botBadge" class="chip">Not connected</span></div><button id="theme" class="iconbtn" aria-label="Toggle appearance">◐</button></header>
+</aside><div class="workspace"><header class="topbar rf-topbar">
+<button id="rfMobileMenu" class="rf-mobile-menu" type="button" aria-label="Open navigation" aria-controls="rfRail" aria-expanded="false">☰</button>
+<a class="rf-mobile-brand" href="/v9.html#overview" aria-label="Rangeform overview"><img src="/static/rangeform-official-icon.png" alt=""><strong>Rangeform</strong></a>
+<form class="rf-top-search" action="/v9.html#signals" method="get" role="search"><span aria-hidden="true">⌕</span><input id="rfDeskSymbol" type="search" name="symbol" maxlength="10" pattern="[A-Za-z][A-Za-z0-9.\\-]{0,9}" placeholder="Search a symbol (e.g. NVDA, SHOP)" aria-label="Search stock symbol in Trade Signals"><kbd>↵</kbd></form>
+<div class="rf-top-actions"><span class="rf-version-marker" title="Shared Rangeform workspace">RANGEFORM · STUDIO</span><span class="chip" id="botBadge">Not connected</span><button id="theme" class="iconbtn" type="button" aria-label="Toggle light and dark theme">◐</button><a class="rf-account-link" href="/account.html" aria-label="My account" title="Account &amp; Sign-in">↗</a></div>
+</header>
 <main><div class="intro"><div><p class="eyebrow">UNATTENDED STRATEGY / FIVE-MINUTE BARS</p><h1>Automation with<br><em>accountable rules.</em></h1><p>Autonomous simulated entries and exits when the scheduled Worker is active, with transparent risk controls and an audited paper ledger. Real broker orders require a separate, authorized integration.</p></div><div class="safety"><strong>PAPER TRADING · REAL ORDERS OFF</strong><span>Paper execution only</span><span>Background autonomy must be verified through the scheduled Worker heartbeat</span></div></div>
 <div class="card"><div class="section-top"><div><p class="eyebrow">SYSTEM STATUS</p><h2>Bot readiness</h2><p id="connection">Checking owner authentication and server configuration…</p></div><button id="refreshBot" type="button">Refresh status ↻</button></div>
 <div id="botMessage" class="message" role="status">Waiting for server configuration.</div>
@@ -65,4 +73,4 @@
 <p>This is a working code implementation, not an activated background service until the separate Worker is deployed. Detailed Cloudflare owner instructions are in <a class="source" href="https://github.com/manvirt97/trading-platform/blob/main/AUTONOMOUS_BOT_SETUP.md" target="_blank" rel="noopener noreferrer">AUTONOMOUS_BOT_SETUP.md ↗</a>.</p>
 <p class="footnote">A paper bot can lose money in realistic conditions. No documented strategy profitability or audited results are claimed. Prediction-market automatic execution and real-money Kraken order placement are not included.</p></div>
 <footer><span>RANGEFORM · PAPER AUTONOMATION</span><span>Manual consent required · no real orders · no performance guarantees</span></footer>
-</main></div></div></body></html>
+</main></div></div><div id="rfNavShade" class="rf-nav-shade" hidden></div></body></html>

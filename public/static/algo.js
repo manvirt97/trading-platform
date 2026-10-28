@@ -146,7 +146,7 @@ function setTab(active){
 function init(){
  // Align the separate desk to the currently selected main-app theme.
  let theme;try{theme=localStorage.getItem('rf_v9_theme')||localStorage.getItem('rangeform_theme')||'light'}catch{theme='light'}
- if(!['light','dark','warm'].includes(theme))theme='light';
+ if(!['light','dark'].includes(theme))theme='light';
  window.RangeformTheme?.apply(theme);document.body.dataset.theme=theme;
  $('theme').addEventListener('click',()=>{let next=document.body.dataset.theme==='light'?'dark':'light';window.RangeformTheme?.apply(next);document.body.dataset.theme=next;try{localStorage.setItem('rf_v9_theme',next)}catch{}});
  $('pair').addEventListener('change',()=>{snapshot=null;lastSnapshotAt=0;error=null;render();refresh()});

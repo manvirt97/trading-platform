@@ -25,11 +25,12 @@ try {
    const isMain=path==='/v9.html';
    if(isAccount)await page.locator('#accountMobileMenu').click();
    if(isMain)await page.locator('#mobileMenu').click();
+   if(!isAccount&&!isMain)await page.locator('#rfMobileMenu').click();
    // Wait for the 180ms drawer animation. Otherwise CI snapshots capture a
    // partially offscreen drawer and falsely appear to show a clipped menu.
-   if(isAccount||isMain)await page.waitForTimeout(260);
+   await page.waitForTimeout(260);
    const logo=isAccount?'.account-rail-brand':isMain?'.sidebar .brand':'.rail .logo';
-   const navLink=isAccount?'.account-rail-link':isMain?'.sidebar .nav-link':null;
+   const navLink=isAccount?'.account-rail-link':isMain?'.sidebar .nav-link':'.rail .rail-link';
    const dimensions=await page.evaluate(({logo,navLink})=>{
     const el=document.querySelector(logo);
     if(!el) return null;
@@ -48,7 +49,7 @@ try {
    // OS clock occupies the first ~50 CSS px. Logo must start below it.
    assert.ok(dimensions.top>=54,JSON.stringify({path,width,...dimensions}));
    assert.ok(dimensions.bottom<=820, 'Logo offscreen '+path);
-   if(isAccount||isMain){
+   {
     assert.ok(dimensions.left>=-2&&dimensions.right<=width+2,
       'Opened drawer logo clipped horizontally: '+JSON.stringify({path,width,...dimensions}));
     assert.ok(dimensions.link&&dimensions.link.left>=-2&&dimensions.link.right<=width+2,
@@ -57,6 +58,11 @@ try {
       'Opened drawer navigation link not reachable in viewport: '+JSON.stringify({path,width,...dimensions}));
    }
    assert.ok(dimensions.scrollWidth<=width+2,'Unexpected horizontal page overflow '+path);
+   if(!isAccount&&!isMain){
+    assert.equal(await page.locator('#rfMobileMenu').getAttribute('aria-expanded'),'true');
+    await page.locator('#rfNavShade').click({position:{x:width-10,y:400}});
+    assert.equal(await page.locator('#rfMobileMenu').getAttribute('aria-expanded'),'false');
+   }
    if(isAccount){
     assert.equal(await page.locator('#accountMobileMenu').getAttribute('aria-expanded'),'true');
     await page.locator('#accountNavShade').click({position:{x:width-10,y:400}});

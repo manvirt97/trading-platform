@@ -1,32 +1,32 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
+const read=path=>readFileSync(new URL('../'+path,import.meta.url),'utf8');
 
-const read = path => readFileSync(new URL('../' + path, import.meta.url), 'utf8');
-
-test('Algorithmic Desk and Autonomous Bot use the same responsive mobile header', () => {
-  const css = read('public/static/workspace-unified-v17.css');
-  const mobile = css.slice(css.indexOf('/* V19: structurally separate status message'));
-  assert.ok(mobile.startsWith('/* V19:'), 'mobile header override must be present');
-  assert.ok(mobile.includes('@media(max-width:760px)'), 'narrow-viewport breakpoint');
-  assert.ok(mobile.includes('grid-template-areas:"back theme" "status status"'), 'separate rows for navigation and long feed/bot status');
-  assert.ok(mobile.includes('.topbar>.actions{grid-area:status'), 'status wrapper must be its own grid item');
-  assert.ok(mobile.includes('.topbar>.actions>.chip{'), 'dynamic provider/bot status must occupy full second row');
-  assert.ok(mobile.includes('white-space:normal;overflow-wrap:anywhere'), 'long status text must wrap, not overlap');
-  assert.ok(mobile.includes('.topbar>#theme{grid-area:theme'), 'appearance toggle must be its own grid item');
-  assert.ok(mobile.includes('min-width:44px;width:44px;height:44px'), 'appearance toggle must be touch-sized');
-  assert.ok(mobile.includes('env(safe-area-inset-top)'), 'iOS standalone safe area must be respected');
-  assert.ok(mobile.includes('env(safe-area-inset-bottom)'), 'mobile bottom safe area must be respected');
-  assert.ok(mobile.includes('.rail-links{width:100%;max-width:100%;min-width:0;min-height:44px'), 'mobile tabs must remain scrollable');
-  for (const file of ['public/algo.html', 'public/bot.html']) {
-    const html = read(file);
-    assert.match(html, /name="viewport"[^>]+viewport-fit=cover/);
-    assert.match(html, /workspace-unified-v17\.css\?v=19/);
-    assert.match(html, /<header class="topbar">/);
-    assert.match(html, /<div class="actions">/);
-    assert.match(html, /id="theme"/);
-    assert.match(html, /class="rail-links"/);
-  }
-  assert.match(read('public/algo.html'), /id="feedPill"/);
-  assert.match(read('public/bot.html'), /id="botBadge"/);
+test('Algorithmic and Autonomous desks now share the current Rangeform mobile header',()=>{
+ const css=read('public/static/rangeform-design-v26.css');
+ const js=read('public/static/workspace-shell-v26.js');
+ assert.match(css,/grid-template-areas:"menu brand actions" "search search search"/);
+ assert.match(css,/\.workspace>\.topbar/);
+ assert.match(css,/\.rf-top-actions/);
+ assert.match(css,/\.rf-top-search\{grid-area:search/);
+ assert.match(css,/\.rail\.rf-open\{transform:translateX\(0\)\}/);
+ assert.match(css,/rangeform-ios-standalone/);
+ assert.match(css,/env\(safe-area-inset-bottom\)/);
+ assert.match(css,/max\(62px,env\(safe-area-inset-top,0px\)\)/);
+ assert.match(js,/shade\.addEventListener\('click',close\)/);
+ assert.match(js,/aria-expanded/);
+ for(const file of ['public/algo.html','public/bot.html']){
+  const html=read(file);
+  assert.match(html,/viewport-fit=cover/);
+  assert.match(html,/<header class="topbar rf-topbar">/);
+  assert.match(html,/id="rfMobileMenu"/);
+  assert.match(html,/class="rf-top-actions"/);
+  assert.match(html,/id="theme"/);
+  assert.match(html,/class="rf-top-search"/);
+  assert.match(html,/id="rfNavShade"/);
+  assert.match(html,/rangeform-design-v26\.css\?v=26/);
+ }
+ assert.match(read('public/algo.html'),/id="feedPill"/);
+ assert.match(read('public/bot.html'),/id="botBadge"/);
 });

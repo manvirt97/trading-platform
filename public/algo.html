@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#f1f4f8"><meta name="description" content="Rangeform algorithmic research: genuine Kraken spot depth, cost-aware paper trades and a manual prediction-contract pairing calculator.">
+<meta name="theme-color" content="#f3f4f2"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="default"><meta name="apple-mobile-web-app-title" content="Rangeform"><link rel="manifest" href="/manifest.webmanifest?v=26"><link rel="apple-touch-icon" href="/static/rangeform-official-icon.png?v=1"><meta name="description" content="Rangeform algorithmic research: genuine Kraken spot depth, cost-aware paper trades and a manual prediction-contract pairing calculator.">
 <title>Rangeform · Algorithmic Desk</title>
 <link rel="icon" href="/static/rangeform-official-icon.png">
 <link rel="stylesheet" href="/static/theme-sync.css?v=2">
@@ -10,9 +10,9 @@
 <link rel="stylesheet" href="/static/workspace-palette-v21.css?v=21">
 <script src="/static/theme-sync.js?v=22"></script>
 <script type="module" src="/static/algo.js?v=1"></script>
-<link rel="stylesheet" href="/static/ios-statusbar-v22.css?v=22"><script src="/static/pwa-update-v24.js?v=24" defer></script></head><body>
+<link rel="stylesheet" href="/static/ios-statusbar-v22.css?v=22"><script src="/static/workspace-shell-v26.js?v=26" defer></script><script src="/static/pwa-update-v26.js?v=26" defer></script><link rel="stylesheet" href="/static/rangeform-design-v26.css?v=26"></head><body>
 <div class="shell">
-<aside class="rail" aria-label="Workspace navigation">
+<aside class="rail" id="rfRail" aria-label="Workspace navigation">
 <a class="logo" href="/v9.html#overview"><img alt="" width="37" height="37" src="/static/rangeform-official-icon.png"><span><strong>Rangeform</strong><small>RESEARCH &amp; DECISIONS</small></span></a>
 <span class="nav-tag">WORKSPACE</span>
 <nav class="rail-links" aria-label="Main navigation">
@@ -25,6 +25,9 @@
 <a href="/v9.html#news" class="rail-link"><span class="nav-symbol" aria-hidden="true">▤</span> News & catalysts</a>
 <a href="/v9.html#studio" class="rail-link"><span class="nav-symbol" aria-hidden="true">◈</span> Research Studio</a>
 <a href="/v9.html#ai" class="rail-link"><span class="nav-symbol" aria-hidden="true">✳</span> Research AI</a>
+</nav>
+<div class="nav-tag rf-tools-label">YOUR TOOLS</div>
+<nav class="rail-links" aria-label="Research tools">
 <a href="/v9.html#risk" class="rail-link"><span class="nav-symbol" aria-hidden="true">◇</span> Risk planner</a>
 <a href="/v9.html#journal" class="rail-link"><span class="nav-symbol" aria-hidden="true">▣</span> Paper journal</a>
 <a href="/v9.html#settings" class="rail-link"><span class="nav-symbol" aria-hidden="true">⚙</span> Settings</a>
@@ -33,10 +36,11 @@
 <div class="rail-bottom"><span class="statusdot"></span> Read-only Kraken snapshot<p>Manual paper trades only · no real orders</p></div>
 </aside>
 <div class="workspace">
-<header class="topbar">
-<a href="/v9.html#daydesk" class="back">← Main workspace</a>
-<span class="top-title">RANGEFORM / ALGORITHMIC DESK</span>
-<div class="actions"><span class="chip" id="feedPill">Feed not checked</span></div><button id="theme" type="button" class="iconbtn" aria-label="Toggle appearance">◐</button>
+<header class="topbar rf-topbar">
+<button id="rfMobileMenu" class="rf-mobile-menu" type="button" aria-label="Open navigation" aria-controls="rfRail" aria-expanded="false">☰</button>
+<a class="rf-mobile-brand" href="/v9.html#overview" aria-label="Rangeform overview"><img src="/static/rangeform-official-icon.png" alt=""><strong>Rangeform</strong></a>
+<form class="rf-top-search" action="/v9.html#signals" method="get" role="search"><span aria-hidden="true">⌕</span><input id="rfDeskSymbol" type="search" name="symbol" maxlength="10" pattern="[A-Za-z][A-Za-z0-9.\\-]{0,9}" placeholder="Search a symbol (e.g. NVDA, SHOP)" aria-label="Search stock symbol in Trade Signals"><kbd>↵</kbd></form>
+<div class="rf-top-actions"><span class="rf-version-marker" title="Shared Rangeform workspace">RANGEFORM · STUDIO</span><span class="chip" id="feedPill">Feed not checked</span><button id="theme" class="iconbtn" type="button" aria-label="Toggle light and dark theme">◐</button><a class="rf-account-link" href="/account.html" aria-label="My account" title="Account &amp; Sign-in">↗</a></div>
 </header>
 <main>
 <div class="intro"><div><p class="eyebrow">KRAKEN PUBLIC MARKET DEPTH · PAPER SIMULATION</p><h1>Test the strategy.<br><em>Trust the evidence.</em></h1><p>Real Kraken spot order-book snapshots, explicit execution costs and a controlled paper ledger. Nothing here places actual orders.</p></div><div class="safety"><strong>BROKER TRADING NOT CONNECTED</strong><span>Manual paper buys and sells work with a fresh, verified order-book snapshot.</span><span>Real-money orders require a separate authorized broker connection.</span></div></div>
@@ -105,4 +109,4 @@
 </div>
 </section>
 <footer><span>RANGEFORM · RESEARCH AND SIMULATION</span><span>Non-custodial · no automated brokerage orders · no guaranteed returns</span></footer>
-</main></div></div></body></html>
+</main></div></div><div id="rfNavShade" class="rf-nav-shade" hidden></div></body></html>
