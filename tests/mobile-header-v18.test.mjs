@@ -13,14 +13,15 @@ test('Algorithmic Desk and Autonomous Bot use the same responsive mobile header'
   assert.ok(mobile.includes('.topbar>.actions{grid-area:status'), 'status wrapper must be its own grid item');
   assert.ok(mobile.includes('.topbar>.actions>.chip{'), 'dynamic provider/bot status must occupy full second row');
   assert.ok(mobile.includes('white-space:normal;overflow-wrap:anywhere'), 'long status text must wrap, not overlap');
-  assert.ok(mobile.includes('.topbar>#theme{grid-area:theme'), 'appearance toggle must be its own grid item');\n  assert.ok(mobile.includes('min-width:44px;width:44px;height:44px'), 'appearance toggle must be touch-sized');
+  assert.ok(mobile.includes('.topbar>#theme{grid-area:theme'), 'appearance toggle must be its own grid item');
+  assert.ok(mobile.includes('min-width:44px;width:44px;height:44px'), 'appearance toggle must be touch-sized');
   assert.ok(mobile.includes('env(safe-area-inset-top)'), 'iOS standalone safe area must be respected');
   assert.ok(mobile.includes('env(safe-area-inset-bottom)'), 'mobile bottom safe area must be respected');
-  assert.ok(mobile.includes('.rail-links{max-width:100%;min-height:44px'), 'mobile tabs must remain scrollable');
+  assert.ok(mobile.includes('.rail-links{width:100%;max-width:100%;min-width:0;min-height:44px'), 'mobile tabs must remain scrollable');
   for (const file of ['public/algo.html', 'public/bot.html']) {
     const html = read(file);
     assert.match(html, /name="viewport"[^>]+viewport-fit=cover/);
-    assert.match(html, /workspace-unified-v17\.css/);
+    assert.match(html, /workspace-unified-v17\.css\?v=19/);
     assert.match(html, /<header class="topbar">/);
     assert.match(html, /<div class="actions">/);
     assert.match(html, /id="theme"/);
