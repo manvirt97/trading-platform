@@ -269,3 +269,27 @@ body .workspace>.rf-topbar button.rf-mobile-menu{
 body .rail .rf-tools-label{margin-top:6px}
 body .workspace .back{color:var(--rf-highlight)}
 body .daydesk-session,body .daydesk-toolbar{background:var(--card);border-color:var(--line);color:var(--ink)}
+
+/* V27 emergency mobile correction. V26's unqualified body .app desktop grid
+   outranked v9.css @media(max-width:940px) .app and left the content confined
+   to the narrow desktop second column (user-facing Day Trading Desk regression).
+   Fix the actual grid, do not just increase the width of cards. */
+@media(max-width:940px){
+ html body .app,html body .account-app{
+  grid-template-columns:minmax(0,1fr);
+  width:100%;max-width:100%;min-width:0;
+ }
+ html body .content-shell,html body .account-workspace,
+ html body .workspace{
+  width:100%;max-width:100%;min-width:0;
+ }
+ html body .main,html body .daydesk-page,html body .page.visible{
+  box-sizing:border-box;width:100%;max-width:100%;min-width:0;
+ }
+}
+@media(max-width:640px){
+ html,body{width:100%;max-width:100%;overflow-x:clip}
+ html body .app{grid-template-columns:minmax(0,1fr)}
+ html body .topbar,html body .main{max-width:100%;min-width:0}
+ html body .daydesk-toolbar{min-width:0}
+}
