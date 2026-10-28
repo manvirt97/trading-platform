@@ -1,0 +1,25 @@
+name: Verify production release
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+  schedule:
+    - cron: '25 14 * * 1-5'
+permissions:
+  contents: read
+jobs:
+  public-production-gate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 9
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate Cloudflare Pages deployment and public API endpoints
+        run: node scripts/verify-production.mjs
+      - name: Clarify unverified private deployment dependencies
+        if: always()
+        run: |
+          echo 'Production verification is read-only and requires no Cloudflare credential.'
+          echo 'Worker cron, D1, owner authorization and real trading are not verified by public checks.'

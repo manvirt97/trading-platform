@@ -1,0 +1,49 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {readFileSync} from 'node:fs';
+const read=p=>readFileSync(new URL('../'+p,import.meta.url),'utf8');
+
+test('Pages paper bot controls stay owner-authenticated and D1-gated',()=>{
+ const pages=read('wrangler.toml');
+ const bot=read('wrangler.bot.toml');
+ const auth=read('functions/api/auto-bot.js');
+ const service=read('functions/_shared/auto-bot-service.js');
+ assert.match(pages,/BOT_SERVICE_ENABLED = "on"/);
+ assert.match(pages,/binding = "DB"/);
+ assert.match(pages,/database_name = "rangeform-users"/);
+ assert.match(bot,/BOT_SERVICE_ENABLED = "off"/);
+ assert.match(bot,/crons = \["\* \* \* \* \*"\]/);
+ assert.match(auth,/uid!==env\.BOT_OWNER_UID/);
+ assert.match(auth,/live_orders_enabled:false/);
+ assert.match(service,/env\.BOT_OWNER_UID&&env\.BOT_SERVICE_ENABLED==='on'/);
+});
+test('manual Cloudflare workflow never deploys real orders or launches cron automatically',()=>{
+ const workflow=read('.github/workflows/deploy-paper-worker.yml');
+ assert.match(workflow,/workflow_dispatch:/);
+ assert.doesNotMatch(workflow,/^  push:/m);
+ assert.match(workflow,/prepare_disabled/);
+ assert.match(workflow,/activate_paper_worker/);
+ assert.match(workflow,/ENABLE PAPER ONLY/);
+ assert.match(workflow,/CLOUDFLARE_API_TOKEN:.*secrets\.CLOUDFLARE_API_TOKEN/);
+ assert.match(workflow,/BOT_OWNER_UID:.*secrets\.BOT_OWNER_UID/);
+ assert.match(workflow,/secret put BOT_OWNER_UID --config wrangler\.bot\.toml/);
+ assert.match(workflow,/pages secret put BOT_OWNER_UID --project-name rangeform/);
+ assert.match(workflow,/status" != "401"/);
+ assert.match(workflow,/^          npx wrangler deploy --config wrangler\.bot\.toml$/m);
+ assert.match(workflow,/sed -i 's\/\^BOT_SERVICE_ENABLED/);
+ assert.doesNotMatch(workflow,/AddOrder|broker.*secret.*put|withdrawal|order submit/i);
+});
+test('public production verification refuses stale release and never claims Worker heartbeat',()=>{
+ const checker=read('scripts/verify-production.mjs');
+ const workflow=read('.github/workflows/verify-production.yml');
+ assert.match(workflow,/push:/);
+ assert.match(workflow,/workflow_dispatch:/);
+ assert.match(checker,/release\.json\?verification=/);
+ assert.match(checker,/no-store/);
+ assert.match(checker,/\/api\/status/);
+ assert.match(checker,/\/api\/feed-state/);
+ assert.match(checker,/\/api\/auto-bot/);
+ assert.match(checker,/cron NOT verified/);
+ assert.match(checker,/process\.exitCode=1/);
+ assert.doesNotMatch(checker,/BOT_OWNER_UID|CLOUDFLARE_API_TOKEN|Authorization: Bearer/);
+});

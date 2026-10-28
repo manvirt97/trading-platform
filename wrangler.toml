@@ -13,6 +13,9 @@ database_id = "6aa50056-4a2d-4ba1-8517-da4de248322f"
 # Firebase Web SDK identifiers. These are public browser configuration values, not private keys.
 # Google sign-in also requires enabling the provider and authorizing rangeform.pages.dev.
 [vars]
+# Safe enable for Pages owner controls only. Owner secret and D1 are still required;
+# real-money trading remains impossible and separate cron Worker stays off by default.
+BOT_SERVICE_ENABLED = "on"
 CLAUDE_AGENTS_ENABLED = "on"
 FIREBASE_PROJECT_ID = "rangeform-7e8d2"
 FIREBASE_API_KEY = "AIzaSyDuW6AYo89yiDQXFQWG_Ea0b3U1iaShbdk"

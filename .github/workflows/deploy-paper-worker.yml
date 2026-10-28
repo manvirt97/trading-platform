@@ -1,0 +1,97 @@
+name: Deploy autonomous PAPER Worker
+on:
+  workflow_dispatch:
+    inputs:
+      operation:
+        description: 'Choose a paper-only Cloudflare operation'
+        required: true
+        type: choice
+        default: prepare_disabled
+        options:
+          - prepare_disabled
+          - activate_paper_worker
+      confirmation:
+        description: 'For activation, type ENABLE PAPER ONLY (leave blank to prepare disabled Worker)'
+        required: false
+        type: string
+        default: ''
+permissions:
+  contents: read
+concurrency:
+  group: rangeform-paper-worker-cloudflare
+  cancel-in-progress: false
+jobs:
+  cloudflare-paper:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    environment: production-paper
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      BOT_OWNER_UID: ${{ secrets.BOT_OWNER_UID }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate prerequisites and explicit paper-only consent
+        env:
+          OPERATION: ${{ inputs.operation }}
+          CONFIRMATION: ${{ inputs.confirmation }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          for key in CLOUDFLARE_API_TOKEN CLOUDFLARE_ACCOUNT_ID BOT_OWNER_UID; do
+            if [[ -z "${!key:-}" ]]; then
+              echo "::error::Missing encrypted GitHub Actions secret: $key. Add it to the production-paper environment or repository secrets."
+              exit 1
+            fi
+          done
+          if [[ "$OPERATION" == "activate_paper_worker" && "$CONFIRMATION" != "ENABLE PAPER ONLY" ]]; then
+            echo "::error::To activate the paper-only scheduler, type exactly ENABLE PAPER ONLY."
+            exit 1
+          fi
+          if [[ "$OPERATION" != "prepare_disabled" && "$OPERATION" != "activate_paper_worker" ]]; then
+            echo "::error::Unknown operation"
+            exit 1
+          fi
+          echo "Operation: $OPERATION — NO REAL BROKER ORDERS IN THIS WORKER."
+      - name: Install pinned-major Wrangler CLI
+        shell: bash
+        run: |
+          npm install --no-save --package-lock=false wrangler@4
+          npx wrangler --version
+      - name: Deploy fail-closed Worker and securely configure owner on Pages and Worker
+        if: ${{ inputs.operation == 'prepare_disabled' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -q '^BOT_SERVICE_ENABLED = "off"$' wrangler.bot.toml
+          npx wrangler deploy --config wrangler.bot.toml
+          printf '%s' "$BOT_OWNER_UID" | npx wrangler secret put BOT_OWNER_UID --config wrangler.bot.toml
+          printf '%s' "$BOT_OWNER_UID" | npx wrangler pages secret put BOT_OWNER_UID --project-name rangeform
+          echo "### Cloudflare paper Worker prepared" >> "$GITHUB_STEP_SUMMARY"
+          echo "Worker deployed DISABLED; owner identifier set as encrypted secrets on Worker and Pages." >> "$GITHUB_STEP_SUMMARY"
+          echo "Next: set Pages BOT_SERVICE_ENABLED=on (source control already enables it) and redeploy Pages. Confirm signed-out GET /api/auto-bot returns HTTP 401 before activating the Worker." >> "$GITHUB_STEP_SUMMARY"
+      - name: Require production Pages owner settings before enabling cron
+        if: ${{ inputs.operation == 'activate_paper_worker' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          status=$(curl --silent --show-error --location --output /dev/null --write-out '%{http_code}' --max-time 20 'https://rangeform.pages.dev/api/auto-bot')
+          if [[ "$status" != "401" ]]; then
+            echo "::error::Pages must return HTTP 401 to signed-out /api/auto-bot before Worker can run; received $status. Confirm BOT_OWNER_UID, BOT_SERVICE_ENABLED=on and D1, then redeploy Pages."
+            exit 1
+          fi
+          echo "Pages owner gate is configured (unauthenticated 401). This does not verify cron or account identity."
+      - name: Enable dedicated PAPER cron Worker only after manual confirmation
+        if: ${{ inputs.operation == 'activate_paper_worker' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -q '^BOT_SERVICE_ENABLED = "off"$' wrangler.bot.toml
+          sed -i 's/^BOT_SERVICE_ENABLED = "off"$/BOT_SERVICE_ENABLED = "on"/' wrangler.bot.toml
+          npx wrangler deploy --config wrangler.bot.toml
+          echo "### Cloudflare PAPER Worker activation requested" >> "$GITHUB_STEP_SUMMARY"
+          echo "Enabled bot Worker configuration and scheduled cron * * * * *." >> "$GITHUB_STEP_SUMMARY"
+          echo "Not complete until actual Cloudflare invocations and lastCronTickAt advance with browser closed. Real orders remain disabled." >> "$GITHUB_STEP_SUMMARY"
