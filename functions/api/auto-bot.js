@@ -27,7 +27,7 @@ export async function onRequestPost({request,env}){
    const result=await runPaperTick(env);
    return reply({...result,live_orders_enabled:false});
   }
-  if(!['start','pause','reset'].includes(data.action))return reply({error:'Unsupported control'},400);
+  if(!['start','pause','reset','flatten'].includes(data.action))return reply({error:'Unsupported control'},400);
   const result=await controlBot(env,data.action,{capital:data.capital});
   return reply({ok:true,...result,live_orders_enabled:false});
  }catch(e){return reply({error:String(e.message).slice(0,180)},/Concurrent update/.test(e.message)?409:400)}
