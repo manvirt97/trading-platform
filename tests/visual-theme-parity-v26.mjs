@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import {mkdirSync} from 'node:fs';
 import {chromium} from 'playwright';
 const base=process.env.RANGEFORM_VISUAL_BASE||'http://127.0.0.1:8999';
 const pages=[
@@ -7,6 +8,7 @@ const pages=[
  {path:'/bot.html',nav:'.rail',search:'#rfDeskSymbol',switch:'#theme'},
  {path:'/account.html',nav:'.account-rail',search:'#accountGlobalSearch',switch:'#themeToggle'}
 ];
+mkdirSync('artifacts/theme',{recursive:true});
 const browser=await chromium.launch({headless:true});
 try{
  const context=await browser.newContext({viewport:{width:1280,height:860}});
@@ -36,6 +38,7 @@ try{
     accent:body.getPropertyValue('--rf-highlight').trim()};
   },item.nav);
   samples.push({path:item.path,...x});
+  await page.screenshot({path:'artifacts/theme/'+item.path.replace(/[^a-z0-9]+/gi,'-')+'-light.png',fullPage:false});
  }
  for(const s of samples){
   assert.equal(s.theme,'light',JSON.stringify(s));
@@ -60,6 +63,7 @@ try{
   assert.deepEqual(x,{
    theme:'dark',bg:'rgb(14, 17, 22)',nav:'rgb(18, 23, 30)',card:'rgb(21, 26, 33)',accent:'#c9ab6c'
   },'dark palette mismatch '+item.path);
+  await page.screenshot({path:'artifacts/theme/'+item.path.replace(/[^a-z0-9]+/gi,'-')+'-dark.png',fullPage:false});
  }
  console.log('PASS: matching light and dark palettes, sidebar, cards, typography and theme persistence across four pages');
  await context.close();
