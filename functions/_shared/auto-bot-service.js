@@ -1,6 +1,7 @@
 /* Cloudflare D1 single-owner autonomous PAPER ledger. Never place or cancel a real exchange order. */
 import {initialBot,advanceBot} from './auto-bot.js';
 import {publicMarket} from './auto-bot-feed.js';
+import {assumedFill} from '../../public/static/algo-math.mjs';
 const SQL='CREATE TABLE IF NOT EXISTS rangeform_auto_bot (id INTEGER PRIMARY KEY CHECK(id=1), revision INTEGER NOT NULL DEFAULT 0, payload TEXT NOT NULL)';
 export async function initialize(db){
  if(!db)throw Error('Cloudflare D1 DB binding is missing');
@@ -37,10 +38,21 @@ export async function controlBot(env,action,{capital}={}){
   if(!Number.isFinite(Number(capital))||capital<100||capital>1000000)throw Error('Choose initial paper capital between $100 and $1,000,000');
   Object.assign(state,initialBot(),{capital:Number(capital),cash:Number(capital)});
  }else if(action==='flatten'){
-  // No synthetic exit: a real Kraken quote is required, even for hypothetical exits.
-  if(!state.position)throw Error('There is no paper position to flatten.');
-  const {advanceBot: _unused}=await import('./auto-bot.js');
-  throw Error('Manual paper flattening is not enabled. Pause and request assisted recovery; no fabricated exit price will be recorded.');
+  // Owner-directed PAPER flatten uses a fresh public exchange bid and cost assumptions.
+  // This is an assumed fill, not an order, and fails closed without sufficient top depth.
+  if(!state.position)throw Error('No paper position to close');
+  const now=Date.now(),market=await publicMarket('XBTUSD',now);
+  const pos=state.position,bid=market.book.best_bid;
+  if(!(market.book.bids[0][1]>=pos.qty))throw Error('Insufficient market depth; hypothetical exit not recorded');
+  const fill=assumedFill('sell',bid,pos.qty,40,10);
+  const pnl=fill.total-pos.cost;
+  state.cash+=fill.total;state.realizedPnl+=pnl;
+  const day=new Date(now).toISOString().slice(0,10);
+  if(state.day!==day){state.day=day;state.dayPnl=0;state.entriesToday=0;state.lossStreak=0}
+  state.dayPnl+=pnl;state.position=null;state.enabled=false;
+  const activity={at:new Date(now).toISOString(),action:'PAPER_SELL',pair:'XBTUSD',qty:pos.qty,price:fill.execution,fee:fill.fee,pnl,reason:'OWNER_FLATTEN'};
+  state.events=[activity,...state.events].slice(0,120);
+
  }
  state.updatedAt=new Date().toISOString();
  return write(env.DB,current,state);
