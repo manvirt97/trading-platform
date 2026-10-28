@@ -3,7 +3,7 @@
    Source-of-truth for ALL live public workspaces: Main/Day Desk, Algo, Bot, Account.
    Loaded last. Never alters trading, auth, quote or paper-order state. */
 :root{font-family:Inter,"Segoe UI Variable Text","Segoe UI",-apple-system,BlinkMacSystemFont,system-ui,sans-serif;font-synthesis:none}
-body[data-theme="light"]{
+body[data-theme="light"],html[data-rf-theme="light"] body{
  color-scheme:light;
  --bg:#f3f4f2;--sidebar:#f7f7f4;--card:#fff;--muted-card:#f7f7f4;
  --ink:#141820;--secondary:#646d79;--line:#e1e3df;
@@ -15,7 +15,7 @@ body[data-theme="light"]{
  --rf-highlight:#9c7a3c;--rf-heading:#141820;
  --shadow:0 1px 2px rgba(20,24,32,.022),0 9px 29px rgba(20,24,32,.035);
 }
-body[data-theme="dark"]{
+body[data-theme="dark"],html[data-rf-theme="dark"] body{
  color-scheme:dark;
  --bg:#0e1116;--sidebar:#12171e;--card:#151a21;--muted-card:#1b212a;
  --ink:#eceff4;--secondary:#aab5c1;--line:#303944;
@@ -256,3 +256,16 @@ body .message.success,body .tag.ok,body #cronState[data-heartbeat="verified"]{co
 @media(prefers-reduced-motion:reduce){
  body .rail{transition:none}
 }
+
+/* Outrank legacy algorithmic button defaults (which target all non-tab buttons). */
+body .workspace>.rf-topbar button.rf-mobile-menu{
+ display:none;border:1px solid var(--line);background:var(--card);color:var(--ink);
+ font-size:19px;padding:0;border-radius:10px;cursor:pointer
+}
+@media(max-width:940px){
+ body .workspace>.rf-topbar button.rf-mobile-menu{display:grid;grid-area:menu;place-items:center}
+}
+/* Context-aware secondary action colours; do not recolour technical chart candles. */
+body .rail .rf-tools-label{margin-top:6px}
+body .workspace .back{color:var(--rf-highlight)}
+body .daydesk-session,body .daydesk-toolbar{background:var(--card);border-color:var(--line);color:var(--ink)}
