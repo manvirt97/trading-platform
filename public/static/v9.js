@@ -28,7 +28,7 @@ function saveWatch(){try{localStorage.setItem('rf_v9_watch',JSON.stringify(state
 function setTheme(v){
  document.body.dataset.theme=v==='dark'?'dark':'light';
  const themeMeta=document.querySelector('meta[name="theme-color"]');
- if(themeMeta)themeMeta.setAttribute('content',document.body.dataset.theme==='dark'?'#101923':'#f6f8fb');
+ if(themeMeta)themeMeta.setAttribute('content',document.body.dataset.theme==='dark'?'#0e1116':'#f3f4f2');
  try{localStorage.setItem('rf_v9_theme',document.body.dataset.theme);localStorage.setItem('rangeform_theme',document.body.dataset.theme)}catch{}
  if($('settingsTheme'))$('settingsTheme').value=document.body.dataset.theme;
 }
