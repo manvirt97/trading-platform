@@ -22,7 +22,7 @@ test('all four Rangeform screens load the SAME last-in-cascade appearance tokens
 test('Account reuses the main workspace sidebar grouping, topbar and heading patterns',()=>{
  const html=read('public/account.html'),css=read('public/static/account-shell-v21.css');
  assert.match(html,/YOUR TOOLS/);
- assert.match(html,/class="account-rail-divider"/);
+ assert.match(html,/class="account-rail-label account-rail-divider"/);
  assert.match(html,/class="account-top-search"/);
  assert.match(html,/action="\/v9\.html#signals"/);
  assert.match(html,/name="symbol"/);
