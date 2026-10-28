@@ -96,7 +96,7 @@ async function setupAuth(){
 }
 function init(){
  let theme;try{theme=localStorage.getItem('rf_v9_theme')||localStorage.getItem('rangeform_theme')||'light'}catch{theme='light'}
- if(!['light','dark','warm'].includes(theme))theme='light';
+ if(!['light','dark'].includes(theme))theme='light';
  window.RangeformTheme?.apply(theme);document.body.dataset.theme=theme;
  $('theme').addEventListener('click',()=>{const next=document.body.dataset.theme==='light'?'dark':'light';window.RangeformTheme?.apply(next);document.body.dataset.theme=next;try{localStorage.setItem('rf_v9_theme',next)}catch{}});
  $('refreshBot').addEventListener('click',refresh);
