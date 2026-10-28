@@ -4,23 +4,34 @@
 <link rel="icon" href="/static/rangeform-official-icon.png">
 <link rel="stylesheet" href="/static/theme-sync.css?v=2">
 <link rel="stylesheet" href="/static/algo.css?v=1">
+<link rel="stylesheet" href="/static/workspace-unified-v17.css?v=1">
 <link rel="stylesheet" href="/static/auto-bot.css?v=1">
-<script src="/static/theme-sync.js?v=3"></script><script type="module" src="/static/auto-bot.js?v=1"></script>
+<script src="/static/theme-sync.js?v=4"></script><script type="module" src="/static/auto-bot.js?v=2"></script>
 </head><body><div class="shell"><aside class="rail" aria-label="Workspace navigation">
 <a class="logo" href="/v9.html#overview"><img src="/static/rangeform-official-icon.png" width="37" height="37" alt=""><span><strong>Rangeform</strong><small>RESEARCH &amp; DECISIONS</small></span></a><span class="nav-tag">WORKSPACE</span>
-<a href="/v9.html#overview" class="rail-link">◫ &nbsp; Overview</a>
-<a href="/v9.html#daydesk" class="rail-link">▥ &nbsp; Day Trading Desk</a>
-<a href="/algo.html" class="rail-link">◇ &nbsp; Algorithmic Desk</a>
-<a href="/bot.html" class="rail-link current" aria-current="page">⟳ &nbsp; Autonomous Paper Bot</a>
-<a href="/account.html" class="rail-link">⚙ &nbsp; Account &amp; Sign-in</a>
-<div class="rail-bottom">PAPER-ONLY AUTOMATION<p>No broker credentials, no live orders, no leverage.</p></div>
+<nav class="rail-links" aria-label="Main navigation">
+<a href="/v9.html#overview" class="rail-link"><span class="nav-symbol" aria-hidden="true">◫</span> Overview</a>
+<a href="/v9.html#daydesk" class="rail-link"><span class="nav-symbol" aria-hidden="true">▥</span> Day Trading Desk</a>
+<a href="/algo.html" class="rail-link"><span class="nav-symbol" aria-hidden="true">◇</span> Algorithmic Desk</a>
+<a href="/bot.html" class="rail-link current" aria-current="page"><span class="nav-symbol" aria-hidden="true">⟳</span> Autonomous Paper Bot</a>
+<a href="/v9.html#signals" class="rail-link"><span class="nav-symbol" aria-hidden="true">↗</span> Trade signals</a>
+<a href="/v9.html#scanner" class="rail-link"><span class="nav-symbol" aria-hidden="true">◎</span> Opportunity scanner</a>
+<a href="/v9.html#news" class="rail-link"><span class="nav-symbol" aria-hidden="true">▤</span> News & catalysts</a>
+<a href="/v9.html#studio" class="rail-link"><span class="nav-symbol" aria-hidden="true">◈</span> Research Studio</a>
+<a href="/v9.html#overview#assistantTitle" class="rail-link"><span class="nav-symbol" aria-hidden="true">✳</span> Research AI</a>
+<a href="/v9.html#risk" class="rail-link"><span class="nav-symbol" aria-hidden="true">◇</span> Risk planner</a>
+<a href="/v9.html#journal" class="rail-link"><span class="nav-symbol" aria-hidden="true">▣</span> Paper journal</a>
+<a href="/v9.html#settings" class="rail-link"><span class="nav-symbol" aria-hidden="true">⚙</span> Settings</a>
+<a href="/account.html" class="rail-link"><span class="nav-symbol" aria-hidden="true">☰</span> Account & Sign-in</a>
+</nav>
+<div class="rail-bottom">AUTONOMOUS SIMULATION<p>No broker credentials, no real orders, no leverage.</p></div>
 </aside><div class="workspace"><header class="topbar"><a href="/algo.html" class="back">← Algorithmic Desk</a><span class="top-title">RANGEFORM / AUTONOMOUS PAPER BOT</span><div class="actions"><span id="botBadge" class="chip">Not connected</span><button id="theme" class="iconbtn" aria-label="Toggle appearance">◐</button></div></header>
-<main><div class="intro"><div><p class="eyebrow">UNATTENDED STRATEGY / FIVE-MINUTE BARS</p><h1>Automation with<br><em>accountable rules.</em></h1><p>Server-side scheduled strategy research and hypothetical orders, with transaction-cost assumptions and an audited paper ledger. Never sends real-money orders.</p></div><div class="safety"><strong>REAL ORDERS DISABLED</strong><span>Paper execution only</span><span>Background operation requires separate Worker deployment</span></div></div>
+<main><div class="intro"><div><p class="eyebrow">UNATTENDED STRATEGY / FIVE-MINUTE BARS</p><h1>Automation with<br><em>accountable rules.</em></h1><p>Autonomous simulated entries and exits when the scheduled Worker is active, with transparent risk controls and an audited paper ledger. Real broker orders require a separate, authorized integration.</p></div><div class="safety"><strong>PAPER TRADING · REAL ORDERS OFF</strong><span>Paper execution only</span><span>Background autonomy must be verified through the scheduled Worker heartbeat</span></div></div>
 <div class="card"><div class="section-top"><div><p class="eyebrow">SYSTEM STATUS</p><h2>Bot readiness</h2><p id="connection">Checking owner authentication and server configuration…</p></div><button id="refreshBot" type="button">Refresh status ↻</button></div>
 <div id="botMessage" class="message" role="status">Waiting for server configuration.</div>
-<div class="stat-grid"><div class="stat"><small>ENGINE STATE</small><strong id="engineState">—</strong><span>Server-side enabled state</span></div><div class="stat"><small>LAST CHECK</small><strong id="lastCheck">—</strong><span>UTC timestamp</span></div><div class="stat"><small>STRATEGY</small><strong>EMA 9/21</strong><span>Long-only BTC/USD, 5-minute completed bars</span></div><div class="stat"><small>LAST SIGNAL</small><strong id="signal">—</strong><span id="error">Verified candles required</span></div></div>
-<div class="paper-buttons"><button class="primary" type="button" id="startBot" disabled>Start autonomous paper bot</button><button type="button" id="pauseBot" disabled>Pause immediately</button><button type="button" id="runTick" disabled>Run one verification tick</button><button type="button" id="flattenBot" disabled>Close hypothetical position &amp; pause</button></div>
-<p class="footnote">Starting here enables paper decisions in the shared D1 ledger. For unattended operation when the browser is closed, deploy and enable the dedicated Cloudflare Cron Worker. The start button does not itself deploy the Worker.</p>
+<div class="stat-grid"><div class="stat"><small>ENGINE STATE</small><strong id="engineState">—</strong><span>Server-side enabled state</span></div><div class="stat"><small>LAST CHECK</small><strong id="lastCheck">—</strong><span>Any verification tick</span></div><div class="stat"><small>CRON AUTONOMY</small><strong id="cronState">NOT VERIFIED</strong><span id="cronLastSeen">No scheduled Worker heartbeat</span></div><div class="stat"><small>STRATEGY</small><strong>EMA 9/21</strong><span>Long-only BTC/USD, 5-minute completed bars</span></div><div class="stat"><small>LAST SIGNAL</small><strong id="signal">—</strong><span id="error">Verified candles required</span></div></div>
+<div class="paper-buttons"><button class="primary" type="button" id="startBot" disabled>Enable paper strategy</button><button type="button" id="pauseBot" disabled>Pause immediately</button><button type="button" id="runTick" disabled>Run one verification tick</button><button type="button" id="flattenBot" disabled>Close hypothetical position &amp; pause</button></div>
+<p class="footnote">Enabling the strategy changes only your paper ledger. <strong>It does not deploy or start a Cloudflare Worker.</strong> The scheduled heartbeat above must update independently while the browser is closed before the bot can be described as unattended.</p>
 </div>
 <div class="two-col">
 <section class="card"><div class="section-top"><div><p class="eyebrow">COSTS &amp; RISK</p><h2>Paper portfolio</h2></div><span class="tag">NO LIVE EXECUTION</span></div><div class="stat-grid small-stats">
