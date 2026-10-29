@@ -191,7 +191,8 @@ body .message.success,body .tag.ok,body #cronState[data-heartbeat="verified"]{co
  body .rail{
   position:fixed;top:0;left:0;z-index:70;
   width:252px;max-width:min(85vw,300px);height:100dvh;max-height:none;
-  padding:18px 10px 20px;overflow-x:hidden;overflow-y:auto;
+  padding:18px 10px max(20px,env(safe-area-inset-bottom,0px));overflow-x:hidden;overflow-y:auto;
+  overscroll-behavior-y:contain;-webkit-overflow-scrolling:touch;
   border-right:1px solid var(--line);border-bottom:0;
   transform:translateX(-105%);transition:transform .18s ease;
   background:var(--sidebar);display:flex;flex-direction:column
@@ -199,11 +200,14 @@ body .message.success,body .tag.ok,body #cronState[data-heartbeat="verified"]{co
  body .rail.rf-open{transform:translateX(0)}
  body .rail .rail-links{
   display:flex;flex-direction:column;flex-wrap:nowrap;
-  width:100%;min-width:0;max-width:100%;min-height:0;
-  gap:3px;overflow:visible;padding:0
+  width:100%;min-width:0;max-width:100%;min-height:auto;
+  flex:0 0 auto;gap:3px;overflow:visible;padding:0
  }
  body .rail .rail-link{flex:0 0 auto;min-height:44px;width:100%;padding:10px 12px;white-space:normal}
  body .rail .nav-tag,body .rail .rail-bottom{display:block}
+ /* Do not shrink section headings or footer into the navigation links.
+    The drawer itself scrolls when its full content exceeds phone height. */
+ body .rail>.logo,body .rail>.nav-tag,body .rail>.rail-bottom{flex:0 0 auto}
  body .rf-nav-shade[hidden]{display:none!important}
  body .rf-nav-shade{position:fixed;inset:0;z-index:69;background:rgba(7,12,19,.48)}
  body .workspace>.topbar{

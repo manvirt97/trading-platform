@@ -86,6 +86,45 @@ try {
    }
    assert.ok(dimensions.scrollWidth<=width+2,'Unexpected horizontal page overflow '+path);
    if(!isAccount&&!isMain){
+    // Regression #40: the first link can be visible while the last links,
+    // section dividers and status footer overlap in a shrinkable flex rail.
+    // Compare *every* consecutive visual element in document order, including
+    // links nested inside the two navigation groups.
+    const stacking=await page.evaluate(()=>{
+     const rail=document.querySelector('#rfRail');
+     const nodes=[...rail.children].flatMap(el=>
+      el.matches('.rail-links')?[...el.querySelectorAll('.rail-link')]:[el]
+     ).filter(el=>getComputedStyle(el).display!=='none');
+     const rows=nodes.map(el=>{
+      const r=el.getBoundingClientRect();
+      return {label:(el.textContent||'').trim().slice(0,50),top:r.top,bottom:r.bottom,left:r.left,right:r.right};
+     });
+     const overlaps=[];
+     for(let i=1;i<rows.length;i++){
+      if(rows[i].top<rows[i-1].bottom-.75)overlaps.push([rows[i-1],rows[i]]);
+     }
+     return {rows,overlaps,scrollHeight:rail.scrollHeight,clientHeight:rail.clientHeight};
+    });
+    assert.equal(stacking.overlaps.length,0,
+     'DRAWER OVERLAP #40 '+JSON.stringify({path,width,...stacking}));
+    assert.ok(stacking.rows.every(r=>r.left>=-2&&r.right<=width+2),
+     'DRAWER HORIZONTAL CLIP '+JSON.stringify({path,width,...stacking}));
+    await page.locator('.rail .rail-bottom').evaluate(el=>el.scrollIntoView({block:'end'}));
+    const bottom=await page.evaluate(()=>{
+     const rail=document.querySelector('#rfRail'),rr=rail.getBoundingClientRect();
+     const last=rail.querySelectorAll('.rail-link');
+     const lr=last[last.length-1].getBoundingClientRect();
+     const fr=rail.querySelector('.rail-bottom').getBoundingClientRect();
+     return {scrollTop:rail.scrollTop,scrollHeight:rail.scrollHeight,clientHeight:rail.clientHeight,
+      lastBottom:lr.bottom,footerBottom:fr.bottom,railBottom:rr.bottom};
+    });
+    assert.ok(bottom.footerBottom<=bottom.railBottom+2&&bottom.lastBottom<=bottom.railBottom+2,
+     'DRAWER FOOTER NOT REACHABLE '+JSON.stringify({path,width,...bottom}));
+    if(bottom.scrollHeight>bottom.clientHeight+2)
+     assert.ok(bottom.scrollTop>0,'DRAWER DOES NOT SCROLL '+JSON.stringify({path,width,...bottom}));
+    await page.screenshot({path:'artifacts/mobile/'+path.replace(/[^a-z0-9]+/gi,'-')+'-'+width+'-scrolled.png'});
+   }
+   if(!isAccount&&!isMain){
     assert.equal(await page.locator('#rfMobileMenu').getAttribute('aria-expanded'),'true');
     await page.locator('#rfNavShade').click({position:{x:width-10,y:400}});
     assert.equal(await page.locator('#rfMobileMenu').getAttribute('aria-expanded'),'false');

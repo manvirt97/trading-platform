@@ -1,5 +1,5 @@
 {
-  "version": "28",
-  "build": "rangeform-v28-iphone-header-grid",
-  "description": "Restore unclipped two-row mobile header and full-width symbol search"
+  "version": "29",
+  "build": "rangeform-v29-mobile-drawer-scroll",
+  "description": "Prevent mobile Algorithmic and Autonomous navigation overlap; test all links and scroll reachability"
 }
