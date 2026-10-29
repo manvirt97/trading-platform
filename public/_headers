@@ -33,6 +33,8 @@
   Cache-Control: no-cache, must-revalidate
 /static/pwa-update-v24.js
   Cache-Control: no-store, max-age=0
+/static/pwa-update-v29.js
+  Cache-Control: no-store, max-age=0
 /algo.html
   Cache-Control: no-store, max-age=0
 /bot.html
