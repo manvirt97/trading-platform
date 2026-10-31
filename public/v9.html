@@ -5,8 +5,8 @@
 <meta name="description" content="Rangeform: evidence-first market research, conditional trade plans and market news.">
 <title>Rangeform — Market intelligence</title>
 <link rel="icon" type="image/png" href="/static/rangeform-official-icon.png">
-<link rel="stylesheet" href="/static/v9.css?v=8"><link rel="stylesheet" href="/static/v11-mobile.css?v=1"><link rel="stylesheet" href="/static/v12-settings-news.css?v=1"><link rel="stylesheet" href="/static/v13-premium.css?v=1"><link rel="stylesheet" href="/static/v14-unified.css?v=1"><link rel="stylesheet" href="/static/v15-daydesk.css?v=2"><link rel="stylesheet" href="/static/workspace-palette-v21.css?v=21"><link rel="stylesheet" href="/static/ios-statusbar-v22.css?v=22">
-<script src="/static/v9.js?v=21" defer></script><script type="module" src="/static/research-studio.js?v=1"></script><script src="/static/v9-ai.js?v=5" type="module"></script><script src="/static/v9-paper.js?v=1" defer></script><script type="module" src="/static/day-desk.js?v=2"></script>
+<link rel="stylesheet" href="/static/v9.css?v=8"><link rel="stylesheet" href="/static/v11-mobile.css?v=1"><link rel="stylesheet" href="/static/v12-settings-news.css?v=1"><link rel="stylesheet" href="/static/v13-premium.css?v=1"><link rel="stylesheet" href="/static/v14-unified.css?v=1"><link rel="stylesheet" href="/static/v15-daydesk.css?v=2"><link rel="stylesheet" href="/static/trader-lab.css?v=1"><link rel="stylesheet" href="/static/workspace-palette-v21.css?v=21"><link rel="stylesheet" href="/static/ios-statusbar-v22.css?v=22">
+<script src="/static/v9.js?v=21" defer></script><script type="module" src="/static/research-studio.js?v=1"></script><script src="/static/v9-ai.js?v=5" type="module"></script><script src="/static/v9-paper.js?v=1" defer></script><script type="module" src="/static/day-desk.js?v=2"></script><script type="module" src="/static/trader-lab.js?v=1"></script>
 <script src="/static/pwa-update-v28.js?v=28" defer></script><link rel="stylesheet" href="/static/rangeform-design-v26.css?v=28"></head>
 <body data-view="overview" data-theme="light">
 <div class="app">
@@ -165,6 +165,38 @@
      </div>
      <div class="daydesk-risk-actions"><button id="day-risk-calc" class="primary-btn" type="button">Calculate hypothetical size</button><span>Full risk model needs actual bid/ask spreads, borrowing, broker fees and execution rules.</span></div>
      <div id="day-risk-result" class="daydesk-risk-results" role="status" aria-live="polite">Enter a hypothetical entry and stop to calculate a risk-based maximum position.</div>
+    </section>
+    <section class="card trader-lab" id="trader-lab" aria-labelledby="trader-lab-heading">
+     <div class="trader-lab-head">
+      <div><div class="eyebrow">DAYTRADER LAB / HISTORICAL SCENARIOS</div><h2 id="trader-lab-heading">10,000-path replay &amp; risk review</h2>
+      <p>Research a hypothetical long entry, stop and target using only licensed, completed intraday candles. The return bootstrap is NOT the original Python Time Machine, a forecast, or a backtested win rate.</p></div>
+      <span class="trader-lab-mark">EXPLICIT REQUEST · PAPER ONLY</span>
+     </div>
+     <div class="trader-lab-layout">
+      <div>
+       <div class="trader-lab-fields">
+        <label for="trader-lab-entry">Historical entry reference<input id="trader-lab-entry" type="number" min=".0001" step="any" placeholder="e.g. 100"></label>
+        <label for="trader-lab-stop">Hypothetical stop<input id="trader-lab-stop" type="number" min=".0001" step="any" placeholder="e.g. 99"></label>
+        <label for="trader-lab-target">Hypothetical target<input id="trader-lab-target" type="number" min=".0001" step="any" placeholder="e.g. 102"></label>
+        <label for="trader-lab-horizon">Horizon (completed bars)<input id="trader-lab-horizon" type="number" min="3" max="48" step="1" value="12"></label>
+       </div>
+       <div class="trader-lab-actions">
+        <button class="primary-btn" type="button" id="trader-lab-run">Run 10,000 scenarios</button>
+        <button class="subtle-btn" type="button" id="trader-lab-levels">Use qualified historical levels</button>
+        <button class="subtle-btn" type="button" id="trader-lab-risk">Check hypothetical risk ↗</button>
+       </div>
+       <div class="trader-lab-output" id="trader-lab-output" role="status" aria-live="polite">
+        <p class="trader-lab-intro">Enter a hypothetical long scenario, select the ticker and interval above, then run. No automatic scan or provider request starts when this page opens.</p>
+       </div>
+      </div>
+      <aside class="trader-lab-sidebar" aria-label="DayTrader integration status">
+       <h3>11-skill integration · honest status</h3>
+       <p><strong>Rangeform web tools:</strong> chart scanning, source-linked news, conditional entries, exit references, hypothetical sizing and risk constraints are already present. This panel adds a 10,000-path research simulation.</p>
+       <p><strong>Python-only:</strong> full-universe scanner, standalone entry watcher, SEC earnings/disclosure readers, persistent alerts and the original Time Machine run from the local research toolkit—not inside Cloudflare Pages.</p>
+       <p><strong>Broker:</strong> Disabled. No order submissions, live fills or unattended trade execution. All scenario percentages describe simulated paths, not trading success rates.</p>
+       <p>Read the <a href="https://github.com/manvirt97/trading-platform/tree/main/local-toolkit/research" target="_blank" rel="noopener noreferrer">local Python toolkit</a> for original scripts.</p>
+      </aside>
+     </div>
     </section>
     <div class="daydesk-footnote">No automatic refresh or hidden six-symbol polling: each analysis uses an explicit request and may consume provider credits. Data can be delayed, unavailable or outside exchange hours. Research and paper planning only.</div>
    </section>
