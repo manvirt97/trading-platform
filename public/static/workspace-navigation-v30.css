@@ -1,0 +1,30 @@
+/* Rangeform V30 | one clear navigation path, no moving scanner card.
+   Supplemental layout only: preserve the V28 tested responsive header. */
+.workspace-crumbs{
+ display:flex;align-items:center;flex-wrap:wrap;gap:9px;
+ min-height:30px;margin:0 0 19px;
+ font-size:11px;font-weight:700;letter-spacing:.035em;
+ color:var(--secondary);line-height:1.35;
+}
+.workspace-crumbs strong{font-size:11px;font-weight:800;color:var(--ink)}
+.workspace-crumb-root{opacity:.84}
+.workspace-crumb-separator{font-size:13px;opacity:.54}
+.workspace-crumb-back{
+ min-height:34px;padding:7px 11px;margin-right:3px;
+ border-radius:9px;border:1px solid var(--line);
+ background:var(--card);color:var(--blue);font-size:12px;font-weight:750;
+ cursor:pointer;
+}
+.workspace-crumb-back:hover{background:var(--muted-card)}
+.workspace-crumb-back:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+.workspace-crumb-back[hidden]{display:none}
+.scanner-page>.discovery-card{margin:15px 0 18px}
+.scanner-page>.page-heading{margin-bottom:16px}
+.scanner-page>.security-strip{margin-bottom:16px}
+.page-heading>.primary-btn{flex-shrink:0}
+body[data-theme="dark"] .workspace-crumb-back{background:var(--card);color:var(--blue);border-color:var(--line)}
+@media(max-width:600px){
+ .workspace-crumbs{margin-bottom:14px;gap:7px;font-size:10px}
+ .workspace-crumb-back{min-height:40px;padding:10px 12px}
+ .scanner-page>.discovery-card{margin:12px 0 15px}
+}
