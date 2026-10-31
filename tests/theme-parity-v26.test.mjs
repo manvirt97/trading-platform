@@ -13,7 +13,7 @@ test('all active Rangeform surfaces load one EquityClimb-inspired design layer l
   const cssLinks=[...head.matchAll(/href="(\/static\/[^"]+\.css\?v=[^"]+)"/g)].map(x=>x[1]);
   assert.match(cssLinks.at(-1),/rangeform-design-v26\.css\?v=28/,'design must override older page CSS: '+page);
   assert.match(head,/manifest\.webmanifest\?v=28/,'missing common installed-app identity: '+page);
-  assert.match(head,/pwa-update-v28\.js\?v=28/,'stale release marker: '+page);
+  assert.match(head,/pwa-update-v29\.js\?v=29/,'stale release marker: '+page);
   assert.match(html,/name="theme-color" content="#f3f4f2"/);
  }
  assert.match(css,/--bg:#f3f4f2/);
@@ -73,10 +73,10 @@ test('mobile desks have actual closable slideout navigation and existing iPhone 
  assert.match(css,/max\(62px,env\(safe-area-inset-top,0px\)\)/);
 });
 
-test('published release marks installed apps as V28',()=>{
+test('published release marks installed apps as V29',()=>{
  const release=JSON.parse(read('public/release.json'));
- const pwa=read('public/static/pwa-update-v28.js');
- assert.equal(release.version,'28');
- assert.equal(release.build,'rangeform-v28-iphone-header-grid');
- assert.match(pwa,/const CURRENT=28,/);
+ const pwa=read('public/static/pwa-update-v29.js');
+ assert.equal(release.version,'29');
+ assert.equal(release.build,'rangeform-v29-daytrader-lab-paper-replay');
+ assert.match(pwa,/const CURRENT=29,/);
 });
