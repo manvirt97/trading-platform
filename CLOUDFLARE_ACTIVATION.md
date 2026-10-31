@@ -37,3 +37,14 @@
 - `Worker deployed but CRON NOT VERIFIED`: activating Worker alone cannot start the strategy. Check authenticated owner status, enable paper strategy, and inspect scheduled logs and fresh heartbeat.
 
 **Important:** The Cloudflare account controls and GitHub encrypted secrets belong to you. This repository cannot secretly sign in to your accounts. Never paste private tokens into a public chat.
+
+## Workers Builds production deploy (new GitHub-connected Worker)
+The separate Worker was created through Cloudflare Workers Builds, rather than the manual GitHub Actions API-token workflow. After the owner secret is securely configured and Pages signed-out `/api/auto-bot` returns `401`, change ONLY this Worker's Cloudflare **Settings -> Builds -> Deploy command** to:
+
+```bash
+npx wrangler deploy --config wrangler.bot.production.toml
+```
+
+This explicit production file retains the same D1 binding and one-minute cron but sets `BOT_SERVICE_ENABLED=on`, making the paper-only Worker survive later GitHub redeployments. The existing `wrangler.bot.toml` stays `off` for fail-closed manual preparation. The encrypted `BOT_OWNER_UID` lives in Cloudflare, not source. The bot strategy itself must be started by the authenticated owner; an enabled Worker does not automatically open a simulated trade. Watch `/health` for `configured:true` plus all Boolean `checks` and verify actual `lastCronTickAt` advances with browser closed before calling it autonomous.
+
+Do not use the production deploy command without the matching owner secret and D1 binding. Cloudflare Workers Builds may automatically run on future commits; monitor build status.

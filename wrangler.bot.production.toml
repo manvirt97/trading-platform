@@ -1,0 +1,20 @@
+name = "rangeform-autonomous-paper-bot"
+main = "worker/autonomous-paper-bot.js"
+compatibility_date = "2026-10-01"
+
+# PRODUCTION-ONLY PAPER scheduler: the owner secret and D1 binding are required.
+# Use ONLY with Cloudflare Workers Builds for the approved Rangeform Worker.
+# Default wrangler.bot.toml remains fail-closed for manual prepare_disabled.
+# Cloudflare database ID is a resource identifier, not a credential.
+[[d1_databases]]
+binding = "DB"
+database_name = "rangeform-users"
+database_id = "6aa50056-4a2d-4ba1-8517-da4de248322f"
+
+[triggers]
+crons = ["* * * * *"]
+
+[vars]
+# PAPER ONLY: enabled after owner auth + D1 were verified; strategy state itself starts paused.
+BOT_SERVICE_ENABLED = "on"
+# Set BOT_OWNER_UID using: npx wrangler secret put BOT_OWNER_UID --config wrangler.bot.toml
