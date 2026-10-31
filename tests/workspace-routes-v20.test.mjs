@@ -42,10 +42,10 @@ test('account owner UID is visible after authentication without visiting an obsc
 
 test('main SPA deep-links are mapped to the current single workspace',()=>{
  const html=read('public/v9.html'),js=read('public/static/v9.js');
- const sections=['overview','daydesk','signals','scanner','news','settings','studio'];
+ const sections=['overview','scanner','ai','daydesk','signals','news','settings','studio'];
  for(const section of sections)assert.ok(html.includes('data-section="'+section+'"'),'missing section '+section);
  assert.match(js,/journal:\{page:'signals',focus:'paperTitle'\}/);
  assert.match(js,/risk:\{page:'signals',focus:'riskAccount'\}/);
- assert.match(js,/ai:\{page:'overview',focus:'assistantTitle'\}/);
+ assert.match(js,/ai:\{page:'ai'\}/);
  assert.match(html,/href="\/account\.html"/);
 });
