@@ -1,5 +1,5 @@
 {
-  "version": "28",
-  "build": "rangeform-v28-iphone-header-grid",
-  "description": "Restore unclipped two-row mobile header and full-width symbol search"
+  "version": "29",
+  "build": "rangeform-v29-daytrader-lab-paper-replay",
+  "description": "Add opt-in DayTrader historical replay research panel and retain iPhone update controls"
 }
