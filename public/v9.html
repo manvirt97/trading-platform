@@ -48,25 +48,44 @@
     <strong id="workspaceLocation">Overview</strong>
    </nav>
    <section class="page visible" data-section="overview">
-    <div class="page-heading"><div><div class="eyebrow">OVERVIEW / MARKET INTELLIGENCE</div><h1>Find promising setups.<br><em>Know exactly why.</em></h1><p>Scan your watchlist, compare technical evidence, and understand the risks—without the noise.</p></div><button type="button" class="primary-btn" id="overviewScan">Open Opportunity Scanner <span>↗</span></button></div>
-    <div class="market-strip" id="marketStrip" aria-label="Market snapshot">
-     <div class="strip-cell"><span>SPY · US LARGE CAP</span><strong data-quote="SPY">—</strong><small data-change="SPY">Provider required</small></div>
-     <div class="strip-cell"><span>NVDA · SEMICONDUCTORS</span><strong data-quote="NVDA">—</strong><small data-change="NVDA">Provider required</small></div>
-     <div class="strip-cell"><span>TSLA · EV</span><strong data-quote="TSLA">—</strong><small data-change="TSLA">Provider required</small></div>
-     <div class="strip-cell"><span>SHOP · CANADIAN TECH</span><strong data-quote="SHOP">—</strong><small data-change="SHOP">Provider required</small></div>
-    </div>
+    <div class="page-heading overview-intro"><div>
+ <div class="eyebrow">YOUR WORKSPACE / AT A GLANCE</div>
+ <h1>Research with clarity.<br><em>Move with purpose.</em></h1>
+ <p>Pick a task. Each tool has its own focused workspace, without jumping through a long dashboard.</p>
+ </div></div>
+ <nav class="overview-launcher" aria-label="Choose a workspace">
+  <button type="button" class="overview-launch overview-launch-featured" id="overviewScan">
+   <span class="overview-launch-icon" aria-hidden="true">◎</span><span class="overview-launch-copy"><strong>Opportunity Scanner</strong><small>Compare evidence across your watchlist</small></span><span class="overview-launch-arrow" aria-hidden="true">↗</span>
+  </button>
+  <button type="button" class="overview-launch" data-page="daydesk">
+   <span class="overview-launch-icon" aria-hidden="true">▥</span><span class="overview-launch-copy"><strong>Day Trading Desk</strong><small>Session levels and intraday research</small></span><span class="overview-launch-arrow" aria-hidden="true">↗</span>
+  </button>
+  <button type="button" class="overview-launch" data-page="signals">
+   <span class="overview-launch-icon" aria-hidden="true">↗</span><span class="overview-launch-copy"><strong>Trade Signals</strong><small>Examine a ticker's technical evidence</small></span><span class="overview-launch-arrow" aria-hidden="true">↗</span>
+  </button>
+  <button type="button" class="overview-launch" data-page="news">
+   <span class="overview-launch-icon" aria-hidden="true">▤</span><span class="overview-launch-copy"><strong>News &amp; Catalysts</strong><small>Source-linked market developments</small></span><span class="overview-launch-arrow" aria-hidden="true">↗</span>
+  </button>
+ </nav>
+    
     
 
 
     <div class="overview-grid">
-     <section class="card opportunity-card"><div class="card-head"><div><div class="eyebrow">WATCHLIST SCANNER</div><h2>Strongest available setups</h2><p>Ranks only symbols you scan with your authorized feed. No fabricated scores.</p></div><button class="subtle-btn" data-page="scanner">Open scanner ↗</button></div>
-       <div class="table-scroller"><table class="scanner-table"><thead><tr><th>SYMBOL</th><th>DIRECTION</th><th>SETUP QUALITY</th><th>DATA AGE</th><th>RESEARCH</th></tr></thead><tbody id="overviewResults"><tr><td colspan="5"><div class="empty-inline">Run a watchlist scan to see verified historical setups. There is no live scan yet.</div></td></tr></tbody></table></div>
+     <section class="card opportunity-card"><div class="card-head"><div><div class="eyebrow">WATCHLIST SCANNER</div><h2>Latest watchlist check</h2><p id="overviewLatestStatus">No scan completed. Start with Opportunity Scanner above.</p></div></div>
+       <details class="overview-results-disclosure"><summary>View saved results</summary><div class="table-scroller"><table class="scanner-table"><thead><tr><th>SYMBOL</th><th>DIRECTION</th><th>SETUP QUALITY</th><th>DATA AGE</th><th>RESEARCH</th></tr></thead><tbody id="overviewResults"><tr><td colspan="5"><div class="empty-inline">Run a watchlist scan to see verified historical setups. There is no live scan yet.</div></td></tr></tbody></table></div></details>
      </section>
      <aside class="card watch-card"><div class="card-head"><div><div class="eyebrow">PERSONAL WORKSPACE</div><h2>My watchlist</h2></div><button class="text-action" id="watchAdd" title="Add another symbol">+ Add</button></div><div class="watch-list" id="watchList"></div><p class="subtle-note">Symbols saved locally. Prices appear only when authorized bars are loaded.</p></aside>
      
      
     </div>
-   </section>
+   <details class="overview-snapshot"><summary><span>Market snapshot</span><small>Quotes only appear after authorized checks</small></summary><div class="market-strip" id="marketStrip" aria-label="Market snapshot">
+     <div class="strip-cell"><span>SPY · US LARGE CAP</span><strong data-quote="SPY">—</strong><small data-change="SPY">Provider required</small></div>
+     <div class="strip-cell"><span>NVDA · SEMICONDUCTORS</span><strong data-quote="NVDA">—</strong><small data-change="NVDA">Provider required</small></div>
+     <div class="strip-cell"><span>TSLA · EV</span><strong data-quote="TSLA">—</strong><small data-change="TSLA">Provider required</small></div>
+     <div class="strip-cell"><span>SHOP · CANADIAN TECH</span><strong data-quote="SHOP">—</strong><small data-change="SHOP">Provider required</small></div>
+    </div></details>
+</section>
 
    <section class="page scanner-page" data-section="scanner" aria-label="Opportunity Scanner">
  <div class="page-heading scanner-page-heading"><div><div class="eyebrow">DISCOVER / EVIDENCE FIRST</div><h1>Opportunity Scanner</h1>
