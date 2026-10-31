@@ -26,6 +26,8 @@ jobs:
           curl --fail --silent http://127.0.0.1:8999/account.html > /dev/null
       - name: Verify installed-iPhone layout at 320, 375, 390 CSS px
         run: node tests/mobile-visual-smoke.mjs
+      - name: Verify iPhone Account header and Bot drawer never overlap
+        run: node tests/mobile-shell-overlap-v32.mjs
       - name: Verify Overview, Scanner and browser Back navigation
         run: node tests/navigation-browser-v30.mjs
       - name: Verify real iPhone header layout on News, Day Desk, and Trade Signals
