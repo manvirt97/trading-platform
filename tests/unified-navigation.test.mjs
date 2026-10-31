@@ -18,15 +18,17 @@ test('phone app manifests and each shortcut target modern pages',()=>{
  assert.ok(m.shortcuts.some(x=>x.url==='/v9.html#scanner'));
  assert.ok(m.shortcuts.some(x=>x.url==='/v9.html#signals'));
  assert.ok(m.shortcuts.some(x=>x.url==='/account.html'));
- assert.match(read('public/v9.html'),/rel="manifest" href="\/manifest.webmanifest\?v=30"/);
+ assert.match(read('public/v9.html'),/rel="manifest" href="\/manifest.webmanifest\?v=31"/);
  assert.match(read('public/v9.html'),/apple-mobile-web-app-capable/);
 });
 test('modern sidebar routes tools inside V10 without accidental classic navigation',()=>{
  const html=read('public/v9.html'),js=read('public/static/v9.js');
  for(const label of ['Research AI','Risk planner','Paper journal','Settings'])assert.ok(html.includes(label));
- for(const focus of ['assistantTitle','riskAccount','paperTitle'])
+ for(const focus of ['riskAccount','paperTitle'])
   assert.match(html,new RegExp('data-focus="'+focus+'"'));
  assert.match(html,/data-page="settings"/);
+ assert.match(html,/data-page="ai"/);
+ assert.match(html,/data-section="ai"/);
  assert.match(html,/data-section="settings"/);
  assert.doesNotMatch(html,/<a class="nav-link" href="\/research\.html\?classic=1#/);
  assert.doesNotMatch(html,/Open classic workspace/);

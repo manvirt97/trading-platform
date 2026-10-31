@@ -11,9 +11,9 @@ test('all active Rangeform surfaces load one EquityClimb-inspired design layer l
   const head=html.slice(0,html.indexOf('</head>'));
   assert.match(head,/rangeform-design-v26\.css\?v=28/,'shared design missing: '+page);
   const cssLinks=[...head.matchAll(/href="(\/static\/[^"]+\.css\?v=[^"]+)"/g)].map(x=>x[1]);
-  assert.match(cssLinks.at(-1),page==='v9.html'?/workspace-navigation-v30\.css\?v=30/:/rangeform-design-v26\.css\?v=28/,'layout must override older page CSS: '+page);
-  assert.match(head,/manifest\.webmanifest\?v=30/,'missing common installed-app identity: '+page);
-  assert.match(head,/pwa-update-v30\.js\?v=30/,'stale release marker: '+page);
+  assert.match(cssLinks.at(-1),page==='v9.html'?/workspace-hub-v31\.css\?v=31/:/rangeform-design-v26\.css\?v=28/,'layout must override older page CSS: '+page);
+  assert.match(head,/manifest\.webmanifest\?v=31/,'missing common installed-app identity: '+page);
+  assert.match(head,/pwa-update-v31\.js\?v=31/,'stale release marker: '+page);
   assert.match(html,/name="theme-color" content="#f3f4f2"/);
  }
  assert.match(css,/--bg:#f3f4f2/);
@@ -73,10 +73,10 @@ test('mobile desks have actual closable slideout navigation and existing iPhone 
  assert.match(css,/max\(62px,env\(safe-area-inset-top,0px\)\)/);
 });
 
-test('published release marks installed apps as V30',()=>{
+test('published release marks installed apps as V31',()=>{
  const release=JSON.parse(read('public/release.json'));
- const pwa=read('public/static/pwa-update-v30.js');
- assert.equal(release.version,'30');
- assert.equal(release.build,'rangeform-v30-consistent-navigation');
- assert.match(pwa,/const CURRENT=30,/);
+ const pwa=read('public/static/pwa-update-v31.js');
+ assert.equal(release.version,'31');
+ assert.equal(release.build,'rangeform-v31-focused-workspaces');
+ assert.match(pwa,/const CURRENT=31,/);
 });
