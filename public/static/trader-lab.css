@@ -1,0 +1,32 @@
+/* Rangeform V29 DayTrader Lab — contained in existing Day Trading Desk, token-based themes. */
+.trader-lab{margin-top:14px;overflow:hidden}
+.trader-lab-head{display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;align-items:start;padding-bottom:16px;margin-bottom:17px;border-bottom:1px solid var(--line)}
+.trader-lab-head h2{font-size:22px;letter-spacing:-.045em;margin:5px 0;color:var(--ink)}
+.trader-lab-head p{font-size:12px;color:var(--secondary);line-height:1.65;margin:7px 0 0;max-width:740px}
+.trader-lab-mark{font-size:10px;line-height:1.4;font-weight:800;letter-spacing:.04em;border:1px solid var(--line);background:var(--muted-card);color:var(--secondary);padding:8px 10px;border-radius:9px}
+.trader-lab-layout{display:grid;grid-template-columns:minmax(0,1.8fr) minmax(250px,.85fr);gap:18px;align-items:start}
+.trader-lab-fields{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.trader-lab-fields label{display:flex;flex-direction:column;gap:6px;font-size:11px;font-weight:750;color:var(--secondary);min-width:0}
+.trader-lab-fields input{background:var(--muted-card);color:var(--ink);border:1px solid var(--line);border-radius:9px;height:44px;padding:9px 11px;min-width:0;width:100%;font-size:16px;font-variant-numeric:tabular-nums}
+.trader-lab-actions{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:15px 0}
+.trader-lab-actions button{min-height:43px;font-size:11px;white-space:normal}
+.trader-lab-actions button:disabled{opacity:.6;cursor:wait}
+.trader-lab-output{padding:15px;background:var(--muted-card);border:1px solid var(--line);border-radius:11px;color:var(--secondary);font-size:12px;line-height:1.65;overflow-wrap:anywhere}
+.trader-lab-verdict{color:var(--ink);font-size:11px;letter-spacing:.05em}
+.trader-lab-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;margin:13px 0 14px}
+.trader-lab-stat{border:1px solid var(--line);background:var(--card);border-radius:10px;padding:12px;display:flex;flex-direction:column;gap:4px}
+.trader-lab-stat span{font-size:10px;color:var(--secondary)}
+.trader-lab-stat strong{font-size:clamp(19px,2.1vw,29px);letter-spacing:-.045em;font-variant-numeric:tabular-nums;color:var(--ink)}
+.trader-lab-stat small{font-size:10px;color:var(--secondary)}
+.trader-lab-warning{font-size:11px;line-height:1.65;margin:9px 0 0;padding-left:10px;border-left:2px solid var(--line);color:var(--secondary)}
+.trader-lab-footnote{font-size:11px;margin:10px 0;color:var(--secondary);line-height:1.65}
+.trader-lab-intro{margin:0}
+.trader-lab-sidebar{background:var(--muted-card);border:1px solid var(--line);border-radius:12px;padding:17px;min-width:0}
+.trader-lab-sidebar h3{font-size:15px;letter-spacing:-.035em;margin:0 0 10px;color:var(--ink)}
+.trader-lab-sidebar p{color:var(--secondary);font-size:11px;line-height:1.7;margin:11px 0}
+.trader-lab-sidebar strong{color:var(--ink)}
+.trader-lab-sidebar a{color:var(--blue);text-decoration:underline;text-underline-offset:2px}
+@media(max-width:990px){.trader-lab-layout{grid-template-columns:1fr}.trader-lab-fields{grid-template-columns:repeat(4,minmax(0,1fr))}}
+@media(max-width:700px){.trader-lab-fields{grid-template-columns:repeat(2,minmax(0,1fr))}.trader-lab-head h2{font-size:20px}.trader-lab-stats{grid-template-columns:1fr 1fr}}
+@media(max-width:400px){.trader-lab-fields,.trader-lab-stats{grid-template-columns:1fr}.trader-lab-actions button{width:100%}}
+@media(prefers-reduced-motion:reduce){.trader-lab *{scroll-behavior:auto!important}}
