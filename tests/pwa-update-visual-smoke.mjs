@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import {chromium} from 'playwright';
 const base=process.env.RANGEFORM_VISUAL_BASE||'http://127.0.0.1:8999';
 const browser=await chromium.launch({headless:true});
-const payload={version:'30',build:'rangeform-v30-test-release'};
+const payload={version:'31',build:'rangeform-v31-test-release'};
 try {
  // Test 1: existing installed app automatically refreshes without prompting
  // when the user has no unsaved changes. Route/hash and browser storage stay.
@@ -28,7 +28,7 @@ try {
  await edit.addInitScript(()=>Object.defineProperty(navigator,'standalone',{configurable:true,value:true}));
  const draft=await edit.newPage();
  let live=false;
- await draft.route('**/release.json*',r=>r.fulfill({status:200,contentType:'application/json',body:JSON.stringify(live?payload:{version:'29',build:'rangeform-v29-daytrader-lab-paper-replay'})}));
+ await draft.route('**/release.json*',r=>r.fulfill({status:200,contentType:'application/json',body:JSON.stringify(live?payload:{version:'30',build:'rangeform-v30-consistent-navigation'})}));
  await draft.goto(base+'/account.html',{waitUntil:'domcontentloaded'});
  await draft.locator('#historyNote').fill('Keep this unsaved note');
  live=true;
