@@ -50,24 +50,38 @@ async function request(url){
  return d;
 }
 const oldRoutes={
-  copilot:{page:'overview',focus:'assistantTitle'},ai:{page:'overview',focus:'assistantTitle'},
+  copilot:{page:'ai'},ai:{page:'ai'},
   radar:{page:'scanner'},market:{page:'overview'},
   risk:{page:'signals',focus:'riskAccount'},journal:{page:'signals',focus:'paperTitle'},
   backtest:{page:'signals',focus:'agentRoomTitle'}
 };
-const validPages=['overview','daydesk','signals','scanner','news','settings','studio'];
-const pageTitles={overview:'Overview',signals:'Trade signals',scanner:'Opportunity scanner',news:'News & catalysts',settings:'Settings',studio:'Research Studio',daydesk:'Day Trading Desk'};
+const validPages=['overview','scanner','ai','daydesk','signals','news','settings','studio'];
+const pageTitles={overview:'Overview',ai:'Research AI',signals:'Trade signals',scanner:'Opportunity scanner',news:'News & catalysts',settings:'Settings',studio:'Research Studio',daydesk:'Day Trading Desk'};
 const focusTitles={assistantTitle:'Research AI',riskAccount:'Risk planner',paperTitle:'Paper journal',agentRoomTitle:'Specialist research'};
 function routeToken(page,focus){
- if(page==='overview'&&focus==='assistantTitle')return 'ai';
  if(page==='signals'&&focus==='riskAccount')return 'risk';
  if(page==='signals'&&focus==='paperTitle')return 'journal';
  if(page==='signals'&&focus==='agentRoomTitle')return 'backtest';
  return page;
 }
+let scannerMode='watchlist';
+function setScannerMode(mode){
+ const next=mode==='sample'?'sample':'watchlist';
+ scannerMode=next;
+ for(const button of $('[data-scanner-mode]')){
+  const active=button.dataset.scannerMode===next;
+  button.classList.toggle('selected',active);
+  button.setAttribute('aria-selected',String(active));
+  button.tabIndex=active?0:-1;
+ }
+ const watch=$('scannerWatchlist'),sample=$('scannerSample');
+ if(watch)watch.hidden=next!=='watchlist';
+ if(sample)sample.hidden=next!=='sample';
+}
 function setPage(page,focus=null){
  if(!validPages.includes(page))return;
  state.view=page;state.focus=focus;
+ if(page==='scanner'&&state.view!==undefined)setScannerMode('watchlist');
  document.body.dataset.view=page;
  $$('[data-section]').forEach(el=>el.classList.toggle('visible',el.dataset.section===page));
  $$('.nav-link[data-page]').forEach(el=>{
@@ -225,8 +239,14 @@ return {kind,score:Number.isFinite(score)?score:null,fresh,complete,reason:!comp
 function cacheKey(symbol,interval){return symbol+'|'+interval}
 async function analyzeSymbol(symbol,interval='1day',force=false){if(!state.configured)throw Error('Private market-data provider is not enabled. Open Data & settings to connect it.');if(!symbolOK(symbol))throw Error('Please use a valid ticker symbol.');const key=cacheKey(symbol,interval);if(!force&&state.market.has(key))return state.market.get(key);const data=await request('/api/analyze?'+new URLSearchParams({symbol,source:'twelvedata',interval}));if(data.symbol!==symbol||!['twelvedata','finnhub-backup'].includes(data.source)||!Array.isArray(data.bar_history)||!Number.isFinite(Number(data.last))||!Number.isFinite(Date.parse(data.last_bar_utc)))throw Error('Provider analysis was incomplete or unverified.');state.market.set(key,data);if(interval==='1day')state.market.set(symbol,data);return data}
 function setRow(root,symbol,x){const tr=create('tr');const result=x&&!x.error?assessment(x):null;const label=!x?'Not scanned':x.error?'Unavailable':result.kind==='bull'?'Bullish watch':result.kind==='bear'?'Bearish watch':result.fresh?'Wait':'Historical only';const td=(value,tag='td')=>{const el=create(tag,'',value);tr.append(el);return el};let asset=td(symbol);asset.append(create('small','',x?.error||'Completed bars'));if(root.id==='overviewResults'){const dir=td('');dir.append(create('span','signal-tag '+(result?.kind||''),label));td(result?.score!=null?result.score+'/100':'—');td(x?.last_bar_utc?ageLabel(x.last_bar_utc):'—');const last=td('');const b=create('button','cell-btn','Inspect ↗');b.onclick=()=>inspect(symbol);b.disabled=!x||Boolean(x.error);last.append(b)}else{td(x&&!x.error?money(x.last):'—');const dir=td('');dir.append(create('span','signal-tag '+(result?.kind||''),label));td(result?.score!=null?result.score+'/100':'—');td(x?.last_bar_utc?stamp(x.last_bar_utc):'—');const last=td('');const b=create('button','cell-btn','View chart ↗');b.onclick=()=>inspect(symbol);b.disabled=!x||Boolean(x.error);last.append(b)}root.append(tr)}
-function renderScan(rows){for(const id of ['scannerResults','overviewResults']){let el=$(id);el.replaceChildren();if(!rows.length){let row=create('tr'),cell=create('td','empty-inline','No real provider results available.');cell.colSpan=id==='scannerResults'?6:5;row.append(cell);el.append(row)}else for(const [sym,x] of rows)setRow(el,sym,x)}renderWatch();let loaded=rows.filter(([,x])=>x&&!x.error).length;$('scanSummary').textContent=loaded+' of '+rows.length+' symbols returned dated historical evidence. Technical scores are NOT win probabilities.'}
-async function scan(){if(state.scanning)return;if(!state.configured){toast('Connect a permitted Twelve Data feed before scanning.');setPage('signals');return}state.scanning=true;for(const id of ['scanButton','overviewScan']){$(id).disabled=true;$(id).textContent='Analyzing verified bars…'}
+function renderScan(rows){
+ const summary=$('overviewLatestStatus');
+ if(summary){
+  const success=rows.filter(([,result])=>result&&!result.error).length;
+  summary.textContent=rows.length?success+' of '+rows.length+' symbols returned dated evidence. Review the scan details.':'No verified scan yet. Open Opportunity Scanner to begin.';
+ }
+ for(const id of ['scannerResults','overviewResults']){let el=$(id);el.replaceChildren();if(!rows.length){let row=create('tr'),cell=create('td','empty-inline','No real provider results available.');cell.colSpan=id==='scannerResults'?6:5;row.append(cell);el.append(row)}else for(const [sym,x] of rows)setRow(el,sym,x)}renderWatch();let loaded=rows.filter(([,x])=>x&&!x.error).length;$('scanSummary').textContent=loaded+' of '+rows.length+' symbols returned dated historical evidence. Technical scores are NOT win probabilities.'}
+async function scan(){if(state.scanning)return;if(!state.configured){toast('Connect a permitted Twelve Data feed before scanning.');setPage('signals');return}state.scanning=true;for(const id of ['scanButton']){$(id).disabled=true;$(id).textContent='Analyzing verified bars…'}
 const results=[];for(let i=0;i<state.watch.length;i++){
  const sym=state.watch[i];
  try{const x=await analyzeSymbol(sym,'1day');results.push([sym,x])}
@@ -241,7 +261,7 @@ const results=[];for(let i=0;i<state.watch.length;i++){
 }
 results.sort((a,b)=>{const sa=a[1]?.score, sb=b[1]?.score;return (Number.isFinite(sb)?sb:-1)-(Number.isFinite(sa)?sa:-1)});renderScan(results);
 for(const sym of ['SPY','NVDA','TSLA','SHOP']){const x=state.market.get(sym);const q=document.querySelector('[data-quote="'+sym+'"]'),delta=document.querySelector('[data-change="'+sym+'"]');if(x){q.textContent=money(x.last);delta.textContent=pct(x.change_pct)+' · '+ageLabel(x.last_bar_utc);delta.className=Number(x.change_pct)>=0?'positive':'negative'}}
-state.scanning=false;for(const id of ['scanButton','overviewScan']){$(id).disabled=false;$(id).innerHTML=id==='scanButton'?'Run watchlist scan ↗':'Open Opportunity Scanner <span>↗</span>'}
+state.scanning=false;for(const id of ['scanButton']){$(id).disabled=false;$(id).innerHTML=id==='scanButton'?'Run watchlist scan ↗':'Open Opportunity Scanner <span>↗</span>'}
 toast(results.filter(x=>!x[1]?.error).length+' of '+results.length+' symbols analyzed. Review data age before acting.')}
 async function inspect(sym){setMonitor(false);state.symbol=sym;$('symbolInput').value=sym;setPage('signals');await runAnalysis()}
 function clearAnalysis(message){state.analysis=null;state.opportunity=null;state.agentRoom=null;resetAgentRoom(message);resetOpportunity(message);
@@ -492,7 +512,17 @@ function selectArticle(item){
  const link=$('articleOriginal');link.href=item.url;link.hidden=false;
 }
 function bind(){initTheme();initWorkspacePrefs();state.watch=readWatch();renderWatch();bindAgentFilters();$('showAgentRoom')?.addEventListener('click',()=>$('agentRoomTitle')?.scrollIntoView({behavior:'smooth',block:'start'}));scheduleDiscovery();localClock();setInterval(localClock,60000);
-$$('[data-page]').forEach(el=>el.addEventListener('click',()=>setPage(el.dataset.page,el.dataset.focus||null)));
+$('[data-page]').forEach(el=>el.addEventListener('click',()=>setPage(el.dataset.page,el.dataset.focus||null)));
+$('[data-scanner-mode]').forEach(el=>{
+ el.addEventListener('click',()=>setScannerMode(el.dataset.scannerMode));
+ el.addEventListener('keydown',event=>{
+  if(!['ArrowLeft','ArrowRight','Home','End'].includes(event.key))return;
+  event.preventDefault();
+  const next=event.key==='ArrowLeft'||event.key==='Home'?'watchlist':'sample';
+  setScannerMode(next);
+  $(next==='watchlist'?'scannerTabWatchlist':'scannerTabSample')?.focus();
+ });
+});
 $('workspaceOverview')?.addEventListener('click',()=>setPage('overview'));
 $('mobileMenu').onclick=()=>{$('sidebar').classList.toggle('open');$('navShade').hidden=!$('sidebar').classList.contains('open')};$('navShade').onclick=closeNav;
 $('themeToggle').onclick=()=>setTheme(document.body.dataset.theme==='dark'?'light':'dark');
