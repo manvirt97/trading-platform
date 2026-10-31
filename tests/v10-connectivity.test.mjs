@@ -76,11 +76,12 @@ test('background scanner runs only in US regular-hours window and requires expli
 });
 test('V10 visible scanner, 11-Claude console, supervisor and verified provider states',()=>{
  const html=read('public/v9.html'),js=read('public/static/v9.js'),auth=read('public/static/v9-ai.js');
- for(const id of ['discoveryScannerHost','discoveryHome','supervisorHeadline','claudeDeskStatus','claudeDeskTitle','claudeAgentResults','claudeSupervisor','runClaudeCouncil','tvRefresh','cronRefresh'])
+ for(const id of ['supervisorHeadline','claudeDeskStatus','claudeDeskTitle','claudeAgentResults','claudeSupervisor','runClaudeCouncil','tvRefresh','cronRefresh'])
   assert.match(html,new RegExp('id="'+id+'"'));
  assert.match(html,/RANGEFORM · STUDIO/);
  assert.match(html,/Opportunity scanner/);
- assert.match(js,/host\.after\(discovery\)/);
+ assert.doesNotMatch(js,/host\.after\(discovery\)/);
+ assert.match(html,/class="card discovery-card"/);
  assert.match(js,/headlineSupervisor/);
  assert.match(auth,/\/api\/claude-desk/);
  assert.match(auth,/\/api\/scheduled-opportunities/);

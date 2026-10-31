@@ -52,7 +52,7 @@ test('V10 app boots and main navigation plus news filters respond in a browser-l
  };
  const listeners={};const location={hash:'#overview'};const fetches=[];
  const sandbox={
-  document,location,history:{replaceState(_s,_t,fragment){location.hash=fragment}},
+  document,location,history:{pushState(_s,_t,fragment){location.hash=fragment},replaceState(_s,_t,fragment){location.hash=fragment}},
   window:{addEventListener(name,cb){listeners[name]=cb},scrollTo(){}},
   localStorage:{getItem(){return null},setItem(){}},
   fetch:async path=>{fetches.push(String(path));return {ok:true,status:200,json:async()=>String(path).includes('/api/status')?{twelvedata_enabled:false,finnhub_fallback_enabled:false}:{items:[],as_of:'2026-10-26T10:00:00Z',sources_ok:1,sources_total:1,availability:'available'}}},

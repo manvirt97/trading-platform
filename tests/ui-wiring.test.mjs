@@ -21,7 +21,7 @@ test('V10 is canonical and legacy browser entry routes cannot display classic la
  assert.match(account,/href="\/account.html"/);
  assert.match(account,/account-v11.css/);
  assert.doesNotMatch(modern,/href="\/research.html\?classic=1"/); // legacy escape retired
- assert.match(modern,/rel="manifest" href="\/manifest.webmanifest\?v=28"/);
+ assert.match(modern,/rel="manifest" href="\/manifest.webmanifest\?v=30"/);
  assert.equal(manifest.display,'standalone');
  assert.equal(manifest.scope,'/');
  assert.equal(manifest.start_url,'/v9.html#overview');

@@ -1,13 +1,13 @@
 <!doctype html>
 <html lang="en"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#f3f4f2"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Rangeform"><meta name="apple-mobile-web-app-status-bar-style" content="default"><link rel="manifest" href="/manifest.webmanifest?v=28"><link rel="apple-touch-icon" href="/static/rangeform-official-icon.png?v=1">
+<meta name="theme-color" content="#f3f4f2"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Rangeform"><meta name="apple-mobile-web-app-status-bar-style" content="default"><link rel="manifest" href="/manifest.webmanifest?v=30"><link rel="apple-touch-icon" href="/static/rangeform-official-icon.png?v=1">
 <meta name="description" content="Rangeform: evidence-first market research, conditional trade plans and market news.">
 <title>Rangeform — Market intelligence</title>
 <link rel="icon" type="image/png" href="/static/rangeform-official-icon.png">
 <link rel="stylesheet" href="/static/v9.css?v=8"><link rel="stylesheet" href="/static/v11-mobile.css?v=1"><link rel="stylesheet" href="/static/v12-settings-news.css?v=1"><link rel="stylesheet" href="/static/v13-premium.css?v=1"><link rel="stylesheet" href="/static/v14-unified.css?v=1"><link rel="stylesheet" href="/static/v15-daydesk.css?v=2"><link rel="stylesheet" href="/static/trader-lab.css?v=1"><link rel="stylesheet" href="/static/workspace-palette-v21.css?v=21"><link rel="stylesheet" href="/static/ios-statusbar-v22.css?v=22">
-<script src="/static/v9.js?v=21" defer></script><script type="module" src="/static/research-studio.js?v=1"></script><script src="/static/v9-ai.js?v=5" type="module"></script><script src="/static/v9-paper.js?v=1" defer></script><script type="module" src="/static/day-desk.js?v=2"></script><script type="module" src="/static/trader-lab.js?v=1"></script>
-<script src="/static/pwa-update-v29.js?v=29" defer></script><link rel="stylesheet" href="/static/rangeform-design-v26.css?v=28"></head>
+<script src="/static/v9.js?v=30" defer></script><script type="module" src="/static/research-studio.js?v=1"></script><script src="/static/v9-ai.js?v=5" type="module"></script><script src="/static/v9-paper.js?v=1" defer></script><script type="module" src="/static/day-desk.js?v=2"></script><script type="module" src="/static/trader-lab.js?v=1"></script>
+<script src="/static/pwa-update-v30.js?v=30" defer></script><link rel="stylesheet" href="/static/rangeform-design-v26.css?v=28"><link rel="stylesheet" href="/static/workspace-navigation-v30.css?v=30"></head>
 <body data-view="overview" data-theme="light">
 <div class="app">
  <aside class="sidebar" id="sidebar">
@@ -31,7 +31,7 @@
    <button class="nav-link" type="button" data-page="settings"><span class="nav-icon">⚙</span> Settings</button>
    <a class="nav-link" href="/account.html"><span class="nav-icon">☰</span> Account &amp; Sign-in</a>
   </nav>
-  <div class="side-footer"><div class="side-status"><span id="sideStatusDot" class="status-dot amber"></span><div><strong id="sideStatus">Checking market data</strong><small id="sideStatusDetail">Verifying provider configuration</small></div></div><a href="/v9.html#scanner">Explore opportunities ↗</a></div>
+  <div class="side-footer"><div class="side-status"><span id="sideStatusDot" class="status-dot amber"></span><div><strong id="sideStatus">Checking market data</strong><small id="sideStatusDetail">Verifying provider configuration</small></div></div></div>
  </aside>
  <div class="content-shell">
   <header class="topbar">
@@ -41,20 +41,21 @@
    <div class="top-right"><span class="version-marker" title="Rangeform unified research release">RANGEFORM · STUDIO</span><div class="market-time"><span>CALGARY</span><strong id="localTime">--:--</strong></div><button id="providerBadge" type="button" class="provider-pill" title="Market data status. Tap for details."><span id="feedDot" class="status-dot amber"></span><span id="feedLabel">Checking feed</span></button><button id="themeToggle" class="icon-button" type="button" aria-label="Toggle light and dark theme">◐</button><a class="user-circle" href="/account.html" title="Account and private settings" aria-label="My workspace">↗</a></div>
   </header>
   <main class="main" id="main">
+   <nav class="workspace-crumbs" aria-label="Workspace location">
+    <button id="workspaceOverview" type="button" class="workspace-crumb-back" hidden>← Overview</button>
+    <span class="workspace-crumb-root">Rangeform</span>
+    <span class="workspace-crumb-separator" aria-hidden="true">/</span>
+    <strong id="workspaceLocation">Overview</strong>
+   </nav>
    <section class="page visible" data-section="overview">
-    <div class="page-heading"><div><div class="eyebrow">OVERVIEW / MARKET INTELLIGENCE</div><h1>Find promising setups.<br><em>Know exactly why.</em></h1><p>Scan your watchlist, compare technical evidence, and understand the risks—without the noise.</p></div><button type="button" class="primary-btn" id="overviewScan">Explore opportunities <span>↗</span></button></div>
+    <div class="page-heading"><div><div class="eyebrow">OVERVIEW / MARKET INTELLIGENCE</div><h1>Find promising setups.<br><em>Know exactly why.</em></h1><p>Scan your watchlist, compare technical evidence, and understand the risks—without the noise.</p></div><button type="button" class="primary-btn" id="overviewScan">Open Opportunity Scanner <span>↗</span></button></div>
     <div class="market-strip" id="marketStrip" aria-label="Market snapshot">
      <div class="strip-cell"><span>SPY · US LARGE CAP</span><strong data-quote="SPY">—</strong><small data-change="SPY">Provider required</small></div>
      <div class="strip-cell"><span>NVDA · SEMICONDUCTORS</span><strong data-quote="NVDA">—</strong><small data-change="NVDA">Provider required</small></div>
      <div class="strip-cell"><span>TSLA · EV</span><strong data-quote="TSLA">—</strong><small data-change="TSLA">Provider required</small></div>
      <div class="strip-cell"><span>SHOP · CANADIAN TECH</span><strong data-quote="SHOP">—</strong><small data-change="SHOP">Provider required</small></div>
     </div>
-    <div id="discoveryHome"></div><section class="card discovery-card" aria-labelledby="discoveryTitle">
-  <div class="card-head"><div><div class="eyebrow">ON-DEMAND DISCOVERY · SERVER-VERIFIED SAMPLE</div><h2 id="discoveryTitle">Automatic opportunity scanner</h2><p id="discoveryStatus">Run a sample scan when needed. Each symbol requires authorized market data; no market-wide or streaming claims.</p></div>
-    <div class="discovery-actions"><select id="discoveryUniverse" aria-label="Choose sample market universe"><option value="leaders">US large-cap leaders</option><option value="diversified">Diversified US sample</option></select><button id="discoveryRefresh" class="subtle-btn" type="button">Scan sample ↻</button></div></div>
-  <div class="table-scroller"><table class="scanner-table"><thead><tr><th>SYMBOL</th><th>RESEARCH STATUS</th><th>INDICATOR SCORE</th><th>LAST BAR</th><th>WHY IT'S WATCHED</th><th></th></tr></thead><tbody id="discoveryResults"><tr><td colspan="6" class="empty-inline">Automatic discovery requires an authorized OHLCV data connection.</td></tr></tbody></table></div>
-  <div class="discovery-footer"><span id="discoveryTimestamp">Not scanned</span><span>Fixed six-stock sample · scan manually to preserve API credits · no orders</span></div>
-</section>
+    
 <section class="card assistant-card" aria-labelledby="assistantTitle">
  <div class="assistant-heading"><div><div class="eyebrow">EVIDENCE ASSISTANT</div><h2 id="assistantTitle">Ask what the charts actually show</h2><p>Rule-based explanations always identify their data source. Optional Cloudflare AI requires Google sign-in.</p></div><span class="signal-tag" id="assistantService">Checking AI service</span></div>
  <div class="assistant-presets"><button type="button" data-preset="best">Explain the strongest setup</button><button type="button" data-preset="risks">What could go wrong?</button><button type="button" data-preset="patterns">Analyze candle patterns</button></div>
@@ -264,8 +265,13 @@
       </div>
     </div>
    </section>
-   <section class="page" data-section="scanner">
-    <div class="page-heading"><div><div class="eyebrow">AUTOMATIC MARKET DISCOVERY</div><h1>Opportunity scanner</h1><p>Compare up to six watchlist symbols on completed real market bars—not a fake market-wide sweep.</p></div><button id="scanButton" class="primary-btn" type="button">Run watchlist scan ↗</button></div><div id="discoveryScannerHost"></div><div class="security-strip"><span class="status-dot amber"></span><span>Requires an authorized Twelve Data subscription. Historical scores are not forecasts or orders.</span></div><div class="card"><div class="card-head"><div><h2>Technical candidates</h2><p id="scanSummary">No scan completed. Rankings will appear only after actual data is retrieved.</p></div></div><div class="table-scroller"><table class="scanner-table"><thead><tr><th>SYMBOL</th><th>PRICE</th><th>TECHNICAL BIAS</th><th>ALIGNMENT</th><th>BAR TIME</th><th></th></tr></thead><tbody id="scannerResults"><tr><td colspan="6" class="empty-inline">No scan results. Use Run watchlist scan after connecting market data.</td></tr></tbody></table></div></div>
+   <section class="page scanner-page" data-section="scanner" aria-label="Opportunity Scanner">
+    <div class="page-heading"><div><div class="eyebrow">AUTOMATIC MARKET DISCOVERY</div><h1>Opportunity scanner</h1><p>Compare up to six watchlist symbols on completed real market bars—not a fake market-wide sweep.</p></div><button id="scanButton" class="primary-btn" type="button">Run watchlist scan ↗</button></div><section class="card discovery-card" aria-labelledby="discoveryTitle">
+  <div class="card-head"><div><div class="eyebrow">ON-DEMAND DISCOVERY · SERVER-VERIFIED SAMPLE</div><h2 id="discoveryTitle">Automatic opportunity scanner</h2><p id="discoveryStatus">Run a sample scan when needed. Each symbol requires authorized market data; no market-wide or streaming claims.</p></div>
+    <div class="discovery-actions"><select id="discoveryUniverse" aria-label="Choose sample market universe"><option value="leaders">US large-cap leaders</option><option value="diversified">Diversified US sample</option></select><button id="discoveryRefresh" class="subtle-btn" type="button">Scan sample ↻</button></div></div>
+  <div class="table-scroller"><table class="scanner-table"><thead><tr><th>SYMBOL</th><th>RESEARCH STATUS</th><th>INDICATOR SCORE</th><th>LAST BAR</th><th>WHY IT'S WATCHED</th><th></th></tr></thead><tbody id="discoveryResults"><tr><td colspan="6" class="empty-inline">Automatic discovery requires an authorized OHLCV data connection.</td></tr></tbody></table></div>
+  <div class="discovery-footer"><span id="discoveryTimestamp">Not scanned</span><span>Fixed six-stock sample · scan manually to preserve API credits · no orders</span></div>
+</section><div class="security-strip"><span class="status-dot amber"></span><span>Requires an authorized Twelve Data subscription. Historical scores are not forecasts or orders.</span></div><div class="card"><div class="card-head"><div><h2>Technical candidates</h2><p id="scanSummary">No scan completed. Rankings will appear only after actual data is retrieved.</p></div></div><div class="table-scroller"><table class="scanner-table"><thead><tr><th>SYMBOL</th><th>PRICE</th><th>TECHNICAL BIAS</th><th>ALIGNMENT</th><th>BAR TIME</th><th></th></tr></thead><tbody id="scannerResults"><tr><td colspan="6" class="empty-inline">No scan results. Use Run watchlist scan after connecting market data.</td></tr></tbody></table></div></div>
    </section>
    <section class="page" data-section="news">
     <div class="page-heading"><div><div class="eyebrow">DISCOVER / TRUSTED PUBLISHERS</div><h1>News &amp; catalysts<br><em>that matter.</em></h1><p>Company developments, earnings and macro events. Each story links to its source.</p></div></div>

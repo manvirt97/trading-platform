@@ -8,6 +8,8 @@ test('Cloudflare Workers Builds production uses durable paper-only config and ex
  const worker=read('worker/autonomous-paper-bot.js');
  assert.match(safe,/BOT_SERVICE_ENABLED = "off"/);
  assert.match(prod,/BOT_SERVICE_ENABLED = "on"/);
+ assert.match(prod,/keep_vars = true/);
+ assert.match(prod,/required = \["BOT_OWNER_UID"\]/);
  for(const required of [
   'name = "rangeform-autonomous-paper-bot"',
   'main = "worker/autonomous-paper-bot.js"',
