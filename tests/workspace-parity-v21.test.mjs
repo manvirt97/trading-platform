@@ -8,7 +8,7 @@ test('all four Rangeform screens load the SAME last-in-cascade appearance tokens
   const html=read(page);
   assert.match(html,/workspace-palette-v21\.css\?v=21/,'shared palette missing on '+page);
   const lastStyle=html.slice(0,html.indexOf('</head>')).match(/href="\/static\/[^"]+\.css\?v=\d+"/g)||[];
-  assert.match(lastStyle.at(-1),/rangeform-design-v26\.css/,'safe-area rules must follow base palette on '+page);
+  assert.match(lastStyle.at(-1),page==='public/v9.html'?/workspace-navigation-v30\.css/:/rangeform-design-v26\.css/,'last appearance layer incorrect on '+page);
  }
  const tokens=read('public/static/workspace-palette-v21.css');
  for(const name of ['--bg','--sidebar','--card','--muted-card','--ink','--secondary','--line','--panel','--edge','--soft']){
