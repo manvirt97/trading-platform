@@ -15,14 +15,14 @@
   <div class="nav-label">WORKSPACE</div>
   <nav class="side-nav" aria-label="Main navigation">
    <button class="nav-link active" data-page="overview"><span class="nav-icon">◫</span> Overview</button>
+   <button class="nav-link" data-page="scanner"><span class="nav-icon">◎</span> Opportunity scanner</button>
    <button class="nav-link" type="button" data-page="daydesk"><span class="nav-icon">▥</span> Day Trading Desk</button>
    <a class="nav-link" href="/algo.html"><span class="nav-icon">◇</span> Algorithmic Desk</a>
    <a class="nav-link" href="/bot.html"><span class="nav-icon">⟳</span> Autonomous Paper Bot</a>
    <button class="nav-link" data-page="signals"><span class="nav-icon">↗</span> Trade signals</button>
-   <button class="nav-link" data-page="scanner"><span class="nav-icon">◎</span> Opportunity scanner</button>
    <button class="nav-link" data-page="news"><span class="nav-icon">▤</span> News &amp; catalysts</button>
    <button class="nav-link" data-page="studio"><span class="nav-icon">◈</span> Research Studio <span class="nav-hint">10 tools</span></button>
-   <button class="nav-link" type="button" data-page="overview" data-focus="assistantTitle"><span class="nav-icon">✳</span> Research AI</button>
+   <button class="nav-link" type="button" data-page="ai"><span class="nav-icon">✳</span> Research AI</button>
   </nav>
   <div class="nav-label border-label">YOUR TOOLS</div>
   <nav class="side-nav" aria-label="Research tools">
@@ -56,13 +56,7 @@
      <div class="strip-cell"><span>SHOP · CANADIAN TECH</span><strong data-quote="SHOP">—</strong><small data-change="SHOP">Provider required</small></div>
     </div>
     
-<section class="card assistant-card" aria-labelledby="assistantTitle">
- <div class="assistant-heading"><div><div class="eyebrow">EVIDENCE ASSISTANT</div><h2 id="assistantTitle">Ask what the charts actually show</h2><p>Rule-based explanations always identify their data source. Optional Cloudflare AI requires Google sign-in.</p></div><span class="signal-tag" id="assistantService">Checking AI service</span></div>
- <div class="assistant-presets"><button type="button" data-preset="best">Explain the strongest setup</button><button type="button" data-preset="risks">What could go wrong?</button><button type="button" data-preset="patterns">Analyze candle patterns</button></div>
- <div id="assistantAnswer" role="status" aria-live="polite" class="assistant-answer">Connect market data to enable an evidence-grounded assessment. AI does not invent prices or news.</div>
- <div class="assistant-query"><input id="assistantQuestion" maxlength="450" placeholder="Ask about this scan or a candle pattern…" aria-label="Question for market research assistant"><button type="button" id="assistantExplain" class="primary-btn">Explain evidence</button><button type="button" id="assistantUseAI" class="subtle-btn">Ask AI model</button></div>
- <div class="assistant-access"><span id="assistantAuthState">Checking sign-in…</span><button type="button" id="assistantSignIn" class="text-action" hidden>Sign in with Google</button><button type="button" id="assistantSignOut" class="text-action" hidden>Sign out</button></div>
-</section>
+
 
     <div class="overview-grid">
      <section class="card opportunity-card"><div class="card-head"><div><div class="eyebrow">WATCHLIST SCANNER</div><h2>Strongest available setups</h2><p>Ranks only symbols you scan with your authorized feed. No fabricated scores.</p></div><button class="subtle-btn" data-page="scanner">Open scanner ↗</button></div>
@@ -74,7 +68,25 @@
     </div>
    </section>
 
-   <section class="page daydesk-page" data-section="daydesk" aria-label="Day Trading Desk">
+   <section class="page scanner-page" data-section="scanner" aria-label="Opportunity Scanner">
+    <div class="page-heading"><div><div class="eyebrow">AUTOMATIC MARKET DISCOVERY</div><h1>Opportunity scanner</h1><p>Compare up to six watchlist symbols on completed real market bars—not a fake market-wide sweep.</p></div><button id="scanButton" class="primary-btn" type="button">Run watchlist scan ↗</button></div><section class="card discovery-card" aria-labelledby="discoveryTitle">
+  <div class="card-head"><div><div class="eyebrow">ON-DEMAND DISCOVERY · SERVER-VERIFIED SAMPLE</div><h2 id="discoveryTitle">Automatic opportunity scanner</h2><p id="discoveryStatus">Run a sample scan when needed. Each symbol requires authorized market data; no market-wide or streaming claims.</p></div>
+    <div class="discovery-actions"><select id="discoveryUniverse" aria-label="Choose sample market universe"><option value="leaders">US large-cap leaders</option><option value="diversified">Diversified US sample</option></select><button id="discoveryRefresh" class="subtle-btn" type="button">Scan sample ↻</button></div></div>
+  <div class="table-scroller"><table class="scanner-table"><thead><tr><th>SYMBOL</th><th>RESEARCH STATUS</th><th>INDICATOR SCORE</th><th>LAST BAR</th><th>WHY IT'S WATCHED</th><th></th></tr></thead><tbody id="discoveryResults"><tr><td colspan="6" class="empty-inline">Automatic discovery requires an authorized OHLCV data connection.</td></tr></tbody></table></div>
+  <div class="discovery-footer"><span id="discoveryTimestamp">Not scanned</span><span>Fixed six-stock sample · scan manually to preserve API credits · no orders</span></div>
+</section><div class="security-strip"><span class="status-dot amber"></span><span>Requires an authorized Twelve Data subscription. Historical scores are not forecasts or orders.</span></div><div class="card"><div class="card-head"><div><h2>Technical candidates</h2><p id="scanSummary">No scan completed. Rankings will appear only after actual data is retrieved.</p></div></div><div class="table-scroller"><table class="scanner-table"><thead><tr><th>SYMBOL</th><th>PRICE</th><th>TECHNICAL BIAS</th><th>ALIGNMENT</th><th>BAR TIME</th><th></th></tr></thead><tbody id="scannerResults"><tr><td colspan="6" class="empty-inline">No scan results. Use Run watchlist scan after connecting market data.</td></tr></tbody></table></div></div>
+   </section>
+   <section class="page ai-page" data-section="ai" aria-label="Research AI">
+<div class="page-heading"><div><div class="eyebrow">RESEARCH / EVIDENCE ASSISTANT</div><h1>Research AI</h1><p>Ask about real evidence, patterns and risks. Data limitations are always disclosed.</p></div></div>
+<section class="card assistant-card" aria-labelledby="assistantTitle">
+ <div class="assistant-heading"><div><div class="eyebrow">EVIDENCE ASSISTANT</div><h2 id="assistantTitle">Ask what the charts actually show</h2><p>Rule-based explanations always identify their data source. Optional Cloudflare AI requires Google sign-in.</p></div><span class="signal-tag" id="assistantService">Checking AI service</span></div>
+ <div class="assistant-presets"><button type="button" data-preset="best">Explain the strongest setup</button><button type="button" data-preset="risks">What could go wrong?</button><button type="button" data-preset="patterns">Analyze candle patterns</button></div>
+ <div id="assistantAnswer" role="status" aria-live="polite" class="assistant-answer">Connect market data to enable an evidence-grounded assessment. AI does not invent prices or news.</div>
+ <div class="assistant-query"><input id="assistantQuestion" maxlength="450" placeholder="Ask about this scan or a candle pattern…" aria-label="Question for market research assistant"><button type="button" id="assistantExplain" class="primary-btn">Explain evidence</button><button type="button" id="assistantUseAI" class="subtle-btn">Ask AI model</button></div>
+ <div class="assistant-access"><span id="assistantAuthState">Checking sign-in…</span><button type="button" id="assistantSignIn" class="text-action" hidden>Sign in with Google</button><button type="button" id="assistantSignOut" class="text-action" hidden>Sign out</button></div>
+</section>
+</section>
+<section class="page daydesk-page" data-section="daydesk" aria-label="Day Trading Desk">
     <div class="daydesk-heading">
       <div><div class="eyebrow">RANGEFORM / INTRADAY DECISION SUPPORT</div><h1>Day Trading Desk</h1>
       <p>Session structure, measured confirmation and risk discipline—without pretending delayed candles are live quotes.</p></div>
@@ -264,14 +276,6 @@
        <article class="card data-card"><div class="eyebrow">SOURCE TRANSPARENCY</div><h2>Market data connection</h2><div id="connectionDetails"><p>Checking provider settings…</p></div><a class="subtle-btn button-link" href="https://github.com/manvirt97/trading-platform/blob/main/V10_CLAUDE_SUPERVISOR_SETUP.md" target="_blank" rel="noopener noreferrer">Connection setup guide ↗</a></article>
       </div>
     </div>
-   </section>
-   <section class="page scanner-page" data-section="scanner" aria-label="Opportunity Scanner">
-    <div class="page-heading"><div><div class="eyebrow">AUTOMATIC MARKET DISCOVERY</div><h1>Opportunity scanner</h1><p>Compare up to six watchlist symbols on completed real market bars—not a fake market-wide sweep.</p></div><button id="scanButton" class="primary-btn" type="button">Run watchlist scan ↗</button></div><section class="card discovery-card" aria-labelledby="discoveryTitle">
-  <div class="card-head"><div><div class="eyebrow">ON-DEMAND DISCOVERY · SERVER-VERIFIED SAMPLE</div><h2 id="discoveryTitle">Automatic opportunity scanner</h2><p id="discoveryStatus">Run a sample scan when needed. Each symbol requires authorized market data; no market-wide or streaming claims.</p></div>
-    <div class="discovery-actions"><select id="discoveryUniverse" aria-label="Choose sample market universe"><option value="leaders">US large-cap leaders</option><option value="diversified">Diversified US sample</option></select><button id="discoveryRefresh" class="subtle-btn" type="button">Scan sample ↻</button></div></div>
-  <div class="table-scroller"><table class="scanner-table"><thead><tr><th>SYMBOL</th><th>RESEARCH STATUS</th><th>INDICATOR SCORE</th><th>LAST BAR</th><th>WHY IT'S WATCHED</th><th></th></tr></thead><tbody id="discoveryResults"><tr><td colspan="6" class="empty-inline">Automatic discovery requires an authorized OHLCV data connection.</td></tr></tbody></table></div>
-  <div class="discovery-footer"><span id="discoveryTimestamp">Not scanned</span><span>Fixed six-stock sample · scan manually to preserve API credits · no orders</span></div>
-</section><div class="security-strip"><span class="status-dot amber"></span><span>Requires an authorized Twelve Data subscription. Historical scores are not forecasts or orders.</span></div><div class="card"><div class="card-head"><div><h2>Technical candidates</h2><p id="scanSummary">No scan completed. Rankings will appear only after actual data is retrieved.</p></div></div><div class="table-scroller"><table class="scanner-table"><thead><tr><th>SYMBOL</th><th>PRICE</th><th>TECHNICAL BIAS</th><th>ALIGNMENT</th><th>BAR TIME</th><th></th></tr></thead><tbody id="scannerResults"><tr><td colspan="6" class="empty-inline">No scan results. Use Run watchlist scan after connecting market data.</td></tr></tbody></table></div></div>
    </section>
    <section class="page" data-section="news">
     <div class="page-heading"><div><div class="eyebrow">DISCOVER / TRUSTED PUBLISHERS</div><h1>News &amp; catalysts<br><em>that matter.</em></h1><p>Company developments, earnings and macro events. Each story links to its source.</p></div></div>
