@@ -95,7 +95,7 @@ test('Day Trading Desk is reachable from the sidebar and uses the same light/dar
  assert.match(html,/data-page="daydesk"/);
  assert.match(html,/data-section="daydesk"/);
  assert.match(js,/daydesk:'Day Trading Desk'/);
- assert.match(js,/\['overview','daydesk','signals'/);
+ assert.match(js,/\['overview','scanner','ai','daydesk','signals'/);
  assert.match(html,/v15-daydesk\.css\?v=2/);
  assert.match(html,/day-desk\.js\?v=2/);
  assert.match(css,/var\(--card\)/);
