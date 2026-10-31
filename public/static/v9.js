@@ -55,36 +55,51 @@ const oldRoutes={
   risk:{page:'signals',focus:'riskAccount'},journal:{page:'signals',focus:'paperTitle'},
   backtest:{page:'signals',focus:'agentRoomTitle'}
 };
+const pageTitles={overview:'Overview',signals:'Trade signals',scanner:'Opportunity scanner',news:'News & catalysts',settings:'Settings',studio:'Research Studio',daydesk:'Day Trading Desk'};
+const focusTitles={assistantTitle:'Research AI',riskAccount:'Risk planner',paperTitle:'Paper journal',agentRoomTitle:'Specialist research'};
+function routeToken(page,focus){
+ if(page==='overview'&&focus==='assistantTitle')return 'ai';
+ if(page==='signals'&&focus==='riskAccount')return 'risk';
+ if(page==='signals'&&focus==='paperTitle')return 'journal';
+ if(page==='signals'&&focus==='agentRoomTitle')return 'backtest';
+ return page;
+}
 function setPage(page,focus=null){
- if(!['overview','daydesk','signals','scanner','news','settings','studio'].includes(page))return;
+ if(!Object.prototype.hasOwnProperty.call(pageTitles,page))return;
  state.view=page;state.focus=focus;
  document.body.dataset.view=page;
- $$('[data-section]').forEach(el=>el.classList.toggle('visible',el.dataset.section===page));
- $$('.nav-link[data-page]').forEach(el=>{
+ $('[data-section]').forEach(el=>el.classList.toggle('visible',el.dataset.section===page));
+ $('.nav-link[data-page]').forEach(el=>{
   const active=el.dataset.page===page&&(el.dataset.focus||null)===focus;
   el.classList.toggle('active',active);
   if(active)el.setAttribute('aria-current','page');else el.removeAttribute('aria-current');
  });
- document.title='Rangeform · '+({overview:'Overview',signals:'Trade decision desk',scanner:'Opportunity scanner',news:'News & catalysts',settings:'Settings',studio:'Research Studio',daydesk:'Day Trading Desk'}[page]);
- history.replaceState(null,'','#'+page);
+ const label=focusTitles[focus]||pageTitles[page];
+ document.title='Rangeform · '+label;
+ if($('workspaceLocation'))$('workspaceLocation').textContent=label;
+ if($('workspaceOverview'))$('workspaceOverview').hidden=(page==='overview'&&!focus);
+ const token=routeToken(page,focus);
+ if(location.hash!=='#'+token)history.pushState({rangeformRoute:token},'',location.pathname+location.search+'#'+token);
  closeNav();
- const discovery=document.querySelector('.discovery-card'),host=page==='scanner'?$('discoveryScannerHost'):$('discoveryHome');
- if(discovery&&host)host.after(discovery);
  if(page==='news'&&!state.newsCache.has(state.newsCategory+'|'+$('newsQuery').value.trim()))loadNews();
  if(page==='signals'&&state.analysis)renderAnalysis(state.analysis);
  if(page==='settings')syncSettingsControls();
- // No implicit six-stock scan on every page visit: preserve API credits for manual research.
+ // Every new workspace page opens at the top instead of jumping into an old
+ // section far down the previous page. Subtools scroll only when requested.
  if(focus){
   requestAnimationFrame(()=>{
-   const el=$(focus);if(el)el.closest('.card,.assistant-card,.paper-card')?.scrollIntoView({behavior:'smooth',block:'start'});
+   const el=$(focus);if(el)el.closest('.card,.assistant-card,.paper-card')?.scrollIntoView({behavior:'instant',block:'start'});
   });
- }else window.scrollTo({top:0,behavior:'instant'});
+ }else{
+  window.scrollTo({top:0,behavior:'instant'});
+  document.scrollingElement?.scrollTo({top:0,behavior:'instant'});
+ }
 }
 function routeFromHash(){
  const raw=location.hash.slice(1).toLowerCase();
  const legacy=oldRoutes[raw];
  if(legacy){setPage(legacy.page,legacy.focus||null);return}
- setPage(['overview','daydesk','signals','scanner','news','settings','studio'].includes(raw)?raw:'overview');
+ setPage(Object.prototype.hasOwnProperty.call(pageTitles,raw)?raw:'overview');
 }
 function closeNav(){$('sidebar').classList.remove('open');$('navShade').hidden=true}
 function initTheme(){let theme;try{theme=localStorage.getItem('rf_v9_theme')||localStorage.getItem('rangeform_theme')||'light'}catch{}setTheme(theme)}
@@ -225,7 +240,7 @@ const results=[];for(let i=0;i<state.watch.length;i++){
 }
 results.sort((a,b)=>{const sa=a[1]?.score, sb=b[1]?.score;return (Number.isFinite(sb)?sb:-1)-(Number.isFinite(sa)?sa:-1)});renderScan(results);
 for(const sym of ['SPY','NVDA','TSLA','SHOP']){const x=state.market.get(sym);const q=document.querySelector('[data-quote="'+sym+'"]'),delta=document.querySelector('[data-change="'+sym+'"]');if(x){q.textContent=money(x.last);delta.textContent=pct(x.change_pct)+' · '+ageLabel(x.last_bar_utc);delta.className=Number(x.change_pct)>=0?'positive':'negative'}}
-state.scanning=false;for(const id of ['scanButton','overviewScan']){$(id).disabled=false;$(id).innerHTML=id==='scanButton'?'Run watchlist scan ↗':'Explore opportunities <span>↗</span>'}
+state.scanning=false;for(const id of ['scanButton','overviewScan']){$(id).disabled=false;$(id).innerHTML=id==='scanButton'?'Run watchlist scan ↗':'Open Opportunity Scanner <span>↗</span>'}
 toast(results.filter(x=>!x[1]?.error).length+' of '+results.length+' symbols analyzed. Review data age before acting.')}
 async function inspect(sym){setMonitor(false);state.symbol=sym;$('symbolInput').value=sym;setPage('signals');await runAnalysis()}
 function clearAnalysis(message){state.analysis=null;state.opportunity=null;state.agentRoom=null;resetAgentRoom(message);resetOpportunity(message);
@@ -476,7 +491,8 @@ function selectArticle(item){
  const link=$('articleOriginal');link.href=item.url;link.hidden=false;
 }
 function bind(){initTheme();initWorkspacePrefs();state.watch=readWatch();renderWatch();bindAgentFilters();$('showAgentRoom')?.addEventListener('click',()=>$('agentRoomTitle')?.scrollIntoView({behavior:'smooth',block:'start'}));scheduleDiscovery();localClock();setInterval(localClock,60000);
-$$('[data-page]').forEach(el=>el.addEventListener('click',()=>setPage(el.dataset.page,el.dataset.focus||null)));
+$('[data-page]').forEach(el=>el.addEventListener('click',()=>setPage(el.dataset.page,el.dataset.focus||null)));
+$('workspaceOverview')?.addEventListener('click',()=>setPage('overview'));
 $('mobileMenu').onclick=()=>{$('sidebar').classList.toggle('open');$('navShade').hidden=!$('sidebar').classList.contains('open')};$('navShade').onclick=closeNav;
 $('themeToggle').onclick=()=>setTheme(document.body.dataset.theme==='dark'?'light':'dark');
 $('providerBadge').onclick=()=>setPage('settings');
@@ -514,7 +530,7 @@ $('settingsCheckProvider').onclick=async()=>{
  finally{button.disabled=false;button.textContent='Check connection ↻'}
 };
 window.addEventListener('resize',()=>{if(state.analysis)drawChart(state.analysis)});
-loadProvider();window.addEventListener('hashchange',routeFromHash);
+loadProvider();window.addEventListener('hashchange',routeFromHash);window.addEventListener('popstate',routeFromHash);
 // Account's shared symbol search links here with ?symbol=...#signals.
 // Preselect the ticker without an implicit paid provider request.
 const linkedSymbol=new URLSearchParams(location.search).get('symbol')?.trim().toUpperCase();
