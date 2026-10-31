@@ -18,7 +18,7 @@ test('phone app manifests and each shortcut target modern pages',()=>{
  assert.ok(m.shortcuts.some(x=>x.url==='/v9.html#scanner'));
  assert.ok(m.shortcuts.some(x=>x.url==='/v9.html#signals'));
  assert.ok(m.shortcuts.some(x=>x.url==='/account.html'));
- assert.match(read('public/v9.html'),/rel="manifest" href="\/manifest.webmanifest\?v=31"/);
+ assert.match(read('public/v9.html'),/rel="manifest" href="\/manifest.webmanifest\?v=32"/);
  assert.match(read('public/v9.html'),/apple-mobile-web-app-capable/);
 });
 test('modern sidebar routes tools inside V10 without accidental classic navigation',()=>{
