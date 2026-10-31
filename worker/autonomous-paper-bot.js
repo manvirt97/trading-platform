@@ -14,6 +14,12 @@ export default {
  },
  async fetch(request,env){
   if(new URL(request.url).pathname!=='/health'||request.method!=='GET')return json({error:'not found'},404);
-  return json({worker:'rangeform-paper-bot',configured:serviceReady(env),mode:'PAPER_ONLY',execution:'NO_LIVE_BROKER_ORDERS',schedule:'UTC minute cron'});
+  return json({
+   worker:'rangeform-paper-bot',
+   configured:serviceReady(env),
+   // Boolean presence checks only: never return the owner UID, token or D1 content.
+   checks:{d1_bound:Boolean(env.DB),owner_secret_present:Boolean(env.BOT_OWNER_UID),paper_service_enabled:env.BOT_SERVICE_ENABLED==='on'},
+   mode:'PAPER_ONLY',execution:'NO_LIVE_BROKER_ORDERS',schedule:'UTC minute cron'
+  });
  }
 };
