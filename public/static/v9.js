@@ -68,7 +68,7 @@ let scannerMode='watchlist';
 function setScannerMode(mode){
  const next=mode==='sample'?'sample':'watchlist';
  scannerMode=next;
- for(const button of $('[data-scanner-mode]')){
+ for(const button of $$('[data-scanner-mode]')){
   const active=button.dataset.scannerMode===next;
   button.classList.toggle('selected',active);
   button.setAttribute('aria-selected',String(active));
@@ -512,8 +512,8 @@ function selectArticle(item){
  const link=$('articleOriginal');link.href=item.url;link.hidden=false;
 }
 function bind(){initTheme();initWorkspacePrefs();state.watch=readWatch();renderWatch();bindAgentFilters();$('showAgentRoom')?.addEventListener('click',()=>$('agentRoomTitle')?.scrollIntoView({behavior:'smooth',block:'start'}));scheduleDiscovery();localClock();setInterval(localClock,60000);
-$('[data-page]').forEach(el=>el.addEventListener('click',()=>setPage(el.dataset.page,el.dataset.focus||null)));
-$('[data-scanner-mode]').forEach(el=>{
+$$('[data-page]').forEach(el=>el.addEventListener('click',()=>setPage(el.dataset.page,el.dataset.focus||null)));
+$$('[data-scanner-mode]').forEach(el=>{
  el.addEventListener('click',()=>setScannerMode(el.dataset.scannerMode));
  el.addEventListener('keydown',event=>{
   if(!['ArrowLeft','ArrowRight','Home','End'].includes(event.key))return;
