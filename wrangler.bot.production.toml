@@ -1,5 +1,11 @@
 name = "rangeform-autonomous-paper-bot"
 main = "worker/autonomous-paper-bot.js"
+keep_vars = true
+
+# Worker MUST have an encrypted owner secret at deployment time.
+# Abort the deploy rather than silently releasing an unconfigured scheduler.
+[secrets]
+required = ["BOT_OWNER_UID"]
 compatibility_date = "2026-10-01"
 
 # PRODUCTION-ONLY PAPER scheduler: the owner secret and D1 binding are required.
