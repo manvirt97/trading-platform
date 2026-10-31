@@ -69,8 +69,8 @@ function setPage(page,focus=null){
  if(!validPages.includes(page))return;
  state.view=page;state.focus=focus;
  document.body.dataset.view=page;
- $('[data-section]').forEach(el=>el.classList.toggle('visible',el.dataset.section===page));
- $('.nav-link[data-page]').forEach(el=>{
+ $$('[data-section]').forEach(el=>el.classList.toggle('visible',el.dataset.section===page));
+ $$('.nav-link[data-page]').forEach(el=>{
   const active=el.dataset.page===page&&(el.dataset.focus||null)===focus;
   el.classList.toggle('active',active);
   if(active)el.setAttribute('aria-current','page');else el.removeAttribute('aria-current');
