@@ -42,7 +42,7 @@ test('Local visual and news preferences are actually bound, persisted and restor
  assert.match(js,/\$\('settingsNewsCategory'\)\.onchange/);
  assert.match(js,/initTheme\(\);initWorkspacePrefs\(\)/);
  assert.match(html,/v12-settings-news\.css\?v=1/);
- assert.match(html,/v9\.js\?v=(?:14|21)/);
+ assert.match(html,/v9\.js\?v=(?:14|21|30)/);
 });
 test('Settings never asks users to paste market data API keys into browser storage',()=>{
  const html=read('public/v9.html'),js=read('public/static/v9.js');
