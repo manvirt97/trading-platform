@@ -19,6 +19,8 @@ jobs:
           node-version: '22'
       - run: npm test
       - run: npm run syntax
+      - name: Verify all 11 original Python skill adapters are safe
+        run: python3 -m unittest discover -s services/python-skills -p 'test_*.py' -v
       - name: Validate installed-app release marker
         env:
           RANGEFORM_BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
