@@ -55,6 +55,7 @@ const oldRoutes={
   risk:{page:'signals',focus:'riskAccount'},journal:{page:'signals',focus:'paperTitle'},
   backtest:{page:'signals',focus:'agentRoomTitle'}
 };
+const validPages=['overview','daydesk','signals','scanner','news','settings','studio'];
 const pageTitles={overview:'Overview',signals:'Trade signals',scanner:'Opportunity scanner',news:'News & catalysts',settings:'Settings',studio:'Research Studio',daydesk:'Day Trading Desk'};
 const focusTitles={assistantTitle:'Research AI',riskAccount:'Risk planner',paperTitle:'Paper journal',agentRoomTitle:'Specialist research'};
 function routeToken(page,focus){
@@ -65,7 +66,7 @@ function routeToken(page,focus){
  return page;
 }
 function setPage(page,focus=null){
- if(!Object.prototype.hasOwnProperty.call(pageTitles,page))return;
+ if(!validPages.includes(page))return;
  state.view=page;state.focus=focus;
  document.body.dataset.view=page;
  $('[data-section]').forEach(el=>el.classList.toggle('visible',el.dataset.section===page));
@@ -99,7 +100,7 @@ function routeFromHash(){
  const raw=location.hash.slice(1).toLowerCase();
  const legacy=oldRoutes[raw];
  if(legacy){setPage(legacy.page,legacy.focus||null);return}
- setPage(Object.prototype.hasOwnProperty.call(pageTitles,raw)?raw:'overview');
+ setPage(validPages.includes(raw)?raw:'overview');
 }
 function closeNav(){$('sidebar').classList.remove('open');$('navShade').hidden=true}
 function initTheme(){let theme;try{theme=localStorage.getItem('rf_v9_theme')||localStorage.getItem('rangeform_theme')||'light'}catch{}setTheme(theme)}
@@ -491,7 +492,7 @@ function selectArticle(item){
  const link=$('articleOriginal');link.href=item.url;link.hidden=false;
 }
 function bind(){initTheme();initWorkspacePrefs();state.watch=readWatch();renderWatch();bindAgentFilters();$('showAgentRoom')?.addEventListener('click',()=>$('agentRoomTitle')?.scrollIntoView({behavior:'smooth',block:'start'}));scheduleDiscovery();localClock();setInterval(localClock,60000);
-$('[data-page]').forEach(el=>el.addEventListener('click',()=>setPage(el.dataset.page,el.dataset.focus||null)));
+$$('[data-page]').forEach(el=>el.addEventListener('click',()=>setPage(el.dataset.page,el.dataset.focus||null)));
 $('workspaceOverview')?.addEventListener('click',()=>setPage('overview'));
 $('mobileMenu').onclick=()=>{$('sidebar').classList.toggle('open');$('navShade').hidden=!$('sidebar').classList.contains('open')};$('navShade').onclick=closeNav;
 $('themeToggle').onclick=()=>setTheme(document.body.dataset.theme==='dark'?'light':'dark');
