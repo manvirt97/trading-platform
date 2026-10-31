@@ -1,5 +1,5 @@
 {
-  "version": "31",
-  "build": "rangeform-v31-focused-workspaces",
-  "description": "Compact Overview, focused Research AI, watchlist/sample scanner tabs and consistent navigation"
+  "version": "32",
+  "build": "rangeform-v32-iphone-shell-overlap-fix",
+  "description": "Nonoverlapping iPhone Account header and independently scrolling autonomous navigation drawer"
 }
