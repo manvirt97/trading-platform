@@ -9,6 +9,11 @@ test('Cloudflare Workers Builds production uses durable paper-only config and ex
  assert.match(safe,/BOT_SERVICE_ENABLED = "off"/);
  assert.match(prod,/BOT_SERVICE_ENABLED = "on"/);
  assert.match(prod,/keep_vars = true/);
+ // TOML table headings change the scope of following values. Compatibility date
+ // must be top-level, not accidentally nested under [secrets].
+ assert.match(prod,/^compatibility_date = "2026-10-01"$/m);
+ assert.ok(prod.indexOf('compatibility_date =') < prod.indexOf('[secrets]'),
+  'compatibility_date belongs at TOML root, before the secrets table');
  assert.match(prod,/required = \["BOT_OWNER_UID"\]/);
  for(const required of [
   'name = "rangeform-autonomous-paper-bot"',
