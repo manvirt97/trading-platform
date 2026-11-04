@@ -81,7 +81,7 @@ async function check(){
   const [security,config]=await Promise.all([api('/api/cso-status'),api('/api/openai-council')]);
   renderPosture(security.security);
   state.ready=Boolean(config.configured);
-  $('openaiAvailability').textContent=state.ready?'API connected':'API setup required';
+  $('openaiAvailability').textContent=state.ready?'API configured':'API setup required';
   message(state.ready?'Owner verified; OpenAI Council is configured. Model calls use separate API credits.':
    'CSO checks available; OpenAI Council needs a private API key, explicit enable flag and audit migration before it can run.');
  }catch(e){
