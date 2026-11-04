@@ -14,7 +14,7 @@ test('all active Rangeform surfaces load one EquityClimb-inspired design layer l
   const cssLinks=[...head.matchAll(/href="(\/static\/[^"]+\.css\?v=[^"]+)"/g)].map(x=>x[1]);
   assert.match(cssLinks.at(-1),page==='v9.html'?/workspace-hub-v31\.css\?v=31/:/rangeform-design-v26\.css\?v=32/,'layout must override older page CSS: '+page);
   assert.match(head,/manifest\.webmanifest\?v=32/,'missing common installed-app identity: '+page);
-  assert.match(head,/pwa-update-v32\.js\?v=32/,'stale release marker: '+page);
+  assert.ok(head.includes('pwa-update-v'+current+'.js?v='+current),'stale release marker: '+page);
   assert.match(html,/name="theme-color" content="#f3f4f2"/);
  }
  assert.match(css,/--bg:#f3f4f2/);
@@ -78,8 +78,6 @@ test('published release matches installed app update checker version',()=>{
  const release=JSON.parse(read('public/release.json'));
  const pwa=read('public/static/pwa-update-v'+release.version+'.js');
  assert.ok(Number(release.version)>=32);
- assert.match(release.build,new RegExp('^rangeform-v'+release.version+'-[a-z0-9-]+
-});
-));
+ assert.ok(release.build.startsWith('rangeform-v'+release.version+'-'));
  assert.ok(pwa.includes('const CURRENT='+release.version+','));
 });
