@@ -24,7 +24,7 @@ This release adds genuine server-side OpenAI Responses API calls on demand:
    Or run the migration SQL using the D1 dashboard SQL console after verifying the correct database. Do **not** apply this to EquityClimb's database.
 
 7. Only after audit storage and the secret are ready, set `OPENAI_AGENTS_ENABLED=on` in Rangeform's **production** Pages environment and redeploy if required. Leave off in preview unless intentionally testing paid calls.
-8. Sign in via Rangeform Account. Visit `/agent-team.html`, press **Check CSO security**. Expect **Research checks ready** and **API connected** before choosing a focused, owner-confirmed investigation.
+8. Sign in via Rangeform Account. Visit `/agent-team.html`, press **Check CSO security**. Expect **Research checks ready** and **API configured** before choosing a focused, owner-confirmed investigation.
 9. Confirm that a model result is labeled research-only; the final execution decision stays `NO_ORDER`, even for a bullish watch.
 10. Review GitHub Actions → **CSO security watch**. The weekly source-policy check is useful but is **not** a substitute for full vulnerability scanning, access review, production observability or penetration testing.
 
