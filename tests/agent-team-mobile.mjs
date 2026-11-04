@@ -23,6 +23,9 @@ try{
     assert.ok(initial.form.left>=-1&&initial.form.right<=width+1,'Form clipped '+detail);
     assert.ok(initial.scrollWidth<=width+2,'Page overflows horizontally '+detail);
     assert.match(initial.text,/No data has been requested yet/);
+    assert.equal(await page.locator('#runOpenAICouncil').isDisabled(),true,'Paid AI disabled before owner verification '+width);
+    assert.equal(await page.locator('#csoTitle').isVisible(),true,'CSO security panel missing '+width);
+    assert.equal(await page.locator('#councilMode').isVisible(),true,'Council mode selection missing '+width);
     await page.screenshot({path:'artifacts/mobile/agent-team-v33-'+width+'.png',fullPage:true});
     await page.locator('#rfMobileMenu').click();
     const expanded=await page.locator('#rfMobileMenu').getAttribute('aria-expanded');
