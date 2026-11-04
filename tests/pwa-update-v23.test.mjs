@@ -5,7 +5,7 @@ const read=p=>readFileSync(new URL('../'+p,import.meta.url),'utf8');
 const current=JSON.parse(read('public/release.json')).version;
 
 test('all canonical pages load same installed-app release checker',()=>{
- const paths=['public/v9.html','public/account.html','public/algo.html','public/bot.html'];
+ const paths=['public/v9.html','public/account.html','public/algo.html','public/bot.html','public/agent-team.html'];
  for(const path of paths){
   const html=read(path);
   assert.ok(html.includes('pwa-update-v'+current+'.js?v='+current),'missing refresh code on '+path);
