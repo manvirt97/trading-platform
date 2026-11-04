@@ -30,7 +30,7 @@ if(!(Number.isInteger(ver)&&ver>old&&current.build.startsWith('rangeform-v'+ver+
 // Every canonical page and its embedded updater must advance together.
 // A bumped JSON marker with an old CURRENT value otherwise causes repeat refreshes.
 const expected='pwa-update-v'+ver+'.js?v='+ver;
-for(const page of ['v9.html','account.html','algo.html','bot.html']){
+for(const page of ['v9.html','account.html','algo.html','bot.html','agent-team.html']){
  const html=readFileSync('public/'+page,'utf8');
  if(!html.includes(expected)){
   console.error('Release '+ver+' not wired to /'+page+' (expected '+expected+').');
