@@ -82,11 +82,14 @@ export async function onRequestPost({request,env}){
 
   const decision=enforceFinalDecision(room,opportunity,security);
   try{
+    // Check required migration BEFORE reserving a daily paid-call allowance.
+    await env.DB.prepare('SELECT id FROM rangeform_ai_council_audit LIMIT 1').first();
+  }catch{return reply({code:'COUNCIL_AUDIT_UNAVAILABLE',error:'Private AI audit storage missing. Apply the D1 migration before paid model calls.'},503)}
+  try{
     const denied=await quota(env.DB,access.uid,mode);
     if(denied)return reply({code:'AI_DAILY_LIMIT',error:denied},429);
-    // Migration is applied separately. Missing audit storage prevents paid AI calls.
     await record(env.DB,access.uid,symbol,mode,'STARTED');
-  }catch{return reply({code:'COUNCIL_AUDIT_UNAVAILABLE',error:'AI usage or audit tables are missing. Apply the D1 migration before enabling paid AI calls.'},503)}
+  }catch{return reply({code:'COUNCIL_AUDIT_UNAVAILABLE',error:'AI usage counter or audit recording unavailable. No AI call was started.'},503)}
   const evidence=researchEvidence(analysis,opportunity,room,news);
   const selected=ROLES.filter(r=>ALLOWED_MODES[mode].includes(r.id));
   const specialistResults=[];
