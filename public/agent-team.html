@@ -11,11 +11,11 @@
 <link rel="stylesheet" href="/static/workspace-palette-v21.css?v=21">
 <link rel="stylesheet" href="/static/ios-statusbar-v22.css?v=22">
 <link rel="stylesheet" href="/static/rangeform-design-v26.css?v=32">
-<link rel="stylesheet" href="/static/agent-team.css?v=33">
+<link rel="stylesheet" href="/static/agent-team.css?v=33"><link rel="stylesheet" href="/static/openai-council.css?v=34">
 <script src="/static/theme-sync.js?v=22"></script>
 <script src="/static/workspace-shell-v26.js?v=26" defer></script>
 <script src="/static/pwa-update-v33.js?v=33" defer></script>
-<script src="/static/agent-team.js?v=33" defer></script>
+<script src="/static/agent-team.js?v=33" defer></script><script src="/static/openai-council.js?v=34" defer></script>
 </head><body data-theme="light">
 <div class="shell"><aside class="rail" id="rfRail" aria-label="Workspace navigation">
 <a class="logo" href="/v9.html#overview"><img src="/static/rangeform-official-icon.png" width="37" height="37" alt=""><span><strong>Rangeform</strong><small>RESEARCH &amp; DECISIONS</small></span></a>
@@ -39,8 +39,8 @@
 <main class="agent-main">
 <div class="agent-hero">
  <div><p class="eyebrow">RANGEFORM / AGENT COMMAND CENTRE</p>
- <h1>One supervisor.<br><em>Eleven specialist roles.</em></h1>
- <p>Every conclusion is linked to real technical evidence. Missing or stale data means WAIT, never an invented prediction.</p></div>
+ <h1>One supervisor.<br><em>Eleven specialists + CSO.</em></h1>
+ <p>Rule-based evidence remains the safety foundation. Optional OpenAI specialists add independent reasoning, while the CSO checks security limits.</p></div>
  <div class="agent-safety"><strong>Execution locked</strong><span>Real orders off · Paper orders not connected to this team</span></div>
 </div>
 <form class="card agent-form" id="teamForm">
@@ -49,6 +49,23 @@
  <button id="teamAnalyze" type="submit" class="primary">Run agent review</button>
 </form>
 <div class="message" id="teamMessage" role="status" aria-live="polite">Choose a symbol and run a review. No data has been requested yet.</div>
+<section class="card agent-council" aria-labelledby="openaiCouncilTitle">
+ <div class="agent-heading"><div><p class="eyebrow">OPENAI INTELLIGENCE / OPTIONAL PAID API</p><h2 id="openaiCouncilTitle">OpenAI Agent Council</h2></div><span class="chip" id="openaiAvailability">Checking configuration</span></div>
+ <p class="agent-council-note">Run independent AI specialist reviews, an AI Supervisor and a CSO security review. Your existing market-data rules remain authoritative. No stock or paper orders can be placed here.</p>
+ <div class="agent-council-controls">
+  <label for="councilMode">Investigation depth<select id="councilMode"><option value="focused">Focused — 4 specialists + CSO + Supervisor</option><option value="full">Full — 11 specialists + CSO + Supervisor</option></select></label>
+  <button id="runOpenAICouncil" type="button" class="primary" disabled>Run OpenAI council</button>
+  <button id="checkCSO" type="button">Check CSO security</button>
+ </div>
+ <div id="councilMessage" class="message" role="status" aria-live="polite">Connect an owner account and configure the server-side OpenAI API key to enable paid model calls.</div>
+ <div class="agent-council-reports" id="councilResults" aria-label="OpenAI agent reports"><p class="agent-placeholder">No OpenAI model investigation has been run.</p></div>
+</section>
+<section class="card agent-cso" aria-labelledby="csoTitle">
+ <div class="agent-heading"><div><p class="eyebrow">SECURITY OFFICE / READ-ONLY</p><h2 id="csoTitle">CSO Security Agent</h2></div><span class="chip" id="csoBadge">Not checked</span></div>
+ <p class="agent-council-note">Checks authenticated access, private storage, server-side AI credentials and execution restrictions. The AI CSO can explain findings; hard-coded protections and human approval control changes.</p>
+ <div id="csoChecks" class="agent-cso-list"><p class="agent-placeholder">Select Check CSO security to view the current posture. No keys or account identifiers are displayed.</p></div>
+ <p class="agent-cso-foot">This is not a penetration test, a continuous security scan, or permission to trade. The CSO never modifies your Cloudflare, GitHub, brokerage or Firebase credentials.</p>
+</section>
 <section class="card agent-supervisor" aria-labelledby="supervisorTitle">
 <div class="agent-heading"><div><p class="eyebrow">SUPERVISOR / FINAL REVIEW</p><h2 id="supervisorTitle">Supervisor Agent</h2></div><span class="chip" id="supervisorStatus">NOT RUN</span></div>
 <p id="supervisorReason">The supervisor waits for validated evidence from the specialist roles.</p>
