@@ -1,5 +1,5 @@
 {
-  "version": "33",
-  "build": "rangeform-v33-agent-team",
-  "description": "Eleven role agent command centre with explainable research supervisor and zero order permissions"
+  "version": "34",
+  "build": "rangeform-v34-openai-cso-council",
+  "description": "OpenAI-backed agent team with read-only CSO security checks; all brokerage orders disabled"
 }
