@@ -1,8 +1,11 @@
 import assert from 'node:assert/strict';
 import {chromium} from 'playwright';
+import {readFileSync} from 'node:fs';
 const base=process.env.RANGEFORM_VISUAL_BASE||'http://127.0.0.1:8999';
 const browser=await chromium.launch({headless:true});
-const payload={version:'33',build:'rangeform-v33-test-release'};
+const current=JSON.parse(readFileSync(new URL('../public/release.json',import.meta.url),'utf8'));
+const next=Number(current.version)+1;
+const payload={version:String(next),build:'rangeform-v'+next+'-test-release'};
 try {
  // Test 1: existing installed app automatically refreshes without prompting
  // when the user has no unsaved changes. Route/hash and browser storage stay.
@@ -28,7 +31,7 @@ try {
  await edit.addInitScript(()=>Object.defineProperty(navigator,'standalone',{configurable:true,value:true}));
  const draft=await edit.newPage();
  let live=false;
- await draft.route('**/release.json*',r=>r.fulfill({status:200,contentType:'application/json',body:JSON.stringify(live?payload:{version:'32',build:'rangeform-v32-iphone-shell-overlap-fix'})}));
+ await draft.route('**/release.json*',r=>r.fulfill({status:200,contentType:'application/json',body:JSON.stringify(live?payload:current)}));
  await draft.goto(base+'/account.html',{waitUntil:'domcontentloaded'});
  await draft.locator('#historyNote').fill('Keep this unsaved note');
  live=true;

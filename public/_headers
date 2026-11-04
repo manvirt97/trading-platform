@@ -37,6 +37,8 @@
   Cache-Control: no-store, max-age=0
 /bot.html
   Cache-Control: no-store, max-age=0
+/agent-team.html
+  Cache-Control: no-store, max-age=0
 
 /index.html
   Cache-Control: no-store, max-age=0

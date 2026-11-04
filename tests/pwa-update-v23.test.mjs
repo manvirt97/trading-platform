@@ -2,15 +2,16 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 const read=p=>readFileSync(new URL('../'+p,import.meta.url),'utf8');
+const current=JSON.parse(read('public/release.json')).version;
 
 test('all canonical pages load same installed-app release checker',()=>{
  const paths=['public/v9.html','public/account.html','public/algo.html','public/bot.html'];
  for(const path of paths){
   const html=read(path);
-  assert.match(html,/pwa-update-v32\.js\?v=32/,'missing refresh code on '+path);
+  assert.ok(html.includes('pwa-update-v'+current+'.js?v='+current),'missing refresh code on '+path);
   assert.match(html,/viewport-fit=cover/,'must protect installed iPhone safe areas on '+path);
  }
- const checker=read('public/static/pwa-update-v32.js');
+ const checker=read('public/static/pwa-update-v'+current+'.js');
  assert.match(checker,/navigator\.standalone===true/);
  assert.match(checker,/document\.addEventListener\('visibilitychange'/);
  assert.match(checker,/window\.addEventListener\('pageshow'/);
@@ -28,8 +29,8 @@ test('all canonical pages load same installed-app release checker',()=>{
 
 test('release metadata is revalidated rather than retaining a stale offline shell',()=>{
  const meta=JSON.parse(read('public/release.json'));
- assert.equal(meta.version,'32');
- assert.equal(meta.build,'rangeform-v32-iphone-shell-overlap-fix');
+ assert.ok(Number(meta.version)>=32);
+ assert.ok(meta.build.startsWith('rangeform-v'+meta.version+'-'));
  const headers=read('public/_headers');
  assert.match(headers,/\/release\.json\n  Cache-Control: no-store, max-age=0/);
  for(const path of ['algo.html','bot.html','account.html','v9.html'])

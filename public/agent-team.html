@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#f3f4f2"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Rangeform">
+<title>Rangeform · AI Agent Team</title>
+<link rel="icon" href="/static/rangeform-official-icon.png">
+<link rel="manifest" href="/manifest.webmanifest?v=32">
+<link rel="stylesheet" href="/static/theme-sync.css?v=2">
+<link rel="stylesheet" href="/static/algo.css?v=1">
+<link rel="stylesheet" href="/static/workspace-unified-v17.css?v=19">
+<link rel="stylesheet" href="/static/workspace-palette-v21.css?v=21">
+<link rel="stylesheet" href="/static/ios-statusbar-v22.css?v=22">
+<link rel="stylesheet" href="/static/rangeform-design-v26.css?v=32">
+<link rel="stylesheet" href="/static/agent-team.css?v=33">
+<script src="/static/theme-sync.js?v=22"></script>
+<script src="/static/workspace-shell-v26.js?v=26" defer></script>
+<script src="/static/pwa-update-v33.js?v=33" defer></script>
+<script src="/static/agent-team.js?v=33" defer></script>
+</head><body data-theme="light">
+<div class="shell"><aside class="rail" id="rfRail" aria-label="Workspace navigation">
+<a class="logo" href="/v9.html#overview"><img src="/static/rangeform-official-icon.png" width="37" height="37" alt=""><span><strong>Rangeform</strong><small>RESEARCH &amp; DECISIONS</small></span></a>
+<span class="nav-tag">WORKSPACE</span>
+<nav class="rail-links" aria-label="Main navigation">
+<a class="rail-link" href="/v9.html#overview"><span class="nav-symbol" aria-hidden="true">◫</span> Overview</a>
+<a class="rail-link" href="/v9.html#scanner"><span class="nav-symbol" aria-hidden="true">◎</span> Opportunity Scanner</a>
+<a class="rail-link current" aria-current="page" href="/agent-team.html"><span class="nav-symbol" aria-hidden="true">✳</span> Agent Team</a>
+<a class="rail-link" href="/v9.html#daydesk"><span class="nav-symbol" aria-hidden="true">▥</span> Day Trading Desk</a>
+<a class="rail-link" href="/bot.html"><span class="nav-symbol" aria-hidden="true">⟳</span> Autonomous Paper Bot</a>
+<a class="rail-link" href="/v9.html#signals"><span class="nav-symbol" aria-hidden="true">↗</span> Trade Signals</a>
+<a class="rail-link" href="/account.html"><span class="nav-symbol" aria-hidden="true">☰</span> Account &amp; Sign-in</a>
+</nav><div class="rail-bottom">RESEARCH FIRST<p>22 existing technical checks feed 11 coordinated roles. No brokerage orders.</p></div>
+</aside><div class="workspace">
+<header class="topbar rf-topbar">
+<button id="rfMobileMenu" class="rf-mobile-menu" type="button" aria-label="Open navigation" aria-controls="rfRail" aria-expanded="false">☰</button>
+<a class="rf-mobile-brand" href="/v9.html#overview"><img src="/static/rangeform-official-icon.png" alt=""><strong>Rangeform</strong></a>
+<a class="agent-breadcrumb" href="/v9.html#overview">← Overview</a>
+<div class="rf-top-actions"><span class="chip" id="teamHeaderMode">RESEARCH ONLY</span><button id="themeToggleAgent" class="iconbtn" type="button" aria-label="Toggle theme">◐</button></div>
+</header>
+<main class="agent-main">
+<div class="agent-hero">
+ <div><p class="eyebrow">RANGEFORM / AGENT COMMAND CENTRE</p>
+ <h1>One supervisor.<br><em>Eleven specialist roles.</em></h1>
+ <p>Every conclusion is linked to real technical evidence. Missing or stale data means WAIT, never an invented prediction.</p></div>
+ <div class="agent-safety"><strong>Execution locked</strong><span>Real orders off · Paper orders not connected to this team</span></div>
+</div>
+<form class="card agent-form" id="teamForm">
+ <div><label for="teamSymbol">Stock or ETF</label><input id="teamSymbol" name="symbol" maxlength="10" value="SPY" pattern="[A-Za-z][A-Za-z0-9.\\-]{0,9}" autocomplete="off" required></div>
+ <div><label for="teamInterval">Chart interval</label><select id="teamInterval" name="interval"><option value="5min">5 minutes</option><option value="15min">15 minutes</option><option value="1min">1 minute</option></select></div>
+ <button id="teamAnalyze" type="submit" class="primary">Run agent review</button>
+</form>
+<div class="message" id="teamMessage" role="status" aria-live="polite">Choose a symbol and run a review. No data has been requested yet.</div>
+<section class="card agent-supervisor" aria-labelledby="supervisorTitle">
+<div class="agent-heading"><div><p class="eyebrow">SUPERVISOR / FINAL REVIEW</p><h2 id="supervisorTitle">Supervisor Agent</h2></div><span class="chip" id="supervisorStatus">NOT RUN</span></div>
+<p id="supervisorReason">The supervisor waits for validated evidence from the specialist roles.</p>
+<div class="agent-metrics">
+<div><small>Research verdict</small><strong id="supervisorVerdict">—</strong></div>
+<div><small>Agreement</small><strong id="supervisorAgreement">—</strong></div>
+<div><small>Data timestamp</small><strong id="supervisorTimestamp">—</strong></div>
+</div>
+<div class="agent-veto" id="teamVeto">Execution gate: blocked. This screen cannot place a trade.</div>
+</section>
+<section class="card" aria-labelledby="agentsTitle">
+<div class="agent-heading"><div><p class="eyebrow">DEPARTMENT / ROLE REPORTS</p><h2 id="agentsTitle">11 specialist agents</h2></div><span class="chip" id="rolesStatus">0 reviewed</span></div>
+<div class="agent-grid" id="agentGrid">
+<p class="agent-placeholder">No review yet. Role cards will show the exact evidence or explain why an agent abstained.</p>
+</div>
+</section>
+<div class="agent-explain">
+<p><strong>What this team can do:</strong> Coordinate and summarize existing market research checks with a traceable supervisor verdict.</p>
+<p><strong>What it cannot do:</strong> Predict guaranteed gains, trade stocks autonomously, access a brokerage account, or control the separate crypto paper bot. Those require additional tested integrations.</p>
+<a href="/bot.html">View separate paper-trading bot →</a>
+</div>
+</main>
+</div></div><div id="rfNavShade" class="rf-nav-shade" hidden></div>
+</body></html>
