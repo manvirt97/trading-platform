@@ -1,0 +1,33 @@
+name: CSO security watch
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  schedule:
+    - cron: "0 14 * * 1"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  security-policy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Validate agent authentication, secret isolation and no-order protections
+        run: npm run security-gate
+      - name: Run CSO protection regression tests
+        run: node --test tests/openai-council.test.mjs
+      - name: Validate JS syntax in protected routes
+        run: |
+          node --check functions/api/openai-council.js
+          node --check functions/api/cso-status.js
+          node --check functions/_shared/openai-council.js
+          node --check functions/_shared/cso-security.js
+      # GitHub Actions failures notify subscribed repository maintainers.
+      # This watch checks committed code policy, not external infrastructure,
+      # operational logs, broker account permissions or actual vulnerabilities.

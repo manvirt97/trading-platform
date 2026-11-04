@@ -21,7 +21,7 @@ FIREBASE_PROJECT_ID = "rangeform-7e8d2"
 FIREBASE_API_KEY = "AIzaSyDuW6AYo89yiDQXFQWG_Ea0b3U1iaShbdk"
 FIREBASE_AUTH_DOMAIN = "rangeform-7e8d2.firebaseapp.com"
 FIREBASE_APP_ID = "1:1048284129093:web:d93cc7eda8dc14ea96402c"
-# Set on only for rate-limited, signed-in Cloudflare Workers AI. There is no exposed private AI key.
+# OpenAI Council v34: off by default. Never put OPENAI_API_KEY in this file.\n# Cloudflare Pages > Settings > Variables and Secrets: add OPENAI_API_KEY as an encrypted Secret,\n# BOT_OWNER_UID as encrypted owner Secret, and OPENAI_AGENTS_ENABLED=on as an explicit variable\n# after applying migrations/0002_openai_council_audit.sql and setting API usage budget.\n# Existing Cloudflare Workers AI research remains separately controlled.\n# Set on only for rate-limited, signed-in Cloudflare Workers AI. There is no exposed private AI key.
 AI_ENABLED = "on"
 
 [ai]
