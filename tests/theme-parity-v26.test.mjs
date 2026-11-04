@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 const read=p=>readFileSync(new URL('../'+p,import.meta.url),'utf8');
 const pages=['v9.html','algo.html','bot.html','account.html'];
+const current=JSON.parse(read('public/release.json')).version;
 
 test('all active Rangeform surfaces load one EquityClimb-inspired design layer last',()=>{
  const css=read('public/static/rangeform-design-v26.css');
@@ -73,10 +74,12 @@ test('mobile desks have actual closable slideout navigation and existing iPhone 
  assert.match(css,/max\(62px,env\(safe-area-inset-top,0px\)\)/);
 });
 
-test('published release marks installed apps as V32',()=>{
+test('published release matches installed app update checker version',()=>{
  const release=JSON.parse(read('public/release.json'));
- const pwa=read('public/static/pwa-update-v32.js');
- assert.equal(release.version,'32');
- assert.equal(release.build,'rangeform-v32-iphone-shell-overlap-fix');
- assert.match(pwa,/const CURRENT=32,/);
+ const pwa=read('public/static/pwa-update-v'+release.version+'.js');
+ assert.ok(Number(release.version)>=32);
+ assert.match(release.build,new RegExp('^rangeform-v'+release.version+'-[a-z0-9-]+
+});
+));
+ assert.ok(pwa.includes('const CURRENT='+release.version+','));
 });
