@@ -28,6 +28,8 @@ jobs:
         run: node tests/mobile-visual-smoke.mjs
       - name: Verify iPhone Account header and Bot drawer never overlap
         run: node tests/mobile-shell-overlap-v32.mjs
+      - name: Verify Agent Team mobile layout and drawer
+        run: node tests/agent-team-mobile.mjs
       - name: Verify Overview, Scanner and browser Back navigation
         run: node tests/navigation-browser-v30.mjs
       - name: Verify real iPhone header layout on News, Day Desk, and Trade Signals
