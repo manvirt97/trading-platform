@@ -1,5 +1,5 @@
 {
-  "version": "34",
-  "build": "rangeform-v34-openai-cso-council",
-  "description": "OpenAI-backed agent team with read-only CSO security checks; all brokerage orders disabled"
+  "version": "35",
+  "build": "rangeform-v35-forecast-ledger",
+  "description": "Private, clearly unverified market forecast ledger; paper-only trading research; live brokerage orders disabled"
 }
