@@ -186,7 +186,7 @@ export function runStrategyBacktest(inputBars, rawSpec, settings = {}) {
     development: summarize(trades.filter(t => t.phase === 'development')),
     holdout: summarize(trades.filter(t => t.phase === 'holdout')),
     equity_curve: curve.filter((_, index) => index % Math.max(1, Math.floor(curve.length / 280)) === 0 || index === curve.length - 1),
-    trade_log: trades.slice(-300),
+    trade_log: trades,
     warning_flags: forcedMissingCutoff ? ['History lacks an expected cutoff candle on ' + forcedMissingCutoff + ' session(s); liquidation used last observed close.'] : [],
     limitations: [
       'Exploratory backtest, not a validated strategy or recommendation.',
