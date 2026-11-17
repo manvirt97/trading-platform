@@ -15,8 +15,11 @@ export function parseStrategy(description) {
     throw Error('Options need historical option-chain premiums, expiries and contract costs. This first version tests the underlying asset only, not option buying/selling.');
   if (/\b(?:short\s+selling|short\s+(?:stocks?|the\s+market)|leverage|margin|futures?|martingale)\b/i.test(text))
     throw Error('This research engine supports long-only, unleveraged underlying positions. Short or leveraged strategies are not implemented.');
+  if (/\b(?:RSI|MACD|Bollinger|stochastic|VWAP|stop[- ]loss|take[- ]profit|ATR|trailing\s+stop)\b/i.test(text))
+    throw Error('Combined indicator and stop rules are not supported yet. This version evaluates an EMA crossover only.');
   let m = text.match(/\b(\d{1,3})\s*(?:\/|vs\.?|and|-)\s*(\d{1,3})\s*(?:-|\s)*(?:period\s*)?(?:EMA|exponential\s+moving\s+average)s?\b/i);
   if (!m) m = text.match(/\bEMA\s*(\d{1,3})\s*(?:\/|vs\.?|and|-)\s*(?:EMA\s*)?(\d{1,3})\b/i);
+  if (!m) m = text.match(/\b(\d{1,3})\s*EMA\s+(?:crosses|cross|crossing|moves)\s+(?:above|over|below|under)\s+(?:the\s+)?(\d{1,3})\s*EMA\b/i);
   if (!m) throw Error('Only EMA crossover strategies are implemented. Example: "9/21 EMA crossover on 15-minute candles".');
   const fast = Number(m[1]), slow = Number(m[2]);
   if (!Number.isInteger(fast) || !Number.isInteger(slow) || fast < 2 || slow > 150 || fast >= slow)
