@@ -32,11 +32,13 @@ test('plain-English parser recognizes the video EMA strategy and names all assum
   const nifty = parseStrategy('NIFTY 9/21 EMA crossover on 5-minute candles, long-only.');
   assert.equal(nifty.timezone, 'Asia/Kolkata');
   assert.equal(nifty.interval, '5min');
+  assert.equal(parseStrategy('9 EMA crosses above the 21 EMA on 5-minute candles').slow, 21);
 });
 test('parser rejects unsupported trading and unsafe ambiguity instead of quietly inventing rules', () => {
   assert.throws(() => parseStrategy('NIFTY 9/21 EMA buy and sell options strategy'), /Options need/);
   assert.throws(() => parseStrategy('9/21 EMA use short selling on 15-minute bars'), /long-only/);
   assert.throws(() => parseStrategy('Build me a strategy from news'), /Only EMA/);
+  assert.throws(() => parseStrategy('9/21 EMA with RSI confirmation on 15-minute candles'), /not supported/);
   assert.throws(() => parseStrategy('21/9 EMA crossover on 15-minute candles'), /fast/);
   assert.throws(() => parseStrategy('9/21 EMA crossover on 30-minute candles'), /30-minute/);
 });
