@@ -21,7 +21,7 @@ export function parseStrategy(description) {
   const fast = Number(m[1]), slow = Number(m[2]);
   if (!Number.isInteger(fast) || !Number.isInteger(slow) || fast < 2 || slow > 150 || fast >= slow)
     throw Error('EMA settings must be whole numbers, fast >= 2, slow <= 150 and fast < slow.');
-  if (/\b30\s*(?:m|min|minute)/i.test(text))
+  if (/\b30\s*[- ]?\s*(?:m|min|minute)/i.test(text))
     throw Error('30-minute historical candles are not supported yet. Use 1-, 5-, or 15-minute bars.');
   const tf = text.match(/\b(1|5|15)\s*[- ]?\s*(?:m|min|minute)s?\b/i);
   const daily = /\b(?:daily|1\s*[- ]?day)\b/i.test(text);
