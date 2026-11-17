@@ -81,6 +81,38 @@ function emas(bars, period) {
   }
   return result;
 }
+// Shared EMA decision core for historic and read-only live observations.
+// When currentIndex === bars.length, the last completed bar is the signal bar
+// and any future entry would need an independently observed next bar open.
+export function emaDecisionAt(bars, spec, currentIndex, fastSeries = null, slowSeries = null) {
+  const fast = fastSeries || emas(bars, spec.fast);
+  const slow = slowSeries || emas(bars, spec.slow);
+  const valid = currentIndex >= spec.slow + 1 &&
+    [fast[currentIndex - 2], slow[currentIndex - 2], fast[currentIndex - 1], slow[currentIndex - 1]].every(Number.isFinite);
+  const crossUp = valid && fast[currentIndex - 2] <= slow[currentIndex - 2] &&
+    fast[currentIndex - 1] > slow[currentIndex - 1];
+  const crossDown = valid && fast[currentIndex - 2] >= slow[currentIndex - 2] &&
+    fast[currentIndex - 1] < slow[currentIndex - 1];
+  return {
+    crossUp: Boolean(crossUp), crossDown: Boolean(crossDown),
+    signal: crossUp ? 'CROSS_UP' : crossDown ? 'CROSS_DOWN' : 'NONE',
+    trend: valid ? fast[currentIndex - 1] > slow[currentIndex - 1] ? 'ABOVE' : 'BELOW' : 'UNAVAILABLE',
+    signal_bar_utc: valid ? bars[currentIndex - 1].timestamp : null,
+    fast_ema: valid ? ROUND(fast[currentIndex - 1], 5) : null,
+    slow_ema: valid ? ROUND(slow[currentIndex - 1], 5) : null,
+    entry_policy: 'Next candle opening only; current closed candle is not a fill'
+  };
+}
+export function emaChartSeries(bars, spec, maxBars = 200) {
+  const f = emas(bars, spec.fast), s = emas(bars, spec.slow);
+  const start = Math.max(0, bars.length - maxBars);
+  return bars.slice(start).map((bar, index) => {
+    const i = index + start;
+    return { time: bar.timestamp, open: ROUND(bar.open, 5),
+      high: ROUND(bar.high, 5), low: ROUND(bar.low, 5),
+      close: ROUND(bar.close, 5), fast: ROUND(f[i], 5), slow: ROUND(s[i], 5) };
+  });
+}
 function finiteNumber(name, value, min, max) {
   const n = Number(value);
   if (!Number.isFinite(n) || n < min || n > max) throw Error(name + ' must be between ' + min + ' and ' + max + '.');
@@ -144,10 +176,7 @@ export function runStrategyBacktest(inputBars, rawSpec, settings = {}) {
       sell(i - 1, bars[i - 1].close, 'last_available_prior_close');
       forcedMissingCutoff++;
     }
-    const havePriorSignals = i >= spec.slow + 1 &&
-      [fastEMA[i - 2], slowEMA[i - 2], fastEMA[i - 1], slowEMA[i - 1]].every(Number.isFinite);
-    const crossUp = havePriorSignals && fastEMA[i - 2] <= slowEMA[i - 2] && fastEMA[i - 1] > slowEMA[i - 1];
-    const crossDown = havePriorSignals && fastEMA[i - 2] >= slowEMA[i - 2] && fastEMA[i - 1] < slowEMA[i - 1];
+    const { crossUp, crossDown } = emaDecisionAt(bars, spec, i, fastEMA, slowEMA);
     const minute = isDaily ? null : clocks[i].minute;
     const entryAllowed = isDaily || (minute >= entryTime && minute + stepMinutes < exitTime);
     if (position && crossDown) sell(i, bars[i].open, 'ema_cross_down_next_open');
@@ -189,6 +218,7 @@ export function runStrategyBacktest(inputBars, rawSpec, settings = {}) {
     development: summarize(trades.filter(t => t.phase === 'development')),
     holdout: summarize(trades.filter(t => t.phase === 'holdout')),
     equity_curve: curve.filter((_, index) => index % Math.max(1, Math.floor(curve.length / 280)) === 0 || index === curve.length - 1),
+    price_chart: emaChartSeries(bars, spec, 200),
     trade_log: trades,
     warning_flags: forcedMissingCutoff ? ['History lacks an expected cutoff candle on ' + forcedMissingCutoff + ' session(s); liquidation used last observed close.'] : [],
     limitations: [
