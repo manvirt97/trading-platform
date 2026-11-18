@@ -26,6 +26,8 @@ const toast=(message)=>{const el=$('toast');el.textContent=String(message).slice
 function readWatch(){let a;try{a=JSON.parse(localStorage.getItem('rf_v9_watch')||'null')}catch{}const clean=Array.isArray(a)?a.filter(x=>typeof x==='string').map(x=>x.toUpperCase()).filter(symbolOK):[];return [...new Set(clean.length?clean:['NVDA','TSLA','SHOP','AAPL','SPY'])].slice(0,6)}
 function saveWatch(){try{localStorage.setItem('rf_v9_watch',JSON.stringify(state.watch))}catch{}}
 function setTheme(v){
+ // Keep the shared dark/light design tokens in sync across all Rangeform pages.
+ window.RangeformTheme?.paint(v);
  document.body.dataset.theme=v==='dark'?'dark':'light';
  const themeMeta=document.querySelector('meta[name="theme-color"]');
  if(themeMeta)themeMeta.setAttribute('content',document.body.dataset.theme==='dark'?'#0e1116':'#f3f4f2');
