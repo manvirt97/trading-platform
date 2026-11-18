@@ -56,6 +56,12 @@ test('test uses completed signals, next candle entries, and includes trading cos
   assert.ok(firstIndex >= spec.slow + 1);
   assert.ok(costly.trade_log.every(t => Date.parse(t.entry_time) < Date.parse(t.exit_time)));
   assert.ok(costly.equity_curve.length > 0);
+  assert.ok(Array.isArray(costly.trade_audits) && costly.trade_audits.length > 0);
+  const audit = costly.trade_audits.at(-1);
+  assert.ok(audit.candles.some(b => b.entry_marker));
+  assert.ok(audit.candles.some(b => b.exit_marker));
+  assert.ok(audit.candles.every(b => Number.isFinite(b.close)));
+  assert.ok(audit.total_bars_in_window >= audit.displayed_candles);
 });
 test('no lookahead: increasing a following candle open changes the entry, not the signal timing', () => {
   const spec = parseStrategy('9/21 EMA crossover on daily candles');
