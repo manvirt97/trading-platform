@@ -1,5 +1,5 @@
 {
-  "version": "35",
-  "build": "rangeform-v35-forecast-ledger",
-  "description": "Private, clearly unverified market forecast ledger; paper-only trading research; live brokerage orders disabled"
+  "version": "36",
+  "build": "rangeform-v36-strategy-workshop",
+  "description": "EMA Strategy Builder with historical CSV backtesting, assumptions and no brokerage execution"
 }

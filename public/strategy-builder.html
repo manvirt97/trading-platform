@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#f3f4f2">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<link rel="manifest" href="/manifest.webmanifest?v=32">
+<link rel="apple-touch-icon" href="/static/rangeform-official-icon.png">
+<title>Rangeform · Strategy Builder</title>
+<meta name="description" content="Write an EMA strategy in plain English, review testable rules, and backtest on your actual historical data. No orders.">
+<link rel="stylesheet" href="/static/theme-sync.css?v=2">
+<link rel="stylesheet" href="/static/strategy-builder.css?v=1">
+<link rel="stylesheet" href="/static/strategy-live.css?v=1">
+<link rel="stylesheet" href="/static/ios-statusbar-v22.css?v=22">
+<script src="/static/theme-sync.js?v=22" defer></script>
+<script src="/static/strategy-builder.js?v=1" type="module"></script>
+<script src="/static/strategy-live.js?v=1" type="module"></script>
+<script src="/static/pwa-update-v36.js?v=36" defer></script>
+</head>
+<body>
+<header class="sb-header">
+ <a class="sb-brand" href="/v9.html#overview"><img src="/static/rangeform-official-icon.png" alt="" width="33" height="33"><span>Rangeform<small>RESEARCH WORKSPACE</small></span></a>
+ <nav aria-label="Workspace links"><a href="/algo.html">Algorithmic Desk</a><a href="/v9.html#studio">Research Studio</a><a href="/bot.html">Paper Bot</a></nav>
+ <button type="button" id="sbTheme" class="sb-theme" aria-label="Toggle light or dark mode">◐</button>
+</header>
+<main class="sb-wrap">
+ <div class="sb-hero">
+  <div><p class="sb-eyebrow">STRATEGY WORKSHOP / RESEARCH ONLY</p><h1>From trading idea <em>to testable evidence.</em></h1><p>Describe an EMA strategy in ordinary English. Review the rules first, then backtest against real historical candles. No generated trading code is executed and no money can be traded here.</p></div>
+  <div class="sb-lock"><strong>SIMULATION ONLY</strong><span>No broker connection · No live orders · No option premium claims</span></div>
+ </div>
+ <section class="sb-mode-hero" aria-label="Choose strategy dashboard mode">
+   <div class="sb-mode-switch" role="tablist" aria-label="Backtest or live market mode">
+     <button id="sbBacktestTab" class="sb-mode-tab selected" role="tab" aria-selected="true" aria-controls="sbBacktestPane" type="button"><span aria-hidden="true">◴</span> Backtest</button>
+     <button id="sbLiveTab" class="sb-mode-tab" role="tab" aria-selected="false" aria-controls="sbLivePane" type="button"><span class="sb-live-dot" aria-hidden="true"></span> Live</button>
+   </div>
+   <p class="sb-mode-caption" id="sbModeCaption">BACKTEST MODE · Use historical candles to test ideas before risking capital.</p>
+ </section>
+ <div id="sbBacktestPane" role="tabpanel" aria-labelledby="sbBacktestTab">
+ <div class="sb-grid">
+  <section class="sb-card">
+   <div class="sb-heading"><span class="sb-step">01</span><div><h2>Describe the strategy</h2><p>Start with the 9/21 EMA crossover demonstrated in the video. Session times are controlled by the fields below, even if different times appear in your description.</p></div></div>
+   <label for="sbDescription">Your strategy in plain English</label>
+   <textarea id="sbDescription" rows="4" maxlength="1000">Test a 9/21 EMA crossover on 15-minute candles. Go long after the 9 EMA crosses above 21 EMA. Exit after the downward crossover. Start at 09:30 and square off by 15:00.</textarea>
+   <div class="sb-actions"><button id="sbParse" type="button" class="sb-secondary">Review strategy rules</button><span class="sb-muted">Deterministic parser · no paid AI API needed</span></div>
+   <div id="sbRules" class="sb-rule-box" aria-live="polite">Review the rules before running a backtest.</div>
+  </section>
+  <section class="sb-card">
+   <div class="sb-heading"><span class="sb-step">02</span><div><h2>Choose historical data</h2><p>Bring your own dated OHLCV candles, or use your licensed feed if configured.</p></div></div>
+   <div class="sb-field-grid">
+    <label>Symbol<input id="sbSymbol" type="text" maxlength="10" value="SPY" autocapitalize="characters" aria-label="Market ticker"></label>
+    <label>Data source<select id="sbSource"><option value="csv">Import my own CSV</option><option value="twelvedata">Authorized historical market feed</option></select></label>
+    <label>Starting capital<input id="sbCapital" type="number" min="100" max="1000000" value="10000"></label>
+    <label>Fee per side (bps)<input id="sbFees" type="number" min="0" max="250" step="0.5" value="5"></label>
+    <label>Slippage per side (bps)<input id="sbSlippage" type="number" min="0" max="250" step="0.5" value="5"></label>
+    <label>Capital allocation (%)<input id="sbAllocation" type="number" min="1" max="100" value="95"></label>
+    <label>Start entries (local time)<input id="sbEntry" type="time" value="09:30"></label>
+    <label>Square-off (local time)<input id="sbExit" type="time" value="15:00"></label>
+   </div>
+   <div id="sbCsvWrap"><label for="sbFile">CSV file (max 1 MB, 36–8,000 completed bars)</label><input id="sbFile" type="file" accept=".csv,text/csv"><p class="sb-muted">Required headers: <code>timestamp,open,high,low,close,volume</code>. Timestamp = candle start in ISO format with timezone, e.g. 2026-10-01T09:30:00-04:00. Uploads are sent to the Rangeform API for calculation, not saved as trading accounts.</p></div>
+   <button id="sbRun" type="button" class="sb-primary">Run historical backtest</button>
+   <p id="sbStatus" role="status" aria-live="polite">No test has been run.</p>
+  </section>
+ </div>
+ <section class="sb-card sb-results" id="sbResults" hidden>
+  <div class="sb-heading"><span class="sb-step">03</span><div><h2>Backtest results</h2><p id="sbProvenance">History provenance</p></div></div>
+  <div id="sbMetrics" class="sb-metrics"></div>
+  <div class="sb-section-title"><h3>Equity curve</h3><span>Historical simulation · not a forecast</span></div>
+  <div class="sb-chart"><svg id="sbCurve" viewBox="0 0 800 220" role="img" aria-label="Hypothetical backtest equity curve" preserveAspectRatio="none"></svg></div>
+  <div id="sbSegments" class="sb-segments"></div>
+  <div class="sb-section-title"><h3>Trade audit · price and EMAs</h3><span>Completed OHLC candles · no interpolated option premiums</span></div>
+  <div class="sb-chart sb-price-chart"><svg id="sbPriceChart" viewBox="0 0 800 260" preserveAspectRatio="none" role="img" aria-label="Historical close, fast EMA and slow EMA chart"></svg></div>
+  <div class="sb-trade-navigator"><button id="sbPrevTrade" type="button" class="sb-secondary">← Previous</button><span id="sbTradeFocus">Choose a completed trade to inspect</span><button id="sbNextTrade" type="button" class="sb-secondary">Next →</button></div>
+  <div class="sb-filter-toolbar">
+    <label>Outcome<select id="sbFilterOutcome"><option value="all">All results</option><option value="win">Winning trades</option><option value="loss">Losing trades</option><option value="breakeven">Breakeven</option></select></label>
+    <label>From<input id="sbFilterFrom" type="date"></label>
+    <label>To<input id="sbFilterTo" type="date"></label>
+    <button id="sbResetFilters" type="button" class="sb-secondary">Reset filters</button>
+    <p id="sbFilteredCount" class="sb-muted">Filters affect the trade table only; performance metrics always use the complete history.</p>
+  </div>
+  <div class="sb-section-title"><h3>Recent completed trades</h3><button id="sbExport" class="sb-secondary" type="button">Export trade log CSV</button></div>
+  <div class="sb-table-scroll"><table><thead><tr><th>Entry (UTC)</th><th>Exit (UTC)</th><th>Entry</th><th>Exit</th><th>Gross P&amp;L</th><th>Net P&amp;L</th><th>Exit reason</th></tr></thead><tbody id="sbTrades"></tbody></table></div>
+  <div class="sb-notes"><h3>What this test does not prove</h3><ul id="sbLimitations"></ul></div>
+ </section>
+ </div>
+ <section id="sbLivePane" role="tabpanel" aria-labelledby="sbLiveTab" hidden>
+   <div class="sb-live-rail">
+     <div>
+       <p class="sb-eyebrow">LIVE MARKET MONITOR · NO BROKER EXECUTION</p>
+       <h2>Watch the strategy unfold.</h2>
+       <p>Real Kraken public market candles. The last unfinished candle is always excluded, and switching to Live never sends an order.</p>
+     </div>
+     <span id="sbLiveState" class="sb-state-pill">Not connected</span>
+   </div>
+   <section class="sb-card sb-live-controls">
+     <div class="sb-live-config">
+       <label>Market<select id="sbLivePair"><option value="XBTUSD">BTC / USD</option><option value="ETHUSD">ETH / USD</option></select></label>
+       <label>Timeframe<select id="sbLiveInterval"><option value="1min">1 minute</option><option value="5min" selected>5 minutes</option><option value="15min">15 minutes</option><option value="1day">Daily</option></select></label>
+       <label>Fast EMA<input id="sbLiveFast" type="number" min="2" max="149" value="9"></label>
+       <label>Slow EMA<input id="sbLiveSlow" type="number" min="3" max="150" value="21"></label>
+       <button class="sb-primary" id="sbLiveRefresh" type="button">Refresh data ↻</button>
+     </div>
+     <p id="sbLiveMessage" role="status" aria-live="polite">Open Live mode to load verified completed candles.</p>
+   </section>
+   <div id="sbLiveKpis" class="sb-live-metrics" aria-label="Live research indicators">
+     <div class="sb-metric"><span>LAST COMPLETED CLOSE</span><strong id="sbLivePrice">—</strong><small>Market candle, not a fill</small></div>
+     <div class="sb-metric"><span>FAST EMA</span><strong id="sbLiveFastValue">—</strong><small id="sbLiveFastLabel">EMA 9</small></div>
+     <div class="sb-metric"><span>SLOW EMA</span><strong id="sbLiveSlowValue">—</strong><small id="sbLiveSlowLabel">EMA 21</small></div>
+     <div class="sb-metric"><span>LAST CONFIRMED SIGNAL</span><strong id="sbLiveSignal">—</strong><small id="sbLiveTrend">Waiting for data</small></div>
+     <div class="sb-metric"><span>DATA AGE</span><strong id="sbLiveAge">—</strong><small>Polls while page is open</small></div>
+   </div>
+   <div class="sb-live-grid">
+     <section class="sb-card sb-live-chart-card">
+       <div class="sb-section-title"><h3>Completed candles · 9 / 21 EMA</h3><span id="sbLiveAsOf">Waiting for market evidence</span></div>
+       <div class="sb-chart sb-market-chart"><svg id="sbLiveChart" viewBox="0 0 800 300" preserveAspectRatio="none" role="img" aria-label="Kraken completed candles with fast and slow EMA overlays"></svg></div>
+       <div class="sb-chart-legend"><span class="sb-legend-dot fast"></span> Fast EMA <span class="sb-legend-dot slow"></span> Slow EMA <span class="sb-legend-dot price"></span> Completed close</div>
+       <p class="sb-muted">Source: Kraken public OHLC · refreshed approximately every 45 seconds while this tab is open. Data may be delayed. The current incomplete candle is removed.</p>
+     </section>
+     <aside class="sb-card sb-live-signal-card">
+       <div class="sb-heading"><span class="sb-step">LIVE</span><div><h2>Decision monitor</h2><p>Identical EMA crossover logic to backtesting.</p></div></div>
+       <div class="sb-monitor">
+         <div class="sb-monitor-caption">CURRENT RESEARCH POSITION</div>
+         <strong id="sbMonitorDirection">No data</strong>
+         <p id="sbMonitorExplanation">A crossover is only confirmed after a candle closes.</p>
+       </div>
+       <div class="sb-monitor-line"><span>Last verified candle</span><strong id="sbMonitorTimestamp">—</strong></div>
+       <div class="sb-monitor-line"><span>Observation mode</span><strong>Read-only</strong></div>
+       <div class="sb-monitor-line"><span>Broker order permissions</span><strong class="sb-locked">Disabled</strong></div>
+       <div class="sb-monitor-line"><span>Autonomous paper worker</span><strong>Separate service</strong></div>
+       <a class="sb-live-bot-link" href="/bot.html">Open existing paper bot ↗</a>
+       <p class="sb-muted">This monitor does not create paper fills or keep running when the page is closed. Check the bot's independent readiness and controls before relying on it.</p>
+     </aside>
+   </div>
+   <section class="sb-card sb-live-history">
+     <div class="sb-section-title"><h3>Observed signal history</h3><button type="button" class="sb-secondary" id="sbLiveClear">Clear this session</button></div>
+     <p class="sb-muted">Records only confirmed crossovers observed by your open browser tab. These are not trades or performance results.</p>
+     <div class="sb-table-scroll"><table><thead><tr><th>Observed at (UTC)</th><th>Confirmed candle (UTC)</th><th>Market</th><th>Timeframe</th><th>EMA event</th><th>Close</th></tr></thead><tbody id="sbLiveEvents"><tr><td colspan="6">No confirmed crossover observed during this session.</td></tr></tbody></table></div>
+   </section>
+   <section class="sb-card sb-live-gates">
+     <h3>Market and broker data connections</h3>
+     <div class="sb-connectors">
+       <div class="sb-connector-row"><div><strong>Kraken market candles</strong><small>Public crypto historical candles · no account required</small></div><span>Read-only source</span></div>
+       <div class="sb-connector-row"><div><strong>Groww historical research</strong><small>NIFTY expiries, contracts and candles · verified owner only</small></div><span id="sbGrowwStatus">Checking configuration…</span></div>
+       <div class="sb-connector-row"><div><strong>Actual brokerage orders</strong><small>Real capital and broker order placement</small></div><span class="sb-locked">Locked</span></div>
+     </div>
+     <p><a href="https://groww.in/trade-api/docs/curl/backtesting" target="_blank" rel="noopener noreferrer">Groww historical API documentation ↗</a> · Credentials must be stored as encrypted server secrets; never paste tokens into this webpage.</p>
+     <h3>Before real-money trading becomes available</h3>
+     <p>The video uses three modes: historical backtest, forward paper validation and broker live execution. Rangeform currently exposes the first two as research/paper tools; this switch intentionally opens a <strong>read-only live market monitor</strong>, not a brokerage trading engine. We must verify broker eligibility, market-data licensing, secure authentication, position reconciliation and kill switches before enabling real-money execution.</p>
+   </section>
+ </section>
+ <footer class="sb-footer">An EMA backtest on the underlying is <strong>not</strong> a NIFTY options backtest. Options require dated strike/expiry premium series, taxes and market-specific settlement costs. This tool never places real or paper broker orders.</footer>
+</main>
+</body>
+</html>
