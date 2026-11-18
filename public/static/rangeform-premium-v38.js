@@ -99,7 +99,7 @@
     const next=window.RangeformTheme.read()==='dark'?'light':'dark';
     window.RangeformTheme.apply(next);
    });
-   context.append(button);
+   header.append(button);
   }
  }
  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});
