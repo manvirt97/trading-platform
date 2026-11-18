@@ -137,6 +137,13 @@
      <div class="sb-table-scroll"><table><thead><tr><th>Observed at (UTC)</th><th>Confirmed candle (UTC)</th><th>Market</th><th>Timeframe</th><th>EMA event</th><th>Close</th></tr></thead><tbody id="sbLiveEvents"><tr><td colspan="6">No confirmed crossover observed during this session.</td></tr></tbody></table></div>
    </section>
    <section class="sb-card sb-live-gates">
+     <h3>Market and broker data connections</h3>
+     <div class="sb-connectors">
+       <div class="sb-connector-row"><div><strong>Kraken market candles</strong><small>Public crypto historical candles · no account required</small></div><span>Read-only source</span></div>
+       <div class="sb-connector-row"><div><strong>Groww historical research</strong><small>NIFTY expiries, contracts and candles · verified owner only</small></div><span id="sbGrowwStatus">Checking configuration…</span></div>
+       <div class="sb-connector-row"><div><strong>Actual brokerage orders</strong><small>Real capital and broker order placement</small></div><span class="sb-locked">Locked</span></div>
+     </div>
+     <p><a href="https://groww.in/trade-api/docs/curl/backtesting" target="_blank" rel="noopener noreferrer">Groww historical API documentation ↗</a> · Credentials must be stored as encrypted server secrets; never paste tokens into this webpage.</p>
      <h3>Before real-money trading becomes available</h3>
      <p>The video uses three modes: historical backtest, forward paper validation and broker live execution. Rangeform currently exposes the first two as research/paper tools; this switch intentionally opens a <strong>read-only live market monitor</strong>, not a brokerage trading engine. We must verify broker eligibility, market-data licensing, secure authentication, position reconciliation and kill switches before enabling real-money execution.</p>
    </section>
