@@ -112,7 +112,7 @@ function updateCards(){
  for(const m of modes){
   const x=result.comparisons[m];
   pnl('rfPnl-'+m,x.net_pnl);
-  text('rfSub-'+m,x.trades+' trades · Win '+percent(x.win_rate_pct)+' · PF '+display(x.profit_factor)+' · Max DD '+rupee(x.max_drawdown_closed_pnl));
+  text('rfSub-'+m,x.trades+' trades · Win '+percent(x.win_rate_pct)+' · PF '+display(x.profit_factor)+' · DD '+rupee(x.max_drawdown_closed_pnl)+(x.max_drawdown_pct===null?'':' ('+percent(x.max_drawdown_pct)+')'));
   spark('rfSpark-'+m,x.equity_curve);
  }
 }
@@ -166,6 +166,7 @@ async function recompute(){
   const [spot_bars,option_bars]=await Promise.all([parseCsv($('rfSpotFile').files[0]),parseCsv($('rfOptionFile').files[0],true)]);
   const input={spot_bars,option_bars,timeframe,entry_from:$('rfEntryFrom').value,cutoff:$('rfCutoff').value,
    lot_size:Number($('rfLot').value),lots:Number($('rfLots').value),strike_step:Number($('rfStep').value),
+   initial_capital:$('rfCapital').value?Number($('rfCapital').value):undefined,
    costs:{slippage_points:Number($('rfSlip').value)}};
   const raw=JSON.stringify(input);
   if(raw.length>4_000_000)throw Error('Historical upload is too large. Try fewer trading sessions.');
