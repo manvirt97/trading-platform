@@ -25,6 +25,10 @@ try {
    page.on('pageerror',e=>errors.push(e.message));
    await page.goto(base+route,{waitUntil:'domcontentloaded'});
    await page.locator('#rfSuiteBar').waitFor({timeout:8000});
+   // The same context intentionally preserves the previous page's theme.
+   // Establish a light baseline before comparing it to a dark-mode toggle.
+   await page.evaluate(()=>window.RangeformTheme?.apply('light'));
+   assert.equal(await page.locator('html').getAttribute('data-rf-theme'),'light');
    const state=await page.evaluate(()=>{
     const bar=document.getElementById('rfSuiteBar');
     const styles=getComputedStyle(bar);
