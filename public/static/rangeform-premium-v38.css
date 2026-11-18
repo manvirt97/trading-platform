@@ -304,3 +304,6 @@ body[data-rf-ui="v38"] .rf-trade-row.active{
   scroll-behavior:auto!important;transition-duration:0s!important;
  }
 }
+
+body[data-rf-ui="v38"] .rf-suite-theme{position:absolute;top:7px;right:12px;border:1px solid var(--rf38-border);border-radius:8px;background:var(--rf38-soft);color:var(--rf38-ink);padding:6px 11px;cursor:pointer}
+body[data-rf-ui="v38"] .rf-suite-context:has(.rf-suite-theme){padding-right:40px}
