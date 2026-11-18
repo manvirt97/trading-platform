@@ -135,6 +135,22 @@ export function runNiftyOptionBacktest(input){
   const count=(crossByDay.get(b.day)||0)+1;crossByDay.set(b.day,count);
   events.push({at:b.close_time,day:b.day,minute,number:count,direction:up?'BULLISH':'BEARISH',spot_close:b.close});
  }
+ const preparedCharts=new Map();
+ const tradeChart=(trade)=>{
+  if(!preparedCharts.has(trade.entry_time.slice(0,10))){
+   const day=clock(Date.parse(trade.entry_time)).day;
+   const dayBars=bars.map((b,i)=>({b,i})).filter(x=>x.b.day===day);
+   preparedCharts.set(trade.entry_time.slice(0,10),dayBars.map(({b,i})=>({
+    time:b.time,close_time:b.close_time,open:round(b.open),high:round(b.high),
+    low:round(b.low),close:round(b.close),fast:round(fast[i]),slow:round(slow[i])
+   })));
+  }
+  const series=preparedCharts.get(trade.entry_time.slice(0,10));
+  return series.map(b=>({...b,
+   entry_marker:b.close_time===trade.entry_time,
+   exit_marker:b.close_time===trade.exit_time
+  }));
+ };
  const byMode={};const missingByMode={};
  for(const mode of modeIds){let active=null,completed=[],missing=0;
   const finish=(signalTime,reason,newSpot)=>{
@@ -184,7 +200,7 @@ export function runNiftyOptionBacktest(input){
    }
   }
   // Explicit stop: no non-intraday overnight or unpriced positions.
-  byMode[mode]={...summarize(completed),trades_detail:completed.slice(-500),mode_label:names[mode]};
+  byMode[mode]={...summarize(completed),trades_detail:completed.slice(-500).map(t=>({...t,spot_chart:tradeChart(t)})),mode_label:names[mode]};
   missingByMode[mode]=missing;
  }
  return {
