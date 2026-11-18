@@ -34,8 +34,11 @@ async function checkGrowwStatus() {
     if (!response.ok) throw Error('unavailable');
     const data = await response.json();
     label.textContent = data.available ? 'Configured · history only' : 'Not connected';
+    const nifty = $('rfGrowwLiveStatus');
+    if (nifty) nifty.textContent = data.available ? 'History ready · live entitlement still unverified' : 'Not connected';
   } catch {
     label.textContent = 'Connection status unavailable';
+    const nifty=$('rfGrowwLiveStatus');if(nifty)nifty.textContent='Connection status unavailable';
   }
 }
 function setMode(mode) {
