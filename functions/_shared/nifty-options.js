@@ -119,6 +119,7 @@ export function runNiftyOptionBacktest(input){
  if(!Number.isInteger(lot)||!Number.isInteger(lots))throw Error('Lot quantities must be whole numbers.');
  const strikeStep=numeric('Strike step',input.strike_step??50,10,1000);
  const rates=costRates(input.costs);
+ const capital=input.initial_capital===undefined||input.initial_capital===null?null:numeric('Starting capital',input.initial_capital,1,1_000_000_000);
  const spot=validateBars(input.spot_bars,'NIFTY spot 1-minute candles',50000);
  const optionRows=validateBars(input.option_bars,'NIFTY option 1-minute candles',100000,false);
  if(spot.length<50)throw Error('At least 50 NIFTY spot one-minute bars are required.');
@@ -201,7 +202,9 @@ export function runNiftyOptionBacktest(input){
    }
   }
   // Explicit stop: no non-intraday overnight or unpriced positions.
-  byMode[mode]={...summarize(completed),trades_detail:completed.slice(-500).map(t=>({...t,spot_chart:tradeChart(t)})),mode_label:names[mode]};
+  const aggregate=summarize(completed);
+  byMode[mode]={...aggregate,max_drawdown_pct:capital?round(Math.abs(aggregate.max_drawdown_closed_pnl)/capital*100,2):null,
+   trades_detail:completed.slice(-500).map(t=>({...t,spot_chart:tradeChart(t)})),mode_label:names[mode]};
   missingByMode[mode]=missing;
  }
  return {
@@ -210,7 +213,7 @@ export function runNiftyOptionBacktest(input){
    resampled_bars:bars.length,missing_resampled_buckets:sampled.missing_buckets,
    option_minute_bars:optionRows.length},
   settings:{timeframe:tf,entry_from:start,cutoff:cut,mandatory_square_off:'15:00',
-   lot_size:lot,lots,strike_step:strikeStep,costs:rates,
+   lot_size:lot,lots,strike_step:strikeStep,initial_capital:capital,costs:rates,
    fee_basis:'2026 Groww published schedule; historical charges may differ'},
   events_count:events.length,events:events.slice(-200),comparisons:byMode,
   missing_quote_or_exit_counts:missingByMode,
