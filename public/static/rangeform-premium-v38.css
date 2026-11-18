@@ -307,3 +307,70 @@ body[data-rf-ui="v38"] .rf-trade-row.active{
 
 body[data-rf-ui="v38"] .rf-suite-theme{border:1px solid var(--rf38-border);border-radius:9px;background:var(--rf38-soft);color:var(--rf38-ink);padding:8px 11px;min-height:39px;cursor:pointer}
 html.rangeform-ios-standalone body[data-rf-ui="v38"] header.top{padding-top:max(58px,env(safe-area-inset-top,0px))}
+
+
+/* Forecast Ledger was the remaining standalone legacy-looking page.
+ * Keep its local-only forecast data and behavior; unify all presentational pieces. */
+body[data-rf-ui="v38"] header.top{
+ color:var(--rf38-ink);background:var(--rf38-surface);border-color:var(--rf38-border);
+}
+body[data-rf-ui="v38"] header.top :is(.brand,.return){
+ color:var(--rf38-ink);font-size:12px;font-weight:760;
+}
+body[data-rf-ui="v38"] header.top .brand{font-size:20px}
+body[data-rf-ui="v38"] main.shell{padding-top:23px;padding-bottom:55px}
+body[data-rf-ui="v38"] main.shell .hero{max-width:920px;margin-bottom:16px}
+body[data-rf-ui="v38"] main.shell .hero h1{margin:8px 0 10px}
+body[data-rf-ui="v38"] main.shell .hero>p{
+ font-size:12.5px;line-height:1.58;color:var(--rf38-muted)
+}
+body[data-rf-ui="v38"] main.shell .notice,
+body[data-rf-ui="v38"] main.shell .entry,
+body[data-rf-ui="v38"] main.shell .empty{
+ border:1px solid var(--rf38-border);border-radius:11px;
+ background:var(--rf38-soft);color:var(--rf38-muted);
+ padding:14px 16px;font-size:12px;
+}
+body[data-rf-ui="v38"] main.shell .columns{gap:13px}
+body[data-rf-ui="v38"] main.shell .panel{padding:18px}
+body[data-rf-ui="v38"] main.shell h2{font-size:17px}
+body[data-rf-ui="v38"] main.shell :is(label,.hint,.ledger-footer p,footer,.entry-meta){
+ color:var(--rf38-muted);
+}
+body[data-rf-ui="v38"] main.shell :is(form button[type="submit"],#export){
+ background:var(--rf38-primary);border:1px solid var(--rf38-primary);
+ color:var(--rf38-primary-ink);border-radius:9px;
+ padding:11px 14px;font-size:12px;font-weight:750;
+}
+body[data-rf-ui="v38"] main.shell .secondary{
+ background:var(--rf38-soft)!important;
+ color:var(--rf38-ink)!important;
+ border:1px solid var(--rf38-border);
+}
+body[data-rf-ui="v38"] main.shell .entry{
+ background:var(--rf38-surface);padding:15px;
+}
+body[data-rf-ui="v38"] main.shell .direction{
+ background:var(--rf38-primary-soft);color:var(--rf38-primary);
+}
+body[data-rf-ui="v38"] main.shell :is(.symbol,.entry .thesis){
+ color:var(--rf38-ink);
+}
+body[data-rf-ui="v38"] .agent-safety,
+body[data-rf-ui="v38"] .agent-role,
+body[data-rf-ui="v38"] .agent-metrics>div{
+ border:1px solid var(--rf38-border);border-radius:11px;
+ background:var(--rf38-surface);color:var(--rf38-ink);
+ box-shadow:var(--rf38-shadow);
+}
+body[data-rf-ui="v38"] :is(.agent-form,.agent-grid,.agent-metrics){gap:10px}
+body[data-rf-ui="v38"] :is(.agent-heading h2,.agent-role-title h3){
+ font-size:15px;letter-spacing:-.015em;color:var(--rf38-ink);
+}
+@media(max-width:600px){
+ body[data-rf-ui="v38"] main.shell{padding-top:17px}
+ body[data-rf-ui="v38"] header.top{padding-left:12px;padding-right:12px;gap:9px}
+ body[data-rf-ui="v38"] header.top .return{font-size:11px}
+ body[data-rf-ui="v38"] header.top .brand{font-size:16px}
+ body[data-rf-ui="v38"] main.shell .columns{grid-template-columns:1fr}
+}
