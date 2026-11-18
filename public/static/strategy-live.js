@@ -27,6 +27,17 @@ function disconnected(message) {
   note.dataset.bad = 'true';
   clearValues();
 }
+async function checkGrowwStatus() {
+  const label = $('sbGrowwStatus');
+  try {
+    const response = await fetch('/api/groww-research', { cache: 'no-store' });
+    if (!response.ok) throw Error('unavailable');
+    const data = await response.json();
+    label.textContent = data.available ? 'Configured · history only' : 'Not connected';
+  } catch {
+    label.textContent = 'Connection status unavailable';
+  }
+}
 function setMode(mode) {
   currentMode = mode;
   const isLive = mode === 'live';
@@ -40,6 +51,7 @@ function setMode(mode) {
     'LIVE MONITOR · Confirmed exchange candles only · Broker execution OFF' :
     'BACKTEST MODE · Use historical candles to test ideas before risking capital.';
   if (isLive) {
+    checkGrowwStatus();
     refresh();
     if (!polling) polling = setInterval(() => {
       if (!document.hidden && currentMode === 'live') refresh();
