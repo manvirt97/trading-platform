@@ -207,6 +207,29 @@ export function runStrategyBacktest(inputBars, rawSpec, settings = {}) {
     net_pnl: ROUND(subset.reduce((sum, t) => sum + t.net_pnl, 0)),
     win_rate_pct: subset.length ? ROUND(100 * subset.filter(t => t.net_pnl > 0).length / subset.length, 2) : null
   });
+  // Trade-by-trade audit: retain exact observed candles and EMA values,
+  // including entry/exit bars. Large spans are sampled, never fabricated.
+  const locationByTime = new Map(bars.map((b, index) => [b.timestamp, index]));
+  const tradeAudits = trades.slice(-40).map(trade => {
+    const entryIndex = locationByTime.get(trade.entry_time);
+    const exitIndex = locationByTime.get(trade.exit_time);
+    const start = Math.max(0, entryIndex - 18), end = Math.min(bars.length, exitIndex + 18);
+    const step = Math.max(1, Math.ceil((end - start) / 160));
+    const selected = new Set([entryIndex, exitIndex]);
+    for (let index = start; index < end; index += step) selected.add(index);
+    const candles = [...selected].filter(index => index >= start && index < end)
+      .sort((a, b) => a - b).map(index => {
+        const bar = bars[index];
+        return { time: bar.timestamp, open: ROUND(bar.open, 5),
+          high: ROUND(bar.high, 5), low: ROUND(bar.low, 5), close: ROUND(bar.close, 5),
+          fast: ROUND(fastEMA[index], 5), slow: ROUND(slowEMA[index], 5),
+          entry_marker: index === entryIndex, exit_marker: index === exitIndex };
+      });
+    return { entry_time: trade.entry_time, exit_time: trade.exit_time,
+      total_bars_in_window: end - start, displayed_candles: candles.length,
+      sampling: step > 1 ? 'Selected original candles, gaps between samples' : 'All original candles',
+      candles };
+  });
   return {
     spec, bars_tested: bars.length, first_bar: bars[0].timestamp, last_bar: bars.at(-1).timestamp,
     trades: trades.length, gross_pnl: ROUND(grossTotal), net_pnl: ROUND(netTotal), fee_slippage_drag: ROUND(grossTotal - netTotal),
@@ -219,6 +242,7 @@ export function runStrategyBacktest(inputBars, rawSpec, settings = {}) {
     holdout: summarize(trades.filter(t => t.phase === 'holdout')),
     equity_curve: curve.filter((_, index) => index % Math.max(1, Math.floor(curve.length / 280)) === 0 || index === curve.length - 1),
     price_chart: emaChartSeries(bars, spec, 200),
+    trade_audits: tradeAudits,
     trade_log: trades,
     warning_flags: forcedMissingCutoff ? ['History lacks an expected cutoff candle on ' + forcedMissingCutoff + ' session(s); liquidation used last observed close.'] : [],
     limitations: [
