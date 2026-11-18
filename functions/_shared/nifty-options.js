@@ -132,6 +132,7 @@ export function runNiftyOptionBacktest(input){
   const up=fast[i-1]<=slow[i-1]&&fast[i]>slow[i],down=fast[i-1]>=slow[i-1]&&fast[i]<slow[i];
   if(!up&&!down)continue;
   const b=bars[i],minute=b.end;
+  if(minute>900)continue; // No signals after the mandatory 15:00 IST square-off.
   const count=(crossByDay.get(b.day)||0)+1;crossByDay.set(b.day,count);
   events.push({at:b.close_time,day:b.day,minute,number:count,direction:up?'BULLISH':'BEARISH',spot_close:b.close});
  }
