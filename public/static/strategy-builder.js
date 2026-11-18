@@ -1,4 +1,5 @@
 /* Rangeform Strategy Builder: UI only. The server owns strategy rules and math. */
+import { drawEmaChart } from './strategy-live.js';
 const byId = id => document.getElementById(id);
 const form = {
   description: byId('sbDescription'), symbol: byId('sbSymbol'), source: byId('sbSource'),
@@ -7,6 +8,24 @@ const form = {
   entry: byId('sbEntry'), exit: byId('sbExit')
 };
 let lastResults = null;
+let selectedTrade = -1;
+function focusTrade(index) {
+  const trades = lastResults?.trade_log || [];
+  if (!trades.length) {
+    byId('sbTradeFocus').textContent = 'No completed trades to inspect.';
+    byId('sbPrevTrade').disabled = true;
+    byId('sbNextTrade').disabled = true;
+    return;
+  }
+  selectedTrade = Math.max(0, Math.min(index, trades.length - 1));
+  const trade = trades[selectedTrade];
+  byId('sbTradeFocus').textContent = 'Trade ' + (selectedTrade + 1) + ' of ' + trades.length +
+    ' · ' + trade.entry_time + ' → ' + trade.exit_time +
+    ' · net ' + String(trade.net_pnl);
+  byId('sbPrevTrade').disabled = selectedTrade <= 0;
+  byId('sbNextTrade').disabled = selectedTrade >= trades.length - 1;
+}
+
 function status(message, bad = false) {
   const element = byId('sbStatus');
   element.textContent = message;
@@ -161,6 +180,8 @@ function render(data) {
     metric('COST DRAG', fmt(data.fee_slippage_drag), 'Estimated fees and slippage')
   );
   drawCurve(data.equity_curve);
+  drawEmaChart(byId('sbPriceChart'), data.price_chart);
+  focusTrade(data.trade_log.length - 1);
   byId('sbSegments').textContent =
     'Development-labelled trades: ' + data.development.trades + ', P&L ' + fmt(data.development.net_pnl) +
     ' · Last 20% holdout-labelled: ' + data.holdout.trades + ', P&L ' + fmt(data.holdout.net_pnl) +
@@ -249,6 +270,8 @@ byId('sbSource').addEventListener('change', () => {
 byId('sbParse').addEventListener('click', () => { review().catch(() => {}); });
 byId('sbRun').addEventListener('click', runBacktest);
 byId('sbExport').addEventListener('click', exportLog);
+byId('sbPrevTrade').addEventListener('click', () => focusTrade(selectedTrade - 1));
+byId('sbNextTrade').addEventListener('click', () => focusTrade(selectedTrade + 1));
 byId('sbTheme').addEventListener('click', () => {
   const theme = window.RangeformTheme;
   if (theme) theme.apply(theme.read() === 'dark' ? 'light' : 'dark');
