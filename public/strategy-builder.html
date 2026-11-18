@@ -71,6 +71,13 @@
   <div class="sb-section-title"><h3>Trade audit · price and EMAs</h3><span>Completed OHLC candles · no interpolated option premiums</span></div>
   <div class="sb-chart sb-price-chart"><svg id="sbPriceChart" viewBox="0 0 800 260" preserveAspectRatio="none" role="img" aria-label="Historical close, fast EMA and slow EMA chart"></svg></div>
   <div class="sb-trade-navigator"><button id="sbPrevTrade" type="button" class="sb-secondary">← Previous</button><span id="sbTradeFocus">Choose a completed trade to inspect</span><button id="sbNextTrade" type="button" class="sb-secondary">Next →</button></div>
+  <div class="sb-filter-toolbar">
+    <label>Outcome<select id="sbFilterOutcome"><option value="all">All results</option><option value="win">Winning trades</option><option value="loss">Losing trades</option><option value="breakeven">Breakeven</option></select></label>
+    <label>From<input id="sbFilterFrom" type="date"></label>
+    <label>To<input id="sbFilterTo" type="date"></label>
+    <button id="sbResetFilters" type="button" class="sb-secondary">Reset filters</button>
+    <p id="sbFilteredCount" class="sb-muted">Filters affect the trade table only; performance metrics always use the complete history.</p>
+  </div>
   <div class="sb-section-title"><h3>Recent completed trades</h3><button id="sbExport" class="sb-secondary" type="button">Export trade log CSV</button></div>
   <div class="sb-table-scroll"><table><thead><tr><th>Entry (UTC)</th><th>Exit (UTC)</th><th>Entry</th><th>Exit</th><th>Gross P&amp;L</th><th>Net P&amp;L</th><th>Exit reason</th></tr></thead><tbody id="sbTrades"></tbody></table></div>
   <div class="sb-notes"><h3>What this test does not prove</h3><ul id="sbLimitations"></ul></div>
