@@ -170,6 +170,45 @@ function drawCurve(data) {
   svg.append(line);
   svg.setAttribute('aria-label', 'Historical simulated equity from ' + fmt(ys[0]) + ' to ' + fmt(ys.at(-1)));
 }
+function renderTradeTable() {
+  if (!lastResults) return;
+  const total = lastResults.trade_log.length;
+  const outcome = byId('sbFilterOutcome').value;
+  const from = byId('sbFilterFrom').value;
+  const to = byId('sbFilterTo').value;
+  const filtered = lastResults.trade_log.filter(trade => {
+    const result = trade.net_pnl > 0 ? 'win' : trade.net_pnl < 0 ? 'loss' : 'breakeven';
+    const date = trade.exit_time.slice(0, 10);
+    return (outcome === 'all' || outcome === result) && (!from || date >= from) && (!to || date <= to);
+  });
+  byId('sbFilteredCount').textContent =
+    'Showing ' + Math.min(50, filtered.length) + ' of ' + filtered.length +
+    ' matching trades (' + total + ' total). Metrics and export include ALL historical trades. Dates use UTC.';
+  const tbody = byId('sbTrades');
+  tbody.replaceChildren();
+  for (const trade of filtered.slice(-50).reverse()) {
+    const tr = document.createElement('tr');
+    const fullIndex = lastResults.trade_log.indexOf(trade);
+    tr.tabIndex = 0;
+    tr.title = 'Inspect candle chart for this trade';
+    tr.addEventListener('click', () => focusTrade(fullIndex));
+    tr.addEventListener('keydown', event => {
+      if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault(); focusTrade(fullIndex);
+      }
+    });
+    for (const key of ['entry_time', 'exit_time', 'entry', 'exit', 'gross_pnl', 'net_pnl', 'exit_reason'])
+      cell(tr, typeof trade[key] === 'number' ? fmt(trade[key]) : trade[key]);
+    tbody.append(tr);
+  }
+  if (!filtered.length) {
+    const tr = document.createElement('tr'), td = document.createElement('td');
+    td.colSpan = 7;
+    td.textContent = 'No matching completed trades. Adjust the filters or try another history.';
+    tr.append(td);
+    tbody.append(tr);
+  }
+}
 function render(data) {
   lastResults = data;
   byId('sbResults').hidden = false;
@@ -191,31 +230,7 @@ function render(data) {
     'Development-labelled trades: ' + data.development.trades + ', P&L ' + fmt(data.development.net_pnl) +
     ' · Last 20% holdout-labelled: ' + data.holdout.trades + ', P&L ' + fmt(data.holdout.net_pnl) +
     '. This split is descriptive only, not independent validation.';
-  const tbody = byId('sbTrades');
-  tbody.replaceChildren();
-  for (const trade of data.trade_log.slice(-50).reverse()) {
-    const tr = document.createElement('tr');
-    const fullIndex = data.trade_log.indexOf(trade);
-    tr.tabIndex = 0;
-    tr.title = 'Inspect candle chart for this trade';
-    tr.addEventListener('click', () => focusTrade(fullIndex));
-    tr.addEventListener('keydown', event => {
-      if (event.key === 'Enter' || event.key === ' ') {
-        event.preventDefault(); focusTrade(fullIndex);
-      }
-    });
-    for (const key of ['entry_time', 'exit_time', 'entry', 'exit', 'gross_pnl', 'net_pnl', 'exit_reason'])
-      cell(tr, typeof trade[key] === 'number' ? fmt(trade[key]) : trade[key]);
-    tbody.append(tr);
-  }
-  if (!data.trade_log.length) {
-    const tr = document.createElement('tr');
-    const td = document.createElement('td');
-    td.colSpan = 7;
-    td.textContent = 'No completed crossover trades within the supplied history.';
-    tr.append(td);
-    tbody.append(tr);
-  }
+  renderTradeTable();
   const notes = byId('sbLimitations');
   notes.replaceChildren();
   for (const note of [...(data.warning_flags || []), ...(data.limitations || [])]) {
@@ -284,6 +299,16 @@ byId('sbSource').addEventListener('change', () => {
 byId('sbParse').addEventListener('click', () => { review().catch(() => {}); });
 byId('sbRun').addEventListener('click', runBacktest);
 byId('sbExport').addEventListener('click', exportLog);
+for (const id of ['sbFilterOutcome', 'sbFilterFrom', 'sbFilterTo']) {
+  byId(id).addEventListener('change', renderTradeTable);
+}
+byId('sbResetFilters').addEventListener('click', () => {
+  byId('sbFilterOutcome').value = 'all';
+  byId('sbFilterFrom').value = '';
+  byId('sbFilterTo').value = '';
+  renderTradeTable();
+});
+
 byId('sbPrevTrade').addEventListener('click', () => focusTrade(selectedTrade - 1));
 byId('sbNextTrade').addEventListener('click', () => focusTrade(selectedTrade + 1));
 byId('sbTheme').addEventListener('click', () => {
