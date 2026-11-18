@@ -8,12 +8,12 @@ const modeIds=['itm5_buy','atm_buy','atm_sell'];
 const names={itm5_buy:'Deep ITM buy (ITM 5)',atm_buy:'ATM buy',atm_sell:'ATM sell'};
 const mOf=t=>{const p=t.split(':').map(Number);return p[0]*60+p[1]};
 function clock(t){const parts=Object.fromEntries(tz.formatToParts(new Date(t)).map(x=>[x.type,x.value]));return {day:parts.year+'-'+parts.month+'-'+parts.day,minute:Number(parts.hour)*60+Number(parts.minute)}}
-function validateBars(rows,label,limit=50000){
+function validateBars(rows,label,limit=50000,strictOrder=true){
  if(!Array.isArray(rows)||rows.length<1||rows.length>limit)throw Error(label+' must contain 1–'+limit+' real OHLCV records.');
  let previous=-Infinity;
  return rows.map((row,i)=>{
   const timestamp=String(row.timestamp||'');const t=Date.parse(timestamp);
-  if(!/^\d{4}-\d\d-\d\dT\d\d:\d\d(?::\d\d(?:\.\d+)?)?(?:Z|[+-]\d\d:\d\d)$/.test(timestamp)||!Number.isFinite(t)||t>=Date.now()+60000||t<=previous)throw Error(label+' must be sorted, timezone-aware, unique and not in future (row '+(i+1)+').');
+  if(!/^\d{4}-\d\d-\d\dT\d\d:\d\d(?::\d\d(?:\.\d+)?)?(?:Z|[+-]\d\d:\d\d)$/.test(timestamp)||!Number.isFinite(t)||t>=Date.now()+60000||(strictOrder&&t<=previous))throw Error(label+' must be sorted, timezone-aware, unique and not in future (row '+(i+1)+').');
   previous=t;
   const values=['open','high','low','close','volume'].map(k=>Number(row[k]));
   if(values.some(x=>!Number.isFinite(x))||values.slice(0,4).some(x=>x<=0)||values[4]<0||values[1]<Math.max(values[0],values[3])||values[2]>Math.min(values[0],values[3]))throw Error(label+' contains invalid OHLCV at row '+(i+1)+'.');
@@ -92,12 +92,8 @@ function selectContract(mode,direction,spot,step,when,index){
  const atm=Math.floor(spot/step+.5-1e-9)*step; // exact midpoint chooses lower strike
  const type=mode==='atm_sell'?(direction==='BULLISH'?'PE':'CE'):(direction==='BULLISH'?'CE':'PE');
  const strike=mode==='itm5_buy'?(type==='CE'?atm-5*step:atm+5*step):atm;
- const eligible=index.expiries.filter(e=>e>=when);
- for(const expiry of eligible){
-  const found=index.map.get(expiry+'|'+strike+'|'+type+'|'+when.timestamp);
-  if(found)return found;
- }
- return null;
+ const expiry=index.expiries.find(e=>e>=when.day);
+ return expiry?index.map.get(expiry+'|'+strike+'|'+type+'|'+when.timestamp)||null:null;
 }
 function summarize(trades){
  const wins=trades.filter(t=>t.net_pnl>0),losses=trades.filter(t=>t.net_pnl<0);
@@ -124,7 +120,7 @@ export function runNiftyOptionBacktest(input){
  const strikeStep=numeric('Strike step',input.strike_step??50,10,1000);
  const rates=costRates(input.costs);
  const spot=validateBars(input.spot_bars,'NIFTY spot 1-minute candles',50000);
- const optionRows=validateBars(input.option_bars,'NIFTY option 1-minute candles',100000);
+ const optionRows=validateBars(input.option_bars,'NIFTY option 1-minute candles',100000,false);
  if(spot.length<50)throw Error('At least 50 NIFTY spot one-minute bars are required.');
  const options=optionIndex(optionRows),spotByTime=new Map(spot.map(x=>[x.timestamp,x]));
  const sampled=resample(spot,tf),bars=sampled.bars;
@@ -173,7 +169,7 @@ export function runNiftyOptionBacktest(input){
     if(active&&event.direction!==active.direction)finish(event.at,'opposite_cross',event.spot_close);
     if(!active&&event.minute>=mOf(start)&&event.minute<=mOf(cut)&&event.minute<900){
      const option=selectContract(mode,event.direction,event.spot_close,strikeStep,
-      {timestamp:event.at,valueOf:()=>0},options);
+      {timestamp:event.at,day:event.day},options);
      const spotQuote=spotByTime.get(event.at);
      if(!option||!spotQuote){missing++;continue}
      active={time:event.at,day,direction:event.direction,mode,symbol:option.symbol,
