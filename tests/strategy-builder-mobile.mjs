@@ -32,6 +32,24 @@ try {
         });
       } else await route.fulfill({ status: 400, contentType: 'application/json', body: '{"error":"No user-provided history"}' });
     });
+    await page.route('**/api/strategy-live?*', async route => {
+      const url = new URL(route.request().url());
+      const first = Date.now() - 150 * 300000;
+      const chart = Array.from({ length: 120 }, (_, i) => ({
+        time: new Date(first + i * 300000).toISOString(),
+        open: 100 + i * .2, high: 101 + i * .2,
+        low: 99 + i * .2, close: 100.5 + i * .2,
+        fast: i > 8 ? 100 + i * .2 : null, slow: i > 20 ? 99.8 + i * .2 : null
+      }));
+      await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({
+        pair: url.searchParams.get('pair'), name: 'BTC / USD', interval: url.searchParams.get('interval'),
+        fast: 9, slow: 21, source: 'Kraken public REST OHLC', fetched_at: new Date().toISOString(),
+        last_close: 124.3, data_age_seconds: 30, bars_available: 120,
+        last_completed_bar_utc: chart.at(-1).time,
+        indicator: { fast_ema: 123.8, slow_ema: 123.1, signal: 'NONE', trend: 'ABOVE', signal_bar_utc: chart.at(-1).time },
+        chart, monitoring: true, broker_orders: false, order_mode: 'READ_ONLY_OBSERVATION'
+      }) });
+    });
     await page.goto(base + '/algo.html', { waitUntil: 'domcontentloaded' });
     assert.equal(await page.locator('a[href="/strategy-builder.html"]').count(), 1, 'Existing desk must expose new workflow');
     await page.goto(base + '/strategy-builder.html', { waitUntil: 'domcontentloaded' });
@@ -58,6 +76,23 @@ try {
     await page.locator('#sbTheme').click();
     assert.equal(await page.locator('html').getAttribute('data-rf-theme'), 'dark');
     await page.screenshot({ path: 'artifacts/mobile/strategy-builder-dark-' + width + '.png', fullPage: true });
+    await page.locator('#sbLiveTab').click();
+    assert.equal(await page.locator('#sbBacktestPane').isHidden(), true);
+    assert.equal(await page.locator('#sbLivePane').isVisible(), true);
+    await page.locator('#sbLiveState[data-connected="true"]').waitFor({ timeout: 7000 });
+    assert.match(await page.locator('#sbLivePrice').textContent(), /124/);
+    assert.match(await page.locator('#sbMonitorDirection').textContent(), /Bullish/);
+    const liveMetrics = await page.evaluate(() => ({
+      scroll: document.documentElement.scrollWidth, viewport: document.documentElement.clientWidth,
+      switchWidth: document.querySelector('.sb-mode-switch').getBoundingClientRect().width
+    }));
+    assert.ok(liveMetrics.scroll <= width + 2,
+      'Live mode horizontal overflow: ' + JSON.stringify({ width, ...liveMetrics }));
+    await page.screenshot({ path: 'artifacts/mobile/strategy-live-dark-' + width + '.png', fullPage: true });
+    await page.locator('#sbBacktestTab').click();
+    assert.equal(await page.locator('#sbLivePane').isHidden(), true);
+    assert.equal(await page.locator('#sbBacktestPane').isVisible(), true);
+
     await context.close();
   }
   console.log('PASS: strategy builder mobile navigation, safe-area, source switches and dark theme at 320/375/390 CSS px');
