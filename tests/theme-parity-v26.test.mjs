@@ -13,7 +13,7 @@ test('all active Rangeform surfaces load one EquityClimb-inspired design layer l
   assert.match(head,/rangeform-design-v26\.css\?v=32/,'shared design missing: '+page);
   const cssLinks=[...head.matchAll(/href="(\/static\/[^"]+\.css\?v=[^"]+)"/g)].map(x=>x[1]);
   assert.match(cssLinks.at(-1),page==='v9.html'?/workspace-hub-v31\.css\?v=31/:/rangeform-design-v26\.css\?v=32/,'layout must override older page CSS: '+page);
-  assert.match(head,/manifest\.webmanifest\?v=32/,'missing common installed-app identity: '+page);
+  assert.ok(head.includes('manifest.webmanifest?v='+current),'missing current installed-app identity: '+page);
   assert.ok(head.includes('pwa-update-v'+current+'.js?v='+current),'stale release marker: '+page);
   assert.match(html,/name="theme-color" content="#f3f4f2"/);
  }

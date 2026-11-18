@@ -5,29 +5,32 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#f3f4f2">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<link rel="manifest" href="/manifest.webmanifest?v=32">
+<link rel="manifest" href="/manifest.webmanifest?v=37">
 <link rel="apple-touch-icon" href="/static/rangeform-official-icon.png">
 <title>Rangeform · Strategy Builder</title>
 <meta name="description" content="Write an EMA strategy in plain English, review testable rules, and backtest on your actual historical data. No orders.">
 <link rel="stylesheet" href="/static/theme-sync.css?v=2">
 <link rel="stylesheet" href="/static/strategy-builder.css?v=1">
 <link rel="stylesheet" href="/static/strategy-live.css?v=1">
+<link rel="stylesheet" href="/static/strategy-premium-v37.css?v=37">
 <link rel="stylesheet" href="/static/ios-statusbar-v22.css?v=22">
 <script src="/static/theme-sync.js?v=22" defer></script>
 <script src="/static/strategy-builder.js?v=1" type="module"></script>
 <script src="/static/strategy-live.js?v=1" type="module"></script>
-<script src="/static/pwa-update-v36.js?v=36" defer></script>
+<script src="/static/strategy-premium-v37.js?v=37" type="module"></script>
+<script src="/static/pwa-update-v37.js?v=37" defer></script>
 </head>
 <body>
 <header class="sb-header">
  <a class="sb-brand" href="/v9.html#overview"><img src="/static/rangeform-official-icon.png" alt="" width="33" height="33"><span>Rangeform<small>RESEARCH WORKSPACE</small></span></a>
  <nav aria-label="Workspace links"><a href="/algo.html">Algorithmic Desk</a><a href="/v9.html#studio">Research Studio</a><a href="/bot.html">Paper Bot</a></nav>
+ <button type="button" id="rfTopRecompute" class="rf-top-recompute" aria-label="Recompute strategy with verified historical data">Recompute</button>
  <button type="button" id="sbTheme" class="sb-theme" aria-label="Toggle light or dark mode">◐</button>
 </header>
 <main class="sb-wrap">
  <div class="sb-hero">
-  <div><p class="sb-eyebrow">STRATEGY WORKSHOP / RESEARCH ONLY</p><h1>From trading idea <em>to testable evidence.</em></h1><p>Describe an EMA strategy in ordinary English. Review the rules first, then backtest against real historical candles. No generated trading code is executed and no money can be traded here.</p></div>
-  <div class="sb-lock"><strong>SIMULATION ONLY</strong><span>No broker connection · No live orders · No option premium claims</span></div>
+  <div><p class="sb-eyebrow">RANGEFORM / OPTIONS STRATEGY LAB</p><h1>9/21 EMA <em>Crossover</em></h1><p>NIFTY options · backtest &amp; trade audit · only verified market history</p></div>
+  <div class="sb-lock"><strong>SIMULATION ONLY · RANGEFORM v37</strong><span id="rfDataCoverage">NIFTY history not loaded · Broker trading locked</span></div>
  </div>
  <section class="sb-mode-hero" aria-label="Choose strategy dashboard mode">
    <div class="sb-mode-switch" role="tablist" aria-label="Backtest or live market mode">
@@ -37,6 +40,50 @@
    <p class="sb-mode-caption" id="sbModeCaption">BACKTEST MODE · Use historical candles to test ideas before risking capital.</p>
  </section>
  <div id="sbBacktestPane" role="tabpanel" aria-labelledby="sbBacktestTab">
+
+ <section class="rf-toolbar" aria-label="NIFTY options strategy filters">
+  <div class="rf-control"><span>TIMEFRAME</span><div class="rf-timeframes"><button type="button" data-rf-tf="5">5m</button><button type="button" data-rf-tf="15" class="active">15m</button><button type="button" data-rf-tf="30">30m</button></div></div>
+  <label>MODE<select id="rfMode"><option value="itm5_buy">Deep ITM buy (ITM 5)</option><option value="atm_buy">ATM buy</option><option value="atm_sell">ATM sell</option></select></label>
+  <label>ENTRY FROM<select id="rfEntryFrom"><option>09:30</option><option>10:00</option><option>10:30</option></select></label>
+  <label>CUTOFF<select id="rfCutoff"><option>11:30</option><option>12:00</option><option>12:30</option><option>13:00</option><option>13:30</option><option>14:00</option><option selected>14:30</option></select></label>
+  <label>OUTCOME<select id="rfOutcome"><option value="all">All</option><option value="win">Wins</option><option value="loss">Losses</option></select></label>
+  <label>WHICH CROSS<select id="rfCross"><option value="all">Any</option><option value="1">1st</option><option value="2">2nd</option><option value="3">3rd+</option></select></label>
+  <label>WHIPSAW<select id="rfWhipsaw"><option value="all">Any</option><option value="yes">Yes</option><option value="no">No</option></select></label>
+  <label>FROM<input type="date" id="rfFrom"></label>
+  <label>TO<input type="date" id="rfTo"></label>
+  <button id="rfReset" class="rf-reset" type="button">Reset</button>
+ </section>
+ <section class="rf-kpis" aria-label="Verified option backtest results">
+  <article class="rf-kpi"><span>TOTAL TRADES</span><strong id="rfTotal">—</strong><small id="rfTotalSub">Awaiting real history</small></article>
+  <article class="rf-kpi"><span>WIN RATE</span><strong id="rfWin">—</strong><small id="rfWinSub">No historical trades</small></article>
+  <article class="rf-kpi"><span>NET PNL</span><strong id="rfNet">—</strong><small id="rfNetSub">After modeled charges</small></article>
+  <article class="rf-kpi"><span>GROSS PNL</span><strong id="rfGross">—</strong><small id="rfGrossSub">Before fees &amp; slippage</small></article>
+  <article class="rf-kpi"><span>PROFIT FACTOR</span><strong id="rfPf">—</strong><small id="rfPfSub">Wins divided by losses</small></article>
+  <article class="rf-kpi"><span>SELECTED TRADE</span><strong id="rfSelected">—</strong><small id="rfSelectedSub">Choose a completed trade</small></article>
+ </section>
+ <section class="rf-comparisons" aria-label="Compare NIFTY option execution modes">
+  <button type="button" class="rf-compare selected" data-rf-mode="itm5_buy"><div class="rf-compare-head"><strong>Deep ITM buy (ITM 5)</strong><b id="rfPnl-itm5_buy">—</b></div><small id="rfSub-itm5_buy">Real option premiums required</small><svg id="rfSpark-itm5_buy" viewBox="0 0 260 48" preserveAspectRatio="none" aria-label="No equity curve"></svg></button>
+  <button type="button" class="rf-compare" data-rf-mode="atm_buy"><div class="rf-compare-head"><strong>ATM buy</strong><b id="rfPnl-atm_buy">—</b></div><small id="rfSub-atm_buy">Real option premiums required</small><svg id="rfSpark-atm_buy" viewBox="0 0 260 48" preserveAspectRatio="none" aria-label="No equity curve"></svg></button>
+  <button type="button" class="rf-compare" data-rf-mode="atm_sell"><div class="rf-compare-head"><strong>ATM sell</strong><b id="rfPnl-atm_sell">—</b></div><small id="rfSub-atm_sell">Uncovered short · research only</small><svg id="rfSpark-atm_sell" viewBox="0 0 260 48" preserveAspectRatio="none" aria-label="No equity curve"></svg></button>
+ </section>
+ <section class="rf-audit" aria-label="Option trade explorer">
+  <div class="rf-trades-panel"><div class="rf-panel-head"><h2 id="rfTradeCount">Trades (—)</h2><div><button type="button" id="rfUp" aria-label="Previous trade">↑</button><button type="button" id="rfDown" aria-label="Next trade">↓</button></div></div><div id="rfTradeList" class="rf-trade-list"><p class="rf-empty">No option trades yet. Load real NIFTY spot and option contract history below to inspect every result.</p></div></div>
+  <div class="rf-detail-panel">
+   <div class="rf-metadata"><div><span>SYMBOL</span><strong id="rfSymbol">—</strong></div><div><span>DIRECTION</span><strong id="rfDirection">—</strong></div><div><span>NIFTY ENTRY → EXIT</span><strong id="rfSpot">—</strong></div><div><span>OPTION ENTRY → EXIT</span><strong id="rfOption">—</strong></div><div><span>TIME (IST)</span><strong id="rfTime">—</strong></div><div><span>EXPIRY / DTE</span><strong id="rfExpiry">—</strong></div><div><span>EXIT REASON</span><strong id="rfReason">—</strong></div><div><span>NET PNL</span><strong id="rfTradeNet">—</strong></div><div><span>FLAGS</span><strong id="rfFlag">—</strong></div></div>
+   <div class="rf-chart-panel"><div class="rf-panel-head"><h2 id="rfChartTitle">NIFTY spot · 15-minute EMA audit</h2><span class="rf-legend">EMA 9 · EMA 21 · Entry · Exit</span></div><div class="rf-chart-frame"><svg id="rfSpotChart" viewBox="0 0 800 260" preserveAspectRatio="none" role="img" aria-label="No verified NIFTY index history"></svg><p class="rf-empty" id="rfChartEmpty">Verified spot candles and trade markers will appear here.</p></div></div>
+   <div class="rf-cost-panel"><div class="rf-panel-head"><h2>Execution cost breakdown</h2><small>₹ INR</small></div><div id="rfCostRows"><p class="rf-empty">Select a completed trade to see brokerage, slippage, STT, exchange, SEBI, stamp duty, IPFT, GST and net P&amp;L.</p></div></div>
+  </div>
+ </section>
+ <div class="rf-config-strip"><span role="status" aria-live="polite" id="rfDataStatus">No real NIFTY options data loaded. No invented performance or transactions.</span><button type="button" id="rfConfigure">Configure strategy &amp; data ↓</button></div>
+ <details id="rfAdvanced" class="rf-advanced" open><summary>Historical data and strategy settings</summary>
+ <div class="rf-upload-section"><div><h3>NIFTY 1-minute market history</h3><p>Use verified Groww historical exports or your own licensed 1-minute spot and option candles. This is not a brokerage order form.</p>
+  <label>Spot CSV<input id="rfSpotFile" type="file" accept=".csv,text/csv"></label><code>timestamp,open,high,low,close,volume</code>
+  <label>Option contracts CSV<input id="rfOptionFile" type="file" accept=".csv,text/csv"></label><code>timestamp,symbol,expiry,strike,option_type,open,high,low,close,volume</code>
+  <div class="rf-upload-params"><label>Lot size<input id="rfLot" type="number" value="65" min="1" max="2000"></label><label>Lots<input id="rfLots" type="number" value="1" min="1" max="100"></label><label>Strike step<input id="rfStep" type="number" value="50" min="10" max="1000"></label><label>Slippage points<input id="rfSlip" type="number" value="0" step=".05" min="0" max="100"></label><label>Capital (₹, optional)<input id="rfCapital" type="number" min="1" max="1000000000" placeholder="For DD %" aria-label="Starting capital to express drawdown as percent"></label></div>
+  <button type="button" id="rfRun" class="sb-primary">Recompute all three options modes</button><p id="rfUploadStatus" role="status" aria-live="polite">Verified historical data is required. All brokerage orders remain locked.</p><p class="sb-muted">2026 Groww cost schedule is used as a comparison assumption; older exchange fees and contract lot sizes may differ. Execution is simulated at the next available one-minute open.</p></div>
+ <aside><h3>Your existing Rangeform tools</h3><p>The 11-role Claude AI desk, OpenAI Council, Chief Security Officer, paper bot, scanner and other research workspaces remain available.</p><a href="/agent-team.html">AI Agent Team</a><a href="/bot.html">Paper Trading Desk</a><a href="/algo.html">Algorithmic Desk</a><p class="sb-muted">Groww API token and TOTP secrets should never be entered here. Real brokerage execution needs separate owner authorization, static IP and reconciled risk controls.</p></aside></div>
+ </details>
+
  <div class="sb-grid">
   <section class="sb-card">
    <div class="sb-heading"><span class="sb-step">01</span><div><h2>Describe the strategy</h2><p>Start with the 9/21 EMA crossover demonstrated in the video. Session times are controlled by the fields below, even if different times appear in your description.</p></div></div>
@@ -84,6 +131,15 @@
  </section>
  </div>
  <section id="sbLivePane" role="tabpanel" aria-labelledby="sbLiveTab" hidden>
+
+ <section class="rf-live-gateway">
+  <div><p class="sb-eyebrow">NIFTY OPTIONS / CONNECTED TRADING</p><h2>Live strategy operation</h2><p>The same 9/21 EMA strategy can progress from historical validation to paper execution and, after separate broker approvals, real trading. Neither a broker session nor a NIFTY live feed is currently verified.</p></div>
+  <div class="rf-live-gates"><div><span>Groww historical &amp; live data</span><strong id="rfGrowwLiveStatus">Checking connection…</strong></div><div><span>Persistent NIFTY paper strategy</span><strong>Not enabled</strong></div><div><span>Real Groww order execution</span><strong class="rf-loss">Locked</strong></div></div>
+  <p class="sb-muted">A broker connection requires an authorized Groww API entitlement, account permissions, registered static IP, secured credentials, reliable fills/reconciliation and risk controls. No trading credentials should be entered in this page.</p>
+  <a href="/bot.html">Review existing autonomous paper bot</a>
+ </section>
+ <p class="rf-monitor-subhead">Separate market-data demonstration: BTC/USD and ETH/USD completed Kraken candles (read-only)</p>
+
    <div class="sb-live-rail">
      <div>
        <p class="sb-eyebrow">LIVE MARKET MONITOR · NO BROKER EXECUTION</p>

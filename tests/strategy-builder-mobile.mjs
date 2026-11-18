@@ -54,6 +54,18 @@ try {
     assert.equal(await page.locator('a[href="/strategy-builder.html"]').count(), 1, 'Existing desk must expose new workflow');
     await page.goto(base + '/strategy-builder.html', { waitUntil: 'domcontentloaded' });
     await page.locator('#sbRules strong').waitFor({ timeout: 5000 });
+    // New NIFTY premium dashboard must be the FIRST visible research workspace,
+    // with empty (not fictional) metrics and screenshot-inspired layout.
+    assert.equal(await page.locator('.rf-kpi').count(), 6);
+    assert.equal(await page.locator('.rf-compare').count(), 3);
+    assert.equal(await page.locator('#rfTotal').textContent(), '—');
+    assert.equal(await page.locator('#rfNet').textContent(), '—');
+    assert.equal(await page.locator('#rfAdvanced').evaluate(e => e.open), true);
+    assert.equal(await page.locator('#rfMode').inputValue(), 'itm5_buy');
+    await page.locator('[data-rf-tf="30"]').click();
+    assert.equal(await page.locator('[data-rf-tf="30"]').getAttribute('class'), 'active');
+    await page.locator('[data-rf-tf="15"]').click();
+
     const rect = await page.evaluate(() => {
       const heading = document.querySelector('h1')?.getBoundingClientRect();
       const brand = document.querySelector('.sb-brand')?.getBoundingClientRect();
@@ -76,6 +88,17 @@ try {
     await page.locator('#sbTheme').click();
     assert.equal(await page.locator('html').getAttribute('data-rf-theme'), 'dark');
     await page.screenshot({ path: 'artifacts/mobile/strategy-builder-dark-' + width + '.png', fullPage: true });
+    const rfPremium = await page.evaluate(() => ({
+      viewport: document.documentElement.clientWidth,
+      scrollWidth: document.documentElement.scrollWidth,
+      cardWidth: document.querySelector('.rf-kpi').getBoundingClientRect().width,
+      dataForm: document.querySelector('#rfSpotFile') !== null
+    }));
+    assert.ok(rfPremium.scrollWidth <= width + 2,
+      'NIFTY dashboard horizontal overflow: ' + JSON.stringify({width, ...rfPremium}));
+    assert.ok(rfPremium.cardWidth > 110, JSON.stringify({width, ...rfPremium}));
+    assert.ok(rfPremium.dataForm);
+
     await page.locator('#sbLiveTab').click();
     assert.equal(await page.locator('#sbBacktestPane').isHidden(), true);
     assert.equal(await page.locator('#sbLivePane').isVisible(), true);

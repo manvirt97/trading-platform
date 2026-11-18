@@ -1,7 +1,7 @@
 {
   "name": "Rangeform — Market Intelligence",
   "short_name": "Rangeform",
-  "description": "Rangeform market research, trade decisions and paper strategy workspace; evergreen Home Screen updates",
+  "description": "Rangeform verified market research, NIFTY options trade audit and paper strategy workspace; owner-controlled agents and PWA updates",
   "id": "/",
   "start_url": "/v9.html#overview",
   "scope": "/",
@@ -25,6 +25,17 @@
       "name": "Overview",
       "short_name": "Home",
       "url": "/v9.html#overview",
+      "icons": [
+        {
+          "src": "/static/rangeform-official-icon.png",
+          "sizes": "96x96"
+        }
+      ]
+    },
+    {
+      "name": "NIFTY Strategy Lab",
+      "short_name": "Strategy Lab",
+      "url": "/strategy-builder.html",
       "icons": [
         {
           "src": "/static/rangeform-official-icon.png",
