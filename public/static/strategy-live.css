@@ -37,3 +37,8 @@
 .sb-candle-body.sb-candle-down{fill:#d96a6a}
 .sb-entry-marker{stroke:#168c6a;stroke-width:2;stroke-dasharray:5 4}
 .sb-exit-marker{stroke:#c08338;stroke-width:2;stroke-dasharray:5 4}
+
+.sb-filter-toolbar{display:grid;grid-template-columns:1fr 1fr 1fr auto;align-items:end;gap:10px;padding:15px;border-radius:12px;border:1px solid var(--sb-line);background:var(--sb-input);margin-top:20px}
+.sb-filter-toolbar label{margin:0;font-size:11px}.sb-filter-toolbar .sb-secondary{height:44px}.sb-filter-toolbar p{grid-column:1/-1;margin:0}
+#sbTrades tr[tabindex="0"]{cursor:pointer}#sbTrades tr[tabindex="0"]:hover{background:var(--sb-input)}#sbTrades tr[tabindex="0"]:focus-visible{outline:2px solid var(--sb-accent);outline-offset:-3px}
+@media(max-width:650px){.sb-filter-toolbar{grid-template-columns:1fr 1fr}.sb-filter-toolbar .sb-secondary{grid-column:1/-1}.sb-filter-toolbar p{grid-column:1/-1}}
