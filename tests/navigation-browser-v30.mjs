@@ -14,7 +14,8 @@ try{
   await page.goto(base+'/v9.html#overview',{waitUntil:'domcontentloaded'});
   await page.locator('[data-section="overview"].visible').waitFor({timeout:8000});
   const launches=page.locator('.overview-launch');
-  assert.equal(await launches.count(),4);
+  assert.equal(await launches.count(),5);
+  assert.equal(await page.locator('a.overview-launch[href="/strategy-builder.html"]').count(),1);
   assert.equal(await page.locator('[data-section="overview"] .assistant-card').count(),0);
   const intro=await page.locator('[data-section="overview"]').boundingBox();
   assert.ok(intro?.height<(mobile?2100:1550),
