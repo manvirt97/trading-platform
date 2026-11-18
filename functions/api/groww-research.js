@@ -37,7 +37,7 @@ export function growwResearchRequest(input) {
     query = { exchange, underlying_symbol: underlying, expiry_date: expiry };
   } else {
     const segment = simple(input.segment, /^(CASH|FNO)$/, 'segment');
-    const symbol = simple(input.groww_symbol, /^[A-Z0-9-]{3,72}$/, 'instrument symbol');
+    const symbol = simple(input.groww_symbol, /^[A-Za-z0-9-]{3,72}$/, 'instrument symbol');
     const start = simple(input.start_time, /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/, 'start time');
     const end = simple(input.end_time, /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/, 'end time');
     const interval = simple(input.candle_interval, /^(1minute|2minute|3minute|5minute|10minute|15minute|30minute|1hour|4hour|1day)$/, 'candle interval');
@@ -143,7 +143,7 @@ export async function onRequestPost({ request, env = {} }) {
     } else {
       const contracts = data?.payload?.contracts;
       if (!Array.isArray(contracts) || contracts.length > 10000 ||
-        contracts.some(x => typeof x !== 'string' || !/^[A-Z0-9-]{3,72}$/.test(x)))
+        contracts.some(x => typeof x !== 'string' || !/^[A-Za-z0-9-]{3,72}$/.test(x)))
         throw Error('Invalid Groww contracts response');
       result = contracts;
     }
