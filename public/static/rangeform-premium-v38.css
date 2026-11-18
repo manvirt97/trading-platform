@@ -305,5 +305,5 @@ body[data-rf-ui="v38"] .rf-trade-row.active{
  }
 }
 
-body[data-rf-ui="v38"] .rf-suite-theme{position:absolute;top:7px;right:12px;border:1px solid var(--rf38-border);border-radius:8px;background:var(--rf38-soft);color:var(--rf38-ink);padding:6px 11px;cursor:pointer}
-body[data-rf-ui="v38"] .rf-suite-context:has(.rf-suite-theme){padding-right:40px}
+body[data-rf-ui="v38"] .rf-suite-theme{border:1px solid var(--rf38-border);border-radius:9px;background:var(--rf38-soft);color:var(--rf38-ink);padding:8px 11px;min-height:39px;cursor:pointer}
+html.rangeform-ios-standalone body[data-rf-ui="v38"] header.top{padding-top:max(58px,env(safe-area-inset-top,0px))}
