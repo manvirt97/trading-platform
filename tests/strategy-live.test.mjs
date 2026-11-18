@@ -96,7 +96,7 @@ test('centered Backtest/Live UI visibly distinguishes broker trading from market
   assert.match(html, /Broker order permissions/);
   assert.match(html, /Disabled/);
   assert.match(html, /sb-live-dot/);
-  assert.match(liveJs, /role/);
+  assert.match(liveJs, /aria-selected/);
   assert.match(liveJs, /visibilitychange/);
   assert.doesNotMatch(liveJs, /private\/AddOrder|\/api\/orders|submitOrder|placeOrder/);
 });
