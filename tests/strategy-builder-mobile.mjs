@@ -51,7 +51,8 @@ try {
       }) });
     });
     await page.goto(base + '/algo.html', { waitUntil: 'domcontentloaded' });
-    assert.equal(await page.locator('a[href="/strategy-builder.html"]').count(), 1, 'Existing desk must expose new workflow');
+    assert.ok(await page.locator('a[href="/strategy-builder.html"]').count() >= 1, 'Existing desk must expose new workflow');
+    assert.equal(await page.locator('#rfSuiteBar a[href="/strategy-builder.html"]').count(), 1, 'Shared quick-nav must contain one Strategy Lab shortcut');
     await page.goto(base + '/strategy-builder.html', { waitUntil: 'domcontentloaded' });
     await page.locator('#sbRules strong').waitFor({ timeout: 5000 });
     // New NIFTY premium dashboard must be the FIRST visible research workspace,

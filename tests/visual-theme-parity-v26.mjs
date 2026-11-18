@@ -42,10 +42,10 @@ try{
  }
  for(const s of samples){
   assert.equal(s.theme,'light',JSON.stringify(s));
-  assert.equal(s.bg,'rgb(243, 244, 242)',JSON.stringify(s));
-  assert.equal(s.nav,'rgb(247, 247, 244)',JSON.stringify(s));
+  assert.equal(s.bg,'rgb(238, 241, 249)',JSON.stringify(s));
+  assert.equal(s.nav,'rgb(249, 250, 255)',JSON.stringify(s));
   assert.equal(s.card,'rgb(255, 255, 255)',JSON.stringify(s));
-  assert.equal(s.accent,'#9c7a3c',JSON.stringify(s));
+  assert.equal(s.accent,'#3155ca',JSON.stringify(s));
   assert.match(s.font,/Inter|Segoe UI/);
  }
  // Use real UI toggle in the Day Trading Desk; dark mode must survive navigation.
@@ -61,10 +61,10 @@ try{
     card:card?getComputedStyle(card).backgroundColor:'',accent:body.getPropertyValue('--rf-highlight').trim()};
   },item.nav);
   assert.deepEqual(x,{
-   theme:'dark',bg:'rgb(14, 17, 22)',nav:'rgb(18, 23, 30)',card:'rgb(21, 26, 33)',accent:'#c9ab6c'
+   theme:'dark',bg:'rgb(16, 22, 32)',nav:'rgb(20, 28, 41)',card:'rgb(27, 37, 52)',accent:'#8da9ff'
   },'dark palette mismatch '+item.path);
   await page.screenshot({path:'artifacts/theme/'+item.path.replace(/[^a-z0-9]+/gi,'-')+'-dark.png',fullPage:false});
  }
- console.log('PASS: matching light and dark palettes, sidebar, cards, typography and theme persistence across four pages');
+ console.log('PASS: V38 premium blue/indigo design, unified light/dark rails, cards and theme persistence across four pages');
  await context.close();
 }finally{await browser.close()}

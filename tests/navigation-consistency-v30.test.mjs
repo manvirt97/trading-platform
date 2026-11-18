@@ -52,9 +52,12 @@ test('Browser Back, AI route and breadcrumb remain consistent across pages',()=>
  assert.match(js,/document\.scrollingElement\?\.scrollTo\(\{top:0,behavior:'instant'\}\)/);
  assert.match(js,/\$\('workspaceOverview'\)\?\.addEventListener\('click',\(\)=>setPage\('overview'\)\)/);
 });
-test('Focused V31 style is last, mobile-friendly and does not override topbar',()=>{
+test('Focused V31 style is retained before the shared V38 premium shell',()=>{
  const html=read('public/v9.html'),css=read('public/static/workspace-hub-v31.css');
  assert.match(html,/workspace-hub-v31\.css\?v=31/);
+ assert.match(html,/rangeform-premium-v38\.css\?v=38/);
+ assert.ok(html.indexOf('workspace-hub-v31.css?v=31')<html.indexOf('rangeform-premium-v38.css?v=38'));
+ assert.match(html,/rangeform-premium-v38\.js\?v=38/);
  assert.match(css,/\.overview-launcher/);
  assert.match(css,/\.scanner-mode-tabs/);
  assert.match(css,/@media\(max-width:600px\)/);

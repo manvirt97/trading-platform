@@ -40,6 +40,8 @@ jobs:
         run: node tests/visual-theme-parity-v26.mjs
       - name: Verify Strategy Builder iPhone layout, input and theme
         run: node tests/strategy-builder-mobile.mjs
+      - name: Verify common premium V38 style, navigation and iPhone pages
+        run: node tests/premium-workspace-browser-v38.mjs
       - name: Save cross-page light and dark screenshots
         if: always()
         uses: actions/upload-artifact@v4
