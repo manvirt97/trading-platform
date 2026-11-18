@@ -198,3 +198,8 @@ $('rfReset').addEventListener('click',()=>{
 });
 $('rfConfigure').addEventListener('click',()=>{$('rfAdvanced').open=true;$('rfAdvanced').scrollIntoView({block:'start',behavior:'smooth'})});
 $('rfRun').addEventListener('click',recompute);
+$('rfTopRecompute').addEventListener('click',()=>{
+ if($('rfSpotFile').files.length&&$('rfOptionFile').files.length){recompute();return}
+ $('rfAdvanced').open=true;$('rfAdvanced').scrollIntoView({block:'start',behavior:'smooth'});
+ text('rfUploadStatus','Choose verified NIFTY spot and option contract CSV files, then recompute.');
+});
