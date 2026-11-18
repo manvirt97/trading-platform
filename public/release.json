@@ -1,5 +1,5 @@
 {
-  "version": "37",
-  "build": "rangeform-v37-premium-nifty-options",
-  "description": "Premium NIFTY EMA dashboard on Home, 3-mode actual option-premium backtest, trade audit and preserved research agents. Brokerage execution disabled."
+  "version": "38",
+  "build": "rangeform-v38-unified-premium-workspace",
+  "description": "A single premium Rangeform design system across Overview, Strategy Lab, Algo, Paper, Agents, Ledger and Account. All existing execution safeguards remain."
 }
