@@ -1,5 +1,5 @@
 {
-  "version": "36",
-  "build": "rangeform-v36-strategy-workshop",
-  "description": "EMA Strategy Builder with historical CSV backtesting, assumptions and no brokerage execution"
+  "version": "37",
+  "build": "rangeform-v37-premium-nifty-options",
+  "description": "Premium NIFTY EMA dashboard on Home, 3-mode actual option-premium backtest, trade audit and preserved research agents. Brokerage execution disabled."
 }
