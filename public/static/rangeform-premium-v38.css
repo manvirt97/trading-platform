@@ -20,7 +20,7 @@ html[data-rf-theme="dark"]{
  --rf38-primary-soft:#243958;--rf38-positive:#72d2b1;--rf38-negative:#f2a0aa;
  --rf38-shadow:0 5px 22px rgba(0,0,0,.12);
 }
-body[data-rf-ui="v38"]{
+html body[data-rf-ui="v38"]{
  --bg:var(--rf38-canvas);--sidebar:var(--rf38-rail);
  --card:var(--rf38-surface);--panel:var(--rf38-surface);
  --panel2:var(--rf38-soft);--muted-card:var(--rf38-soft);
