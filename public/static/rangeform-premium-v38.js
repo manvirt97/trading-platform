@@ -49,6 +49,10 @@
    if (a.dataset.rfSuiteTarget === selected) a.setAttribute('aria-current','page');
    else a.removeAttribute('aria-current');
   });
+  // On iPhone, reveal the currently selected workspace in the horizontal rail.
+  // Scroll only the nav container, never the body or a user-editing form.
+  const active=nav.querySelector('[aria-current="page"]');
+  if(active)nav.scrollLeft=Math.max(0,active.offsetLeft-nav.offsetLeft-(nav.clientWidth-active.offsetWidth)/2);
  }
  function addMissingRailLinks(){
   // Make the SAME core destinations discoverable from all existing rail variants.
