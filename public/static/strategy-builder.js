@@ -19,9 +19,14 @@ function focusTrade(index) {
   }
   selectedTrade = Math.max(0, Math.min(index, trades.length - 1));
   const trade = trades[selectedTrade];
+  const audit = (lastResults.trade_audits || []).find(a =>
+    a.entry_time === trade.entry_time && a.exit_time === trade.exit_time);
+  drawEmaChart(byId('sbPriceChart'), audit?.candles || lastResults.price_chart);
+
   byId('sbTradeFocus').textContent = 'Trade ' + (selectedTrade + 1) + ' of ' + trades.length +
     ' · ' + trade.entry_time + ' → ' + trade.exit_time +
-    ' · net ' + String(trade.net_pnl);
+    ' · net ' + String(trade.net_pnl) +
+    (audit ? ' · ' + audit.sampling : ' · Detailed candles available for the last 40 trades');
   byId('sbPrevTrade').disabled = selectedTrade <= 0;
   byId('sbNextTrade').disabled = selectedTrade >= trades.length - 1;
 }
@@ -190,6 +195,15 @@ function render(data) {
   tbody.replaceChildren();
   for (const trade of data.trade_log.slice(-50).reverse()) {
     const tr = document.createElement('tr');
+    const fullIndex = data.trade_log.indexOf(trade);
+    tr.tabIndex = 0;
+    tr.title = 'Inspect candle chart for this trade';
+    tr.addEventListener('click', () => focusTrade(fullIndex));
+    tr.addEventListener('keydown', event => {
+      if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault(); focusTrade(fullIndex);
+      }
+    });
     for (const key of ['entry_time', 'exit_time', 'entry', 'exit', 'gross_pnl', 'net_pnl', 'exit_reason'])
       cell(tr, typeof trade[key] === 'number' ? fmt(trade[key]) : trade[key]);
     tbody.append(tr);
