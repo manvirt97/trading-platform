@@ -75,6 +75,26 @@ export function drawEmaChart(svg, chart) {
     const yy = top + (bottom - top) * k / 4;
     addSvg(svg, 'line', { x1: left, y1: yy, x2: right, y2: yy, class: 'sb-chart-grid' });
   }
+  // Compact high/low wicks and open/close bodies for genuine OHLC candles.
+  // On dense charts, use lines only to avoid misleading overlapping bodies.
+  if (chart.length <= 170) chart.forEach((bar, index) => {
+    if (![bar.open, bar.high, bar.low, bar.close].every(Number.isFinite)) return;
+    const cx = x(index);
+    const cls = bar.close >= bar.open ? 'sb-candle-up' : 'sb-candle-down';
+    addSvg(svg, 'line', { x1: cx, x2: cx, y1: y(bar.high), y2: y(bar.low),
+      class: 'sb-candle-wick ' + cls, 'vector-effect': 'non-scaling-stroke' });
+    const body = Math.max(1.3, Math.abs(y(bar.open) - y(bar.close)));
+    const width = Math.max(1.3, Math.min(10, 640 / chart.length));
+    addSvg(svg, 'rect', { x: cx - width / 2, y: Math.min(y(bar.open), y(bar.close)),
+      width, height: body, class: 'sb-candle-body ' + cls });
+    if (bar.entry_marker || bar.exit_marker) {
+      addSvg(svg, 'line', { x1: cx, y1: top, x2: cx, y2: bottom,
+        class: bar.entry_marker ? 'sb-entry-marker' : 'sb-exit-marker',
+        'vector-effect': 'non-scaling-stroke' });
+      addSvg(svg, 'text', { x: Math.max(8, Math.min(cx - 4, 754)), y: bar.entry_marker ? 24 : 40 },
+        bar.entry_marker ? 'ENTRY' : 'EXIT');
+    }
+  });
   for (const [key, css] of [['close', 'sb-chart-price'], ['fast', 'sb-chart-fast'], ['slow', 'sb-chart-slow']]) {
     let segment = [];
     const flush = () => {
