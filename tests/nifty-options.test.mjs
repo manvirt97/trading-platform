@@ -51,6 +51,10 @@ test('all three option modes use distinct strike/side conventions and recognized
  assert.ok(buy.every(t=>t.friction>0));
  assert.ok(buy.some(t=>t.strike!==atm[0].strike));
  assert.equal(DEFAULT_OPTION_COSTS.stt_after_2026_pct,.15);
+ const funded=runNiftyOptionBacktest({...fixtures(),initial_capital:100000});
+ assert.ok(Number.isFinite(funded.comparisons.itm5_buy.max_drawdown_pct));
+ const unfunded=runNiftyOptionBacktest(fixtures());
+ assert.equal(unfunded.comparisons.itm5_buy.max_drawdown_pct,null);
 });
 test('missing exact premium or corrupted option prices cannot become fabricated trades',()=>{
  const input=fixtures({days:3});
