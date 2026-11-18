@@ -10,7 +10,8 @@ test('Overview is a short launcher, scanner is next, and AI has its own page',()
  const ai=html.split('data-section="ai"')[1]?.split('data-section="daydesk"')[0]||'';
  assert.match(overview,/id="overviewScan"/);
  assert.match(overview,/class="overview-launcher"/);
- assert.equal((overview.match(/class="overview-launch(?: overview-launch-featured)?"/g)||[]).length,4);
+ assert.equal((overview.match(/class="overview-launch(?: overview-launch-featured)?"/g)||[]).length,5);
+ assert.match(overview,/href="\/strategy-builder.html"/);
  assert.match(overview,/id="overviewResults"/);
  assert.match(overview,/id="watchList"/);
  assert.match(overview,/class="overview-snapshot"/);
