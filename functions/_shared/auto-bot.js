@@ -18,6 +18,8 @@ export function signalFromBars(bars){
  if(!Array.isArray(bars)||bars.length<35)throw Error('At least 35 completed candles required');
  for(let i=0;i<bars.length;i++){
   if(!Number.isInteger(bars[i].time)||!finitePositive(bars[i].close)||(i&&bars[i].time<=bars[i-1].time))throw Error('Bad or unsorted candles');
+  // A five-minute EMA must not silently treat missing intervals as adjacent observations.
+  if(bars[i].time%300!==0||(i&&bars[i].time-bars[i-1].time!==300))throw Error('Incomplete five-minute candles');
  }
  const closes=bars.map(b=>n(b.close)),fast=ema(closes,DEFAULTS.fast),slow=ema(closes,DEFAULTS.slow);
  const last=bars.length-1,prev=last-1,above=fast[last]>slow[last],prior=fast[prev]>slow[prev];
