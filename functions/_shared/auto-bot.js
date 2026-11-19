@@ -34,7 +34,8 @@ export function inspectMarket(market,now=Date.now()){
  const bid=n(b.best_bid),ask=n(b.best_ask);
  if(!finitePositive(bid)||!finitePositive(ask)||bid>=ask||!Array.isArray(b.bids)||!Array.isArray(b.asks))throw Error('Invalid spot book');
  if(n(b.bids[0]?.[0])!==bid||n(b.asks[0]?.[0])!==ask)throw Error('Top-depth data disagrees with best quote');
- if(now-n(market.fetchedAt)>20000||n(market.fetchedAt)>now+3000)throw Error('Order book snapshot is stale');
+ const fetchedAt=n(market.fetchedAt);
+ if(!Number.isFinite(fetchedAt)||fetchedAt<=0||now-fetchedAt>20000||fetchedAt>now+3000)throw Error('Order book snapshot is stale or missing timestamp');
  const sig=signalFromBars(bars);
  const barAge=now-sig.barTime*1000;
  if(barAge<300000||barAge>1000000)throw Error('Completed five-minute candle is stale or not closed');
